@@ -1,0 +1,26 @@
+{
+  "name": "agentic-js",
+  "version": "0.1.0",
+  "description": "Agentic Engine Optimization (AEO) SDK — empower websites to broadcast searchable, structured capabilities to visiting browser agents via WebMCP-compatible JSON-RPC tool schemas",
+  "private": true,
+  "workspaces": [
+    "packages/types",
+    "packages/core",
+    "packages/plugins/*",
+    "packages/security"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "test": "vitest run",
+    "lint": "eslint packages --ext .ts",
+    "typecheck": "tsc -b --noEmit",
+    "clean": "tsc -b --clean"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "jsdom": "^29.1.1",
+    "typescript": "^5.7.0",
+    "vitest": "^2.0.0"
+  },
+  "license": "Apache-2.0"
+}
