@@ -1,0 +1,157 @@
+<style>
+  /* TechCrunch Daily — Blog Design */
+  .techcrunch {
+    font-family: var(--font-sans);
+    color: var(--text-primary);
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .blog-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: var(--space-md) 0; border-bottom: 1px solid var(--border);
+    margin-bottom: var(--space-lg);
+  }
+  .blog-logo { font-size: 22px; font-weight: 800; }
+  .blog-logo span { color: var(--accent); }
+  .blog-nav { display: flex; gap: var(--space-md); }
+  .blog-nav a {
+    color: var(--text-secondary); text-decoration: none;
+    font-size: 13px; font-weight: 500; transition: color var(--transition);
+  }
+  .blog-nav a:hover { color: var(--text-primary); }
+  .blog-search-section {
+    display: flex; gap: var(--space-sm); align-items: center;
+    padding: var(--space-md); background: var(--bg-tertiary);
+    border-radius: var(--radius); margin-bottom: var(--space-lg);
+  }
+  .blog-search-section input[type="search"] {
+    flex: 1; padding: 8px 12px; background: var(--bg-primary);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    color: var(--text-primary); font-size: 14px; outline: none;
+  }
+  .blog-search-section input[type="search"]:focus { border-color: var(--accent); }
+  .blog-search-section select {
+    padding: 8px 12px; background: var(--bg-primary);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    color: var(--text-primary); font-size: 13px; outline: none;
+  }
+  .blog-search-section select:focus { border-color: var(--accent); }
+  .article-card {
+    background: var(--bg-secondary); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: var(--space-md);
+    margin-bottom: var(--space-md);
+  }
+  .article-card h3 { font-size: 17px; margin-bottom: 4px; }
+  .article-card h3 a { color: var(--text-primary); text-decoration: none; }
+  .article-card h3 a:hover { color: var(--accent); }
+  .article-meta {
+    font-size: 12px; color: var(--text-muted); margin-bottom: var(--space-sm);
+  }
+  .article-excerpt { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+  .article-tags { display: flex; gap: var(--space-xs); margin-top: var(--space-sm); }
+  .tag {
+    padding: 2px 8px; background: var(--bg-tertiary);
+    border-radius: 4px; font-size: 11px; color: var(--text-muted);
+  }
+  .blog-forms-section {
+    display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);
+    margin-top: var(--space-xl); padding-top: var(--space-lg);
+    border-top: 1px solid var(--border);
+  }
+  .blog-form {
+    background: var(--bg-secondary); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: var(--space-md);
+  }
+  .blog-form h3 { font-size: 15px; margin-bottom: var(--space-md); }
+  .blog-form input, .blog-form textarea {
+    width: 100%; padding: 8px 10px; margin-bottom: var(--space-sm);
+    background: var(--bg-primary); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); color: var(--text-primary);
+    font-size: 13px; font-family: var(--font-sans); outline: none;
+  }
+  .blog-form textarea { resize: vertical; min-height: 80px; }
+  .blog-form input:focus, .blog-form textarea:focus { border-color: var(--accent); }
+  .blog-form button {
+    padding: 8px 20px; background: var(--accent); color: white;
+    border: none; border-radius: var(--radius-sm); font-size: 13px;
+    font-weight: 600; cursor: pointer; transition: all var(--transition);
+  }
+  .blog-form button:hover { background: var(--accent-hover); }
+  @media (max-width: 600px) { .blog-forms-section { grid-template-columns: 1fr; } }
+</style>
+
+<div class="techcrunch">
+  <header class="blog-header">
+    <div class="blog-logo">TechCrunch <span>Daily</span></div>
+    <nav class="blog-nav" role="navigation" aria-label="Main navigation">
+      <a href="/" aria-label="Home page">Home</a>
+      <a href="/articles" aria-label="Articles page">Articles</a>
+      <a href="/about" aria-label="About page">About</a>
+      <a href="/contact" aria-label="Contact page">Contact</a>
+    </nav>
+  </header>
+
+  <!-- Search & Filters — auto-inferred by aip.js -->
+  <form class="blog-search-section" role="search" aria-label="Search articles">
+    <input type="search" name="q" placeholder="Search articles..." aria-label="Search articles">
+    <select name="category" aria-label="Filter by category">
+      <option value="">All Categories</option>
+      <option value="ai-ml">AI &amp; Machine Learning</option>
+      <option value="web-dev">Web Development</option>
+      <option value="devops">DevOps &amp; Cloud</option>
+      <option value="ux-design">UX Design</option>
+      <option value="cybersecurity">Cybersecurity</option>
+    </select>
+    <select name="sort" aria-label="Sort articles">
+      <option value="newest">Newest First</option>
+      <option value="oldest">Oldest First</option>
+      <option value="popular">Most Popular</option>
+    </select>
+  </form>
+
+  <div class="article-card">
+    <h3><a href="/articles/agentic-web" aria-label="Read The Agentic Web Is Coming article">The Agentic Web Is Coming — Are You Ready?</a></h3>
+    <div class="article-meta">June 12, 2026 · 8 min read</div>
+    <p class="article-excerpt">AI agents are about to become the dominant consumers of the web. Here's what that means for website owners and how to prepare for the shift from human-first to agent-first design.</p>
+    <div class="article-tags"><span class="tag">AI/ML</span><span class="tag">Web Dev</span></div>
+  </div>
+
+  <div class="article-card">
+    <h3><a href="/articles/kubernetes-2026" aria-label="Read Kubernetes in 2026 article">Kubernetes in 2026: Wasm, eBPF, and the Death of YAML</a></h3>
+    <div class="article-meta">June 10, 2026 · 12 min read</div>
+    <p class="article-excerpt">The container orchestration landscape has shifted dramatically. WebAssembly, eBPF, and new declarative paradigms are reshaping how we deploy and manage workloads at scale.</p>
+    <div class="article-tags"><span class="tag">DevOps</span><span class="tag">Cloud</span></div>
+  </div>
+
+  <div class="article-card">
+    <h3><a href="/articles/css-has-layout" aria-label="Read CSS Has Changed Everything article">CSS :has() Changed Everything — Here's What You Missed</a></h3>
+    <div class="article-meta">June 8, 2026 · 6 min read</div>
+    <p class="article-excerpt">The :has() selector isn't just a parent selector — it's a paradigm shift in CSS architecture. Learn the patterns that are replacing JavaScript-heavy solutions.</p>
+    <div class="article-tags"><span class="tag">Web Dev</span><span class="tag">UX Design</span></div>
+  </div>
+
+  <div class="article-card">
+    <h3><a href="/articles/zero-trust-ai" aria-label="Read Zero Trust for AI Agents article">Zero Trust for AI Agents: Security Patterns for the Agentic Web</a></h3>
+    <div class="article-meta">June 5, 2026 · 10 min read</div>
+    <p class="article-excerpt">When any website visitor could be an AI agent, traditional security models break down. Here's how to implement zero-trust architectures that protect both humans and agents.</p>
+    <div class="article-tags"><span class="tag">Cybersecurity</span><span class="tag">AI/ML</span></div>
+  </div>
+
+  <div class="blog-forms-section">
+    <!-- Newsletter form — data-aip-confirm marks as HIGH RISK -->
+    <form class="blog-form" data-aip-confirm="true" action="/newsletter/subscribe" aria-label="Newsletter signup">
+      <h3>📬 Newsletter</h3>
+      <input type="email" name="email" placeholder="your@email.com" required aria-label="Email address for newsletter">
+      <button type="submit">Subscribe</button>
+    </form>
+
+    <!-- Contact form — data-aip-confirm marks as HIGH RISK -->
+    <form class="blog-form" data-aip-confirm="true" action="/contact/submit" aria-label="Contact form">
+      <h3>✉️ Contact Us</h3>
+      <input type="text" name="name" placeholder="Your name" required aria-label="Your name">
+      <input type="email" name="email" placeholder="your@email.com" required aria-label="Your email">
+      <textarea name="message" placeholder="Your message..." required aria-label="Your message"></textarea>
+      <button type="submit">Send Message</button>
+    </form>
+  </div>
+</div>

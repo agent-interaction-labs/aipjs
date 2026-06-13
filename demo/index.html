@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>aip.js — Agentic Engine Optimization Demo</title>
+  <link rel="stylesheet" href="framework/styles.css">
+</head>
+<body>
+
+  <!-- Demo shell mount point -->
+  <div id="app"></div>
+
+  <!-- ═══ HTML Templates (loaded by scenario modules) ═══ -->
+
+  <!-- General Website scenario template -->
+  <template id="general-template"><style>
+  /* TechCrunch Daily — Blog Design */
+  .techcrunch {
+    font-family: var(--font-sans);
+    color: var(--text-primary);
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .blog-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: var(--space-md) 0; border-bottom: 1px solid var(--border);
+    margin-bottom: var(--space-lg);
+  }
+  .blog-logo { font-size: 22px; font-weight: 800; }
+  .blog-logo span { color: var(--accent); }
+  .blog-nav { display: flex; gap: var(--space-md); }
+  .blog-nav a {
+    color: var(--text-secondary); text-decoration: none;
+    font-size: 13px; font-weight: 500; transition: color var(--transition);
+  }
+  .blog-nav a:hover { color: var(--text-primary); }
+  .blog-search-section {
+    display: flex; gap: var(--space-sm); align-items: center;
+    padding: var(--space-md); background: var(--bg-tertiary);
+    border-radius: var(--radius); margin-bottom: var(--space-lg);
+  }
+  .blog-search-section input[type="search"] {
+    flex: 1; padding: 8px 12px; background: var(--bg-primary);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    color: var(--text-primary); font-size: 14px; outline: none;
+  }
+  .blog-search-section input[type="search"]:focus { border-color: var(--accent); }
+  .blog-search-section select {
+    padding: 8px 12px; background: var(--bg-primary);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    color: var(--text-primary); font-size: 13px; outline: none;
+  }
+  .blog-search-section select:focus { border-color: var(--accent); }
+  .article-card {
+    background: var(--bg-secondary); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: var(--space-md);
+    margin-bottom: var(--space-md);
+  }
+  .article-card h3 { font-size: 17px; margin-bottom: 4px; }
+  .article-card h3 a { color: var(--text-primary); text-decoration: none; }
+  .article-card h3 a:hover { color: var(--accent); }
+  .article-meta {
+    font-size: 12px; color: var(--text-muted); margin-bottom: var(--space-sm);
+  }
+  .article-excerpt { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+  .article-tags { display: flex; gap: var(--space-xs); margin-top: var(--space-sm); }
+  .tag {
+    padding: 2px 8px; background: var(--bg-tertiary);
+    border-radius: 4px; font-size: 11px; color: var(--text-muted);
+  }
+  .blog-forms-section {
+    display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);
+    margin-top: var(--space-xl); padding-top: var(--space-lg);
+    border-top: 1px solid var(--border);
+  }
+  .blog-form {
+    background: var(--bg-secondary); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: var(--space-md);
+  }
+  .blog-form h3 { font-size: 15px; margin-bottom: var(--space-md); }
+  .blog-form input, .blog-form textarea {
+    width: 100%; padding: 8px 10px; margin-bottom: var(--space-sm);
+    background: var(--bg-primary); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); color: var(--text-primary);
+    font-size: 13px; font-family: var(--font-sans); outline: none;
+  }
+  .blog-form textarea { resize: vertical; min-height: 80px; }
+  .blog-form input:focus, .blog-form textarea:focus { border-color: var(--accent); }
+  .blog-form button {
+    padding: 8px 20px; background: var(--accent); color: white;
+    border: none; border-radius: var(--radius-sm); font-size: 13px;
+    font-weight: 600; cursor: pointer; transition: all var(--transition);
+  }
+  .blog-form button:hover { background: var(--accent-hover); }
+  @media (max-width: 600px) { .blog-forms-section { grid-template-columns: 1fr; } }
+</style>
+
+<div class="techcrunch">
+  <header class="blog-header">
+    <div class="blog-logo">TechCrunch <span>Daily</span></div>
+    <nav class="blog-nav" role="navigation" aria-label="Main navigation">
+      <a href="/">Home</a>
+      <a href="/articles">Articles</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+    </nav>
+  </header>
+
+  <form class="blog-search-section" role="search" aria-label="Search articles">
+    <input type="search" name="q" placeholder="Search articles..." aria-label="Search articles">
+    <select name="category" aria-label="Filter by category">
+      <option value="">All Categories</option>
+      <option value="ai-ml">AI &amp; Machine Learning</option>
+      <option value="web-dev">Web Development</option>
+      <option value="devops">DevOps &amp; Cloud</option>
+      <option value="ux-design">UX Design</option>
+      <option value="cybersecurity">Cybersecurity</option>
+    </select>
+    <select name="sort" aria-label="Sort articles">
+      <option value="newest">Newest First</option>
+      <option value="oldest">Oldest First</option>
+      <option value="popular">Most Popular</option>
+    </select>
+  </form>
+
+  <div class="article-card"><h3><a href="/articles/agentic-web">The Agentic Web Is Coming — Are You Ready?</a></h3><div class="article-meta">June 12, 2026 · 8 min read</div><p class="article-excerpt">AI agents are about to become the dominant consumers of the web. Here's what that means for website owners and how to prepare for the shift from human-first to agent-first design.</p><div class="article-tags"><span class="tag">AI/ML</span><span class="tag">Web Dev</span></div></div>
+  <div class="article-card"><h3><a href="/articles/kubernetes-2026">Kubernetes in 2026: Wasm, eBPF, and the Death of YAML</a></h3><div class="article-meta">June 10, 2026 · 12 min read</div><p class="article-excerpt">The container orchestration landscape has shifted dramatically. WebAssembly, eBPF, and new declarative paradigms are reshaping how we deploy and manage workloads.</p><div class="article-tags"><span class="tag">DevOps</span><span class="tag">Cloud</span></div></div>
+  <div class="article-card"><h3><a href="/articles/css-has-layout">CSS :has() Changed Everything — Here's What You Missed</a></h3><div class="article-meta">June 8, 2026 · 6 min read</div><p class="article-excerpt">The :has() selector isn't just a parent selector — it's a paradigm shift in CSS architecture. Learn the patterns that are replacing JavaScript-heavy solutions.</p><div class="article-tags"><span class="tag">Web Dev</span><span class="tag">UX Design</span></div></div>
+  <div class="article-card"><h3><a href="/articles/zero-trust-ai">Zero Trust for AI Agents: Security Patterns for the Agentic Web</a></h3><div class="article-meta">June 5, 2026 · 10 min read</div><p class="article-excerpt">When any website visitor could be an AI agent, traditional security models break down. Here's how to implement zero-trust architectures that protect both humans and agents.</p><div class="article-tags"><span class="tag">Cybersecurity</span><span class="tag">AI/ML</span></div></div>
+
+  <div class="blog-forms-section">
+    <form class="blog-form" data-aip-confirm="true" action="/newsletter/subscribe" aria-label="Newsletter signup">
+      <h3>📬 Newsletter</h3>
+      <input type="email" name="email" placeholder="your@email.com" required aria-label="Email address for newsletter">
+      <button type="submit">Subscribe</button>
+    </form>
+    <form class="blog-form" data-aip-confirm="true" action="/contact/submit" aria-label="Contact form">
+      <h3>✉️ Contact Us</h3>
+      <input type="text" name="name" placeholder="Your name" required aria-label="Your name">
+      <input type="email" name="email" placeholder="your@email.com" required aria-label="Your email">
+      <textarea name="message" placeholder="Your message..." required aria-label="Your message"></textarea>
+      <button type="submit">Send Message</button>
+    </form>
+  </div>
+</div>
+</template>
+
+  <!-- E-Commerce scenario template -->
+  <template id="ecommerce-template"><style>
+  /* ── NovaStore Design System ───────────────────────────────────────── */
+  .novastore {
+    font-family: var(--font-sans);
+    color: var(--text-primary);
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .store-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md) 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: var(--space-lg);
+  }
+  .store-logo {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+  .store-spacer { flex: 1; }
+  .store-cart {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: 6px 14px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius);
+    font-size: 14px;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+  }
+  .store-cart .cart-count {
+    background: var(--accent);
+    color: white;
+    padding: 1px 7px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .store-checkout-btn {
+    padding: 8px 18px;
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .store-checkout-btn:hover { filter: brightness(1.1); }
+  .store-search-bar {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: center;
+    padding: var(--space-md);
+    background: var(--bg-tertiary);
+    border-radius: var(--radius);
+    margin-bottom: var(--space-lg);
+    flex-wrap: wrap;
+  }
+  .store-search-bar input[type="search"] {
+    flex: 1;
+    min-width: 180px;
+    padding: 8px 12px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 14px;
+    outline: none;
+  }
+  .store-search-bar input[type="search"]:focus { border-color: var(--accent); }
+  .store-search-bar select {
+    padding: 8px 12px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 13px;
+    outline: none;
+  }
+  .store-search-bar select:focus { border-color: var(--accent); }
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .filter-group input[type="range"] {
+    width: 100px;
+    accent-color: var(--accent);
+  }
+  .price-label {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--green);
+    min-width: 50px;
+  }
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: 12px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--space-md);
+  }
+  .product-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+    display: flex;
+    flex-direction: column;
+  }
+  .product-image {
+    height: 100px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    margin-bottom: var(--space-sm);
+  }
+  .product-card h3 {
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+  .product-card .desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: var(--space-sm);
+    flex: 1;
+  }
+  .product-card .price {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--green);
+    margin-bottom: 4px;
+  }
+  .product-card .rating {
+    color: var(--amber);
+    font-size: 13px;
+    margin-bottom: var(--space-sm);
+  }
+  .product-card button {
+    padding: 8px 0;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    width: 100%;
+  }
+  .product-card button:hover { background: var(--accent-hover); }
+</style>
+
+<div class="novastore">
+  <header class="store-header">
+    <div class="store-logo"><span class="logo-icon">✦</span> NovaStore</div>
+    <div class="store-spacer"></div>
+    <div class="store-cart">🛒 Cart <span class="cart-count">0</span></div>
+    <form action="/cart/checkout" style="display:inline;">
+      <button type="submit" class="store-checkout-btn">Checkout</button>
+    </form>
+  </header>
+
+  <form class="store-search-bar" role="search" aria-label="Search products">
+    <input type="search" name="q" placeholder="Search products..." aria-label="Search products">
+    <select name="category" aria-label="Filter by category">
+      <option value="">All</option>
+      <option value="electronics">Electronics</option>
+      <option value="clothing">Clothing</option>
+      <option value="home">Home &amp; Garden</option>
+      <option value="sports">Sports</option>
+    </select>
+    <div class="filter-group">
+      <label>Max $</label>
+      <input type="range" name="maxPrice" min="0" max="1000" value="1000">
+      <span class="price-label">$1000</span>
+    </div>
+    <label class="checkbox-label">
+      <input type="checkbox" name="inStock" checked>
+      In Stock Only
+    </label>
+    <select name="sort" aria-label="Sort products">
+      <option value="relevance">Relevance</option>
+      <option value="price_asc">Price: Low–High</option>
+      <option value="price_desc">Price: High–Low</option>
+      <option value="newest">Newest</option>
+      <option value="rating">Top Rated</option>
+    </select>
+  </form>
+
+  <div class="product-grid">
+    <div class="product-card"><div class="product-image">🎧</div><h3>Wireless Headphones Pro</h3><div class="desc">Active noise cancelling, 30hr battery, premium sound</div><div class="price">$149.99</div><div class="rating">★★★★☆ 4.2</div><button type="submit" form="add-cart-1">Add to Cart</button><form id="add-cart-1" action="/cart/add" style="display:none"><input type="hidden" name="product_id" value="WH-001"><input type="hidden" name="quantity" value="1"></form></div>
+    <div class="product-card"><div class="product-image">⌚</div><h3>Smart Watch X</h3><div class="desc">Health tracking, GPS, 7-day battery, always-on display</div><div class="price">$299.99</div><div class="rating">★★★★★ 4.8</div><button type="submit" form="add-cart-2">Add to Cart</button><form id="add-cart-2" action="/cart/add" style="display:none"><input type="hidden" name="product_id" value="SW-002"><input type="hidden" name="quantity" value="1"></form></div>
+    <div class="product-card"><div class="product-image">👟</div><h3>Running Shoes Ultra</h3><div class="desc">Carbon plate, breathable mesh, sizes 7–13</div><div class="price">$129.99</div><div class="rating">★★★★☆ 4.5</div><button type="submit" form="add-cart-3">Add to Cart</button><form id="add-cart-3" action="/cart/add" style="display:none"><input type="hidden" name="product_id" value="RS-003"><input type="hidden" name="quantity" value="1"></form></div>
+    <div class="product-card"><div class="product-image">🪑</div><h3>Ergonomic Desk Chair</h3><div class="desc">Lumbar support, adjustable armrests, mesh back</div><div class="price">$449.99</div><div class="rating">★★★★☆ 4.3</div><button type="submit" form="add-cart-4">Add to Cart</button><form id="add-cart-4" action="/cart/add" style="display:none"><input type="hidden" name="product_id" value="DC-004"><input type="hidden" name="quantity" value="1"></form></div>
+    <div class="product-card"><div class="product-image">📷</div><h3>4K Webcam Pro</h3><div class="desc">Auto-framing, low-light correction, dual mic</div><div class="price">$89.99</div><div class="rating">★★★★☆ 4.1</div><button type="submit" form="add-cart-5">Add to Cart</button><form id="add-cart-5" action="/cart/add" style="display:none"><input type="hidden" name="product_id" value="WC-005"><input type="hidden" name="quantity" value="1"></form></div>
+    <div class="product-card"><div class="product-image">⌨️</div><h3>Mechanical Keyboard RGB</h3><div class="desc">Cherry MX switches, per-key RGB, aluminum frame</div><div class="price">$159.99</div><div class="rating">★★★★★ 4.7</div><button type="submit" form="add-cart-6">Add to Cart</button><form id="add-cart-6" action="/cart/add" style="display:none"><input type="hidden" name="product_id" value="KB-006"><input type="hidden" name="quantity" value="1"></form></div>
+  </div>
+</div>
+</template>
+
+  <!-- ═══ Main Script ═══ -->
+  <script type="module">
+    import { createAgentTerminal } from './framework/terminal.js';
+    import { createDemo } from './framework/harness.js';
+    import { generalScenario } from './scenarios/general.js';
+    import { ecommerceScenario } from './scenarios/ecommerce.js';
+
+    // Create terminal in a temporary container — harness moves it
+    const temp = document.createElement('div');
+    const terminal = createAgentTerminal(temp);
+
+    // Create demo
+    const demo = createDemo({
+      container: '#app',
+      scenarios: {
+        general: generalScenario,
+        ecommerce: ecommerceScenario,
+      },
+      terminal,
+      defaultScenario: 'general',
+      defaultMode: 'auto-inference',
+    });
+
+    // Expose for debugging
+    window.__demo = demo;
+  </script>
+</body>
+</html>

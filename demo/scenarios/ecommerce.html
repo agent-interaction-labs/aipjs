@@ -1,0 +1,439 @@
+<style>
+  /* ── NovaStore Design System ───────────────────────────────────────── */
+  .novastore {
+    font-family: var(--font-sans);
+    color: var(--text-primary);
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  /* ── Header ────────────────────────────────────────────────────────── */
+  .store-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md) 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: var(--space-lg);
+  }
+
+  .store-logo {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .store-logo .logo-icon {
+    font-size: 24px;
+  }
+
+  .store-header-spacer {
+    flex: 1;
+  }
+
+  .cart-icon {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    padding: 6px 12px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .cart-icon:hover {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+  }
+
+  .cart-count {
+    background: var(--accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn-checkout {
+    padding: 8px 18px;
+    background: var(--green);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .btn-checkout:hover {
+    background: #059669;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  }
+
+  /* ── Search & Filters ───────────────────────────────────────────────── */
+  .store-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+    padding: var(--space-md);
+    background: var(--bg-secondary);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    align-items: center;
+  }
+
+  .search-input {
+    flex: 1 1 180px;
+    min-width: 160px;
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    outline: none;
+    transition: border-color var(--transition);
+  }
+
+  .search-input:focus {
+    border-color: var(--accent);
+  }
+
+  .search-input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .filter-select {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .filter-select:focus {
+    border-color: var(--accent);
+  }
+
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .price-range-wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  .price-range-wrapper input[type="range"] {
+    width: 100px;
+    accent-color: var(--accent);
+  }
+
+  .price-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    min-width: 50px;
+    text-align: right;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .checkbox-label input[type="checkbox"] {
+    accent-color: var(--accent);
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+  }
+
+  /* ── Product Grid ───────────────────────────────────────────────────── */
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--space-md);
+  }
+
+  .product-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    transition: border-color var(--transition), box-shadow var(--transition);
+  }
+
+  .product-card:hover {
+    border-color: var(--border-light);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  }
+
+  .product-image {
+    width: 100%;
+    height: 140px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    margin-bottom: var(--space-sm);
+  }
+
+  .product-card h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+
+  .product-card .product-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-sm);
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .product-card .product-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-sm);
+  }
+
+  .product-card .price {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--green);
+    font-family: var(--font-mono);
+  }
+
+  .product-card .rating {
+    font-size: 13px;
+    color: var(--amber);
+    letter-spacing: 1px;
+  }
+
+  .btn-add-cart {
+    width: 100%;
+    padding: 10px 16px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .btn-add-cart:hover {
+    background: var(--accent-hover);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+    transform: translateY(-1px);
+  }
+</style>
+
+<div class="novastore">
+  <!-- ── Header ──────────────────────────────────────────────────────── -->
+  <header class="store-header">
+    <div class="store-logo">
+      <span class="logo-icon">✦</span>
+      NovaStore
+    </div>
+    <div class="store-header-spacer"></div>
+    <div class="cart-icon">
+      🛒 <span class="cart-count">0</span>
+    </div>
+    <form action="/cart/checkout" method="post">
+      <button type="submit" class="btn-checkout">Checkout</button>
+    </form>
+  </header>
+
+  <!-- ── Search & Filters ────────────────────────────────────────────── -->
+  <div class="store-filters">
+    <input
+      type="search"
+      name="q"
+      placeholder="Search products..."
+      aria-label="Search products"
+      class="search-input"
+    />
+
+    <select name="category" aria-label="Filter by category" class="filter-select">
+      <option value="">All</option>
+      <option value="electronics">Electronics</option>
+      <option value="clothing">Clothing</option>
+      <option value="home-garden">Home &amp; Garden</option>
+      <option value="sports">Sports</option>
+    </select>
+
+    <div class="filter-group">
+      <div class="price-range-wrapper">
+        <label for="maxPrice" class="checkbox-label" style="white-space:nowrap;">Max $</label>
+        <input type="range" name="maxPrice" id="maxPrice" min="0" max="1000" value="1000" aria-label="Maximum price">
+        <span class="price-label" id="price-value">$1000</span>
+      </div>
+    </div>
+
+    <div class="checkbox-label">
+      <input type="checkbox" name="inStock" id="inStock">
+      <label for="inStock">In Stock Only</label>
+    </div>
+
+    <select name="sort" aria-label="Sort products" class="filter-select">
+      <option value="relevance">Relevance</option>
+      <option value="price-asc">Price: Low to High</option>
+      <option value="price-desc">Price: High to Low</option>
+      <option value="newest">Newest</option>
+      <option value="rating">Top Rated</option>
+    </select>
+  </div>
+
+  <!-- ── Product Grid ────────────────────────────────────────────────── -->
+  <div class="product-grid">
+
+    <!-- Product 1: Wireless Headphones Pro -->
+    <div class="product-card">
+      <div class="product-image">🎧</div>
+      <h3>Wireless Headphones Pro</h3>
+      <p class="product-desc">Premium noise-cancelling headphones with 30-hour battery life and spatial audio support.</p>
+      <div class="product-meta">
+        <div class="price">$149.99</div>
+        <div class="rating">★★★★☆</div>
+      </div>
+      <form action="/cart/add" method="post">
+        <input type="hidden" name="productId" value="WH-001">
+        <input type="hidden" name="quantity" value="1">
+        <button type="submit" class="btn-add-cart">Add to Cart</button>
+      </form>
+    </div>
+
+    <!-- Product 2: Smart Watch X -->
+    <div class="product-card">
+      <div class="product-image">⌚</div>
+      <h3>Smart Watch X</h3>
+      <p class="product-desc">Advanced fitness tracking, heart rate monitor, GPS, and a vibrant always-on display.</p>
+      <div class="product-meta">
+        <div class="price">$299.99</div>
+        <div class="rating">★★★★★</div>
+      </div>
+      <form action="/cart/add" method="post">
+        <input type="hidden" name="productId" value="SW-002">
+        <input type="hidden" name="quantity" value="1">
+        <button type="submit" class="btn-add-cart">Add to Cart</button>
+      </form>
+    </div>
+
+    <!-- Product 3: Running Shoes Ultra -->
+    <div class="product-card">
+      <div class="product-image">👟</div>
+      <h3>Running Shoes Ultra</h3>
+      <p class="product-desc">Lightweight, responsive cushioning with breathable mesh upper. Built for speed.</p>
+      <div class="product-meta">
+        <div class="price">$129.99</div>
+        <div class="rating">★★★★☆</div>
+      </div>
+      <form action="/cart/add" method="post">
+        <input type="hidden" name="productId" value="RS-003">
+        <input type="hidden" name="quantity" value="1">
+        <button type="submit" class="btn-add-cart">Add to Cart</button>
+      </form>
+    </div>
+
+    <!-- Product 4: Ergonomic Desk Chair -->
+    <div class="product-card">
+      <div class="product-image">🪑</div>
+      <h3>Ergonomic Desk Chair</h3>
+      <p class="product-desc">Adjustable lumbar support, breathable mesh back, and 4D armrests for all-day comfort.</p>
+      <div class="product-meta">
+        <div class="price">$449.99</div>
+        <div class="rating">★★★★★</div>
+      </div>
+      <form action="/cart/add" method="post">
+        <input type="hidden" name="productId" value="DC-004">
+        <input type="hidden" name="quantity" value="1">
+        <button type="submit" class="btn-add-cart">Add to Cart</button>
+      </form>
+    </div>
+
+    <!-- Product 5: 4K Webcam -->
+    <div class="product-card">
+      <div class="product-image">📷</div>
+      <h3>4K Webcam</h3>
+      <p class="product-desc">Ultra HD video with auto-framing, built-in ring light, and dual noise-cancelling mics.</p>
+      <div class="product-meta">
+        <div class="price">$89.99</div>
+        <div class="rating">★★★☆☆</div>
+      </div>
+      <form action="/cart/add" method="post">
+        <input type="hidden" name="productId" value="WC-005">
+        <input type="hidden" name="quantity" value="1">
+        <button type="submit" class="btn-add-cart">Add to Cart</button>
+      </form>
+    </div>
+
+    <!-- Product 6: Mechanical Keyboard RGB -->
+    <div class="product-card">
+      <div class="product-image">⌨️</div>
+      <h3>Mechanical Keyboard RGB</h3>
+      <p class="product-desc">Cherry MX switches, per-key RGB lighting, aluminum frame, and detachable USB-C cable.</p>
+      <div class="product-meta">
+        <div class="price">$159.99</div>
+        <div class="rating">★★★★☆</div>
+      </div>
+      <form action="/cart/add" method="post">
+        <input type="hidden" name="productId" value="KB-006">
+        <input type="hidden" name="quantity" value="1">
+        <button type="submit" class="btn-add-cart">Add to Cart</button>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Live price range display
+  (function() {
+    var range = document.getElementById('maxPrice');
+    var label = document.getElementById('price-value');
+    if (range && label) {
+      range.addEventListener('input', function() {
+        label.textContent = '$' + this.value;
+      });
+    }
+  })();
+</script>
