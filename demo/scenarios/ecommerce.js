@@ -3,7 +3,7 @@
    Demonstrates auto-inference, HIGH RISK mutation classification, and HITL
    ═══════════════════════════════════════════════════════════════════════════ */
 
-import { AIP, registerSearch, registerAction } from '../../packages/core/dist/index.js';
+import { AIP, registerSearch, registerAction } from '../vendor/bundle-entry.mjs';
 
 // Shared reference so securityPanel can access the aip instance
 let __aipInstance = null;

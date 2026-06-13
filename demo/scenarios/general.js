@@ -4,7 +4,7 @@
    plus HITL on newsletter and contact forms.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-import { AIP } from '../../packages/core/dist/index.js';
+import { AIP } from '../vendor/bundle-entry.mjs';
 
 let __aipInstance = null;
 
