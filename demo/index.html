@@ -383,29 +383,38 @@
 
   <!-- ═══ Main Script ═══ -->
   <script type="module">
-    import { createAgentTerminal } from './framework/terminal.js';
-    import { createDemo } from './framework/harness.js';
-    import { generalScenario } from './scenarios/general.js';
-    import { ecommerceScenario } from './scenarios/ecommerce.js';
+    // Show loading state immediately
+    const app = document.getElementById('app');
+    app.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#e4e7ed;font-family:system-ui,sans-serif;font-size:16px;">Loading demo...</div>`;
 
-    // Create terminal in a temporary container — harness moves it
-    const temp = document.createElement('div');
-    const terminal = createAgentTerminal(temp);
+    try {
+      const { createAgentTerminal } = await import('./framework/terminal.js');
+      const { createDemo } = await import('./framework/harness.js');
+      const { generalScenario } = await import('./scenarios/general.js');
+      const { ecommerceScenario } = await import('./scenarios/ecommerce.js');
 
-    // Create demo
-    const demo = createDemo({
-      container: '#app',
-      scenarios: {
-        general: generalScenario,
-        ecommerce: ecommerceScenario,
-      },
-      terminal,
-      defaultScenario: 'general',
-      defaultMode: 'auto-inference',
-    });
+      const temp = document.createElement('div');
+      const terminal = createAgentTerminal(temp);
 
-    // Expose for debugging
-    window.__demo = demo;
+      const demo = createDemo({
+        container: '#app',
+        scenarios: {
+          general: generalScenario,
+          ecommerce: ecommerceScenario,
+        },
+        terminal,
+        defaultScenario: 'general',
+        defaultMode: 'auto-inference',
+      });
+
+      window.__demo = demo;
+    } catch (err) {
+      app.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:16px;font-family:var(--font-sans);">
+        <div style="color:var(--red);font-size:20px;font-weight:700;">⚠ Demo failed to load</div>
+        <pre style="color:var(--text-secondary);background:var(--bg-secondary);padding:20px;border-radius:8px;max-width:80%;overflow:auto;font-size:13px;">${err.stack || err.message || err}</pre>
+      </div>`;
+      console.error('Demo load error:', err);
+    }
   </script>
 </body>
 </html>

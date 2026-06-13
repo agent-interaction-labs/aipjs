@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Framework Test</title>
+  <link rel="stylesheet" href="framework/styles.css">
+</head>
+<body>
+  <div id="app"></div>
+
+  <script type="module">
+    import { createAgentTerminal } from './framework/terminal.js';
+    import { createDemo } from './framework/harness.js';
+
+    // Minimal scenarios — no AIP imports
+    const temp = document.createElement('div');
+    const terminal = createAgentTerminal(temp);
+
+    const testScenario = {
+      label: 'Test',
+      without: {
+        html: '<div style="padding:16px;color:var(--text-primary);"><h2>Left Panel</h2><p>Without aip.js — raw HTML</p></div>',
+      },
+      with: {
+        html: '<div style="padding:16px;color:var(--text-primary);"><h2>Right Panel</h2><p>With aip.js — structured</p></div>',
+        aipConfig: () => null,
+      },
+      terminal: (t) => {
+        t.addMessage('without', 'simple', { icon: '😕', text: 'Agent sees raw HTML, has to guess.' });
+        t.addMessage('with', 'simple', { icon: '✅', text: 'Agent gets structured tool schemas.' });
+      },
+    };
+
+    const demo = createDemo({
+      container: '#app',
+      scenarios: { test: testScenario },
+      terminal,
+    });
+
+    // Signal success
+    document.title = '✓ Framework Works';
+  </script>
+</body>
+</html>
