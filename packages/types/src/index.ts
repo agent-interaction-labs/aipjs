@@ -1,4 +1,4 @@
-// @agentic-js/types — AEO SDK type definitions
+// @aipjs/types — AEO SDK type definitions
 
 export interface JSONRPCRequest {
   jsonrpc: '2.0'; id: string | number; method: string;
@@ -59,17 +59,17 @@ export interface HITLResponse {
   requestId: string; action: HITLAction; reason?: string; timestamp: number;
 }
 
-export interface AgenticJSConfig {
+export interface AIPConfig {
   autoInfer: boolean; developerOverrides: boolean; hitlEnabled: boolean;
   hitlTimeout: number; hitlRiskLevels: RiskLevel[]; sanitizePayloads: boolean;
   uiMirroring: boolean; debug: boolean; cssPrefix: string; inferenceRoot: string;
   inferenceTagAllowlist: string[];
 }
 
-export const DEFAULT_CONFIG: AgenticJSConfig = {
+export const DEFAULT_CONFIG: AIPConfig = {
   autoInfer: true, developerOverrides: true, hitlEnabled: true,
   hitlTimeout: 30000, hitlRiskLevels: [RiskLevel.HIGH_RISK],
-  sanitizePayloads: true, uiMirroring: true, debug: false, cssPrefix: 'agentic-js',
+  sanitizePayloads: true, uiMirroring: true, debug: false, cssPrefix: 'aipjs',
   inferenceRoot: 'body', inferenceTagAllowlist: [],
 };
 
@@ -80,10 +80,10 @@ export interface AgentCapability {
 }
 
 export enum AgentBridgeEvent {
-  CAPABILITIES_REQUEST = 'agentic:capabilities:request',
-  CAPABILITIES_RESPONSE = 'agentic:capabilities:response',
-  TOOL_INVOKE = 'agentic:tool:invoke',
-  TOOL_RESULT = 'agentic:tool:result',
-  HITL_REQUEST = 'agentic:hitl:request',
-  HITL_RESPONSE = 'agentic:hitl:response',
+  CAPABILITIES_REQUEST = 'aip:capabilities:request',
+  CAPABILITIES_RESPONSE = 'aip:capabilities:response',
+  TOOL_INVOKE = 'aip:tool:invoke',
+  TOOL_RESULT = 'aip:tool:result',
+  HITL_REQUEST = 'aip:hitl:request',
+  HITL_RESPONSE = 'aip:hitl:response',
 }

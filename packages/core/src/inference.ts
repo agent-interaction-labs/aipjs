@@ -1,26 +1,26 @@
-import type { ToolSchema, ToolParameter } from '@agentic-js/types';
-import { RiskLevel, ActionCategory } from '@agentic-js/types';
+import type { ToolSchema, ToolParameter } from '@aipjs/types';
+import { RiskLevel, ActionCategory } from '@aipjs/types';
 
 const SEARCH_SELECTORS = [
   'input[type="search"]', 'input[name*="search" i]', 'input[name*="query" i]',
   'input[name="q"]', 'input[placeholder*="search" i]', 'input[role="searchbox"]',
-  'input[role="combobox"]', 'form[role="search"] input', '[data-agentic-search]',
+  'input[role="combobox"]', 'form[role="search"] input', '[data-aip-search]',
 ];
 
 const FILTER_SELECTORS = [
   'select', 'input[type="checkbox"]', 'input[type="radio"]',
-  '[role="radiogroup"]', 'input[type="range"]', '[data-agentic-filter]',
+  '[role="radiogroup"]', 'input[type="range"]', '[data-aip-filter]',
 ];
 
 const SORT_SELECTORS = [
-  'select[name*="sort" i]', 'select[aria-label*="sort" i]', '[data-agentic-sort]',
+  'select[name*="sort" i]', 'select[aria-label*="sort" i]', '[data-aip-sort]',
 ];
 
 const MUTATION_SELECTORS = [
   'button[type="submit"]', 'input[type="submit"]',
   'form[action*="cart" i] button[type="submit"]',
   'form[action*="checkout" i] button[type="submit"]',
-  '[data-agentic-confirm]',
+  '[data-aip-confirm]',
 ];
 
 function getElementLabel(el: Element): string {
@@ -63,7 +63,7 @@ function getElementSelector(el: Element): string {
 }
 
 function classifyRisk(el: Element): RiskLevel {
-  const explicit = el.getAttribute('data-agentic-risk');
+  const explicit = el.getAttribute('data-aip-risk');
   if (explicit === 'high_risk') return RiskLevel.HIGH_RISK;
   if (explicit === 'safe') return RiskLevel.SAFE;
   const tag = el.tagName.toLowerCase();
@@ -73,7 +73,7 @@ function classifyRisk(el: Element): RiskLevel {
   }
   if (el.closest('form[action*="cart" i]') || el.closest('form[action*="checkout" i]'))
     return RiskLevel.HIGH_RISK;
-  if (el.hasAttribute('data-agentic-confirm')) return RiskLevel.HIGH_RISK;
+  if (el.hasAttribute('data-aip-confirm')) return RiskLevel.HIGH_RISK;
   const href = (el as HTMLAnchorElement).href;
   if (href && /(checkout|subscribe|upgrade|delete|remove)/i.test(href))
     return RiskLevel.HIGH_RISK;
@@ -87,7 +87,7 @@ function classifyCategory(el: Element): ActionCategory {
   if (el.tagName.toLowerCase() === 'a') return ActionCategory.NAVIGATE;
   const typeAttr = (el as HTMLInputElement).type;
   if (typeAttr === 'submit') return ActionCategory.MUTATE;
-  const explicit = el.getAttribute('data-agentic-category');
+  const explicit = el.getAttribute('data-aip-category');
   if (explicit) return explicit as ActionCategory;
   return ActionCategory.CUSTOM;
 }
@@ -109,14 +109,16 @@ function extractParameters(el: Element): ToolParameter[] {
       description: getElementLabel(el), required: input.required,
     });
   } else if (tag === 'button' || tag === 'a') {
-    const dataParams = el.getAttribute('data-agentic-params');
+    const dataParams = el.getAttribute('data-aip-params');
     if (dataParams) {
       try {
         const parsed = JSON.parse(dataParams) as Record<string, unknown>;
         for (const [key, value] of Object.entries(parsed)) {
           params.push({ name: key, type: typeof value as ToolParameter['type'], description: key, required: true });
         }
-      } catch { /* ignore */ }
+      } catch (err) {
+        console.warn(`[@aipjs/core] Failed to parse data-aip-params on element:`, el, err);
+      }
     }
   }
   return params;
@@ -125,9 +127,9 @@ function extractParameters(el: Element): ToolParameter[] {
 function generateToolSchema(el: Element, index: number): ToolSchema {
   const category = classifyCategory(el);
   const label = getElementLabel(el);
-  const name = el.getAttribute('data-agentic-name') ||
+  const name = el.getAttribute('data-aip-name') ||
     `${category}_${label.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_${index}`;
-  const description = el.getAttribute('data-agentic-description') ||
+  const description = el.getAttribute('data-aip-description') ||
     `${category === ActionCategory.MUTATE ? '[REQUIRES HUMAN APPROVAL] ' : ''}${label}`;
   return {
     name, description, riskLevel: classifyRisk(el), category,

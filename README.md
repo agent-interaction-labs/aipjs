@@ -1,6 +1,6 @@
-# agentic-js — Universal WebMCP Polyfill for Browser Agents
+# agentic-js — The Agentic Engine Optimization (AEO) SDK
 
-**Agentic Engine Optimization (AEO) SDK.** Give your website the ability to broadcast searchable, structured capabilities to AI agents — today, across all browsers, without waiting for native WebMCP adoption.
+Give your website the ability to broadcast searchable, structured capabilities to visiting AI agents. Secure your platform, control the agent UX, and stop bots from breaking on fragile DOM updates.
 
 [![Build](https://img.shields.io/badge/build-passing-brightgreen)]()
 [![Tests](https://img.shields.io/badge/tests-19%2F19-brightgreen)]()
@@ -8,9 +8,11 @@
 
 ## What is agentic-js?
 
-WebMCP (Web Model Context Protocol) is a [W3C Community Group specification](https://webmachinelearning.github.io/webmcp) that lets websites expose tools to AI agents. Chrome 146+ has an early preview behind a flag — but no other browser has announced support, and the spec is still evolving.
+**agentic-js** is an SDK that enables Agentic Engine Optimization (AEO). Just as SEO optimized websites for search crawlers, AEO optimizes websites for AI agents. 
 
-**agentic-js is the universal polyfill.** It gives your website immediate WebMCP-like capabilities (tool registration, agent discovery, JSON-RPC invocation) with a single script tag — no browser flag needed. When native WebMCP ships everywhere, you drop the polyfill and your tool registrations keep working.
+Instead of allowing agents to scrape your DOM and simulate brittle clicks, agentic-js lets you expose your website's features (search, filter, checkout) as clean, structured JSON-RPC tools. It features auto-inference of your existing forms, developer overrides for SPAs, and built-in Human-in-the-Loop (HITL) security for high-risk actions.
+
+*Note: agentic-js is fully compatible with the emerging [WebMCP (Web Model Context Protocol)](https://webmachinelearning.github.io/webmcp) standard, ensuring your tool schemas remain valid as native browser adoption grows.*
 
 ## How It Works
 

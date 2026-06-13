@@ -1,5 +1,5 @@
 {
-  "name": "@agentic-js/types",
+  "name": "@aipjs/types",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",

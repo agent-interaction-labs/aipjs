@@ -1,7 +1,7 @@
-// @agentic-js/security — HITL Verification + Prompt Injection Protection
+// @aipjs/security — HITL Verification + Prompt Injection Protection
 
-import type { HITLRequest, HITLResponse } from '@agentic-js/types';
-import { HITLAction, RiskLevel, AgentBridgeEvent } from '@agentic-js/types';
+import type { HITLRequest, HITLResponse } from '@aipjs/types';
+import { HITLAction, RiskLevel, AgentBridgeEvent } from '@aipjs/types';
 
 // ============================================================================
 // Prompt Injection Sanitizer
@@ -172,7 +172,7 @@ export function createHITLManager(options: HITLManagerOptions) {
       modal.show(request).then(response => {
         window.dispatchEvent(new CustomEvent(AgentBridgeEvent.HITL_RESPONSE, { detail: response, bubbles: true }));
       }).catch((err: unknown) => {
-        console.error('[agentic-js/security] HITL error:', err);
+        console.error('[@aipjs/security] HITL error:', err);
       });
     };
     window.addEventListener(AgentBridgeEvent.HITL_REQUEST, handler as EventListener);

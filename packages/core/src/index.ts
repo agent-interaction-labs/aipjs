@@ -1,19 +1,19 @@
-import type { AgenticJSConfig, AgentCapability, ToolSchema, JSONRPCRequest, JSONRPCResponse } from '@agentic-js/types';
-import { DEFAULT_CONFIG, RiskLevel, AgentBridgeEvent } from '@agentic-js/types';
+import type { AIPConfig, AgentCapability, ToolSchema, JSONRPCRequest, JSONRPCResponse } from '@aipjs/types';
+import { DEFAULT_CONFIG, RiskLevel, AgentBridgeEvent } from '@aipjs/types';
 import { inferTools, type InferenceResult } from './inference.js';
 import { registerTool, registerSearch, registerAction, unregisterTool, clearRegistry, getRegisteredTools, executeTool } from './registry.js';
 import { initMirroring, onToolStart, onToolComplete, watchNavigation, mirrorElementValue } from './mirror.js';
 
 export { registerTool, registerSearch, registerAction, unregisterTool, clearRegistry, getRegisteredTools, executeTool, mirrorElementValue, inferTools, type InferenceResult };
 
-export class AgenticJS {
-  readonly config: Required<AgenticJSConfig>;
+export class AIP {
+  readonly config: Required<AIPConfig>;
   private tools: ToolSchema[] = [];
   private started = false;
   private cleanupFns: Array<() => void> = [];
 
-  constructor(config: Partial<AgenticJSConfig> = {}) {
-    this.config = { ...DEFAULT_CONFIG, ...config } as Required<AgenticJSConfig>;
+  constructor(config: Partial<AIPConfig> = {}) {
+    this.config = { ...DEFAULT_CONFIG, ...config } as Required<AIPConfig>;
   }
 
   start(): void {
@@ -25,7 +25,7 @@ export class AgenticJS {
     window.addEventListener(AgentBridgeEvent.TOOL_INVOKE, this.handleToolInvoke as EventListener);
     if (this.config.autoInfer) this.cleanupFns.push(watchNavigation(() => this.refreshTools()));
     this.broadcastCapabilities();
-    if (this.config.debug) console.log(`[agentic-js] Started — ${this.tools.length} tools`);
+    if (this.config.debug) console.log(`[aip.js] Started — ${this.tools.length} tools`);
   }
 
   stop(): void {

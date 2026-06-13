@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { registerTool, registerSearch, registerAction, getRegisteredTools, executeTool, clearRegistry, unregisterTool } from '@agentic-js/core';
-import { RiskLevel, ActionCategory } from '@agentic-js/types';
+import { registerTool, registerSearch, registerAction, getRegisteredTools, executeTool, clearRegistry, unregisterTool } from '@aipjs/core';
+import { RiskLevel, ActionCategory } from '@aipjs/types';
 
 describe('Tool Registry', () => {
   beforeEach(() => {

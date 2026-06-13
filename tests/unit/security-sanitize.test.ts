@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { sanitizePayload } from '@agentic-js/security';
+import { sanitizePayload } from '@aipjs/security';
 
 describe('sanitizePayload', () => {
   it('passes through clean strings', () => {

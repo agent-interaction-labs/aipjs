@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { RiskLevel, ActionCategory, HITLAction, AgentBridgeEvent, DEFAULT_CONFIG } from '@agentic-js/types';
+import { RiskLevel, ActionCategory, HITLAction, AgentBridgeEvent, DEFAULT_CONFIG } from '@aipjs/types';
 
 describe('RiskLevel', () => {
   it('defines SAFE and HIGH_RISK levels', () => {
@@ -25,10 +25,10 @@ describe('HITLAction', () => {
 });
 
 describe('AgentBridgeEvent', () => {
-  it('uses agentic namespace', () => {
-    expect(AgentBridgeEvent.CAPABILITIES_REQUEST).toContain('agentic:');
-    expect(AgentBridgeEvent.TOOL_INVOKE).toContain('agentic:');
-    expect(AgentBridgeEvent.HITL_REQUEST).toContain('agentic:');
+  it('uses aip namespace', () => {
+    expect(AgentBridgeEvent.CAPABILITIES_REQUEST).toContain('aip:');
+    expect(AgentBridgeEvent.TOOL_INVOKE).toContain('aip:');
+    expect(AgentBridgeEvent.HITL_REQUEST).toContain('aip:');
   });
 });
 
@@ -38,6 +38,6 @@ describe('DEFAULT_CONFIG', () => {
     expect(DEFAULT_CONFIG.hitlEnabled).toBe(true);
     expect(DEFAULT_CONFIG.hitlTimeout).toBe(30000);
     expect(DEFAULT_CONFIG.hitlRiskLevels).toContain(RiskLevel.HIGH_RISK);
-    expect(DEFAULT_CONFIG.cssPrefix).toBe('agentic-js');
+    expect(DEFAULT_CONFIG.cssPrefix).toBe('aipjs');
   });
 });
