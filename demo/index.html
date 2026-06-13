@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>aip.js — Agentic Engine Optimization Demo</title>
   <link rel="stylesheet" href="framework/styles.css">
+  <!-- Import map: resolve bare module specifiers to local dist files -->
+  <script type="importmap">
+  {
+    "imports": {
+      "@aipjs/types": "/packages/types/dist/index.js",
+      "@aipjs/core": "/packages/core/dist/index.js",
+      "@aipjs/security": "/packages/security/dist/index.js",
+      "@agentic-js/types": "/packages/types/dist/index.js",
+      "@agentic-js/core": "/packages/core/dist/index.js",
+      "@agentic-js/security": "/packages/security/dist/index.js"
+    }
+  }
+  </script>
 </head>
 <body>
 
