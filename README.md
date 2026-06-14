@@ -1,6 +1,6 @@
 # aip.js — The Agent Interaction Protocol (AIP) SDK
 
-**Agent Interaction Protocol (AIP)** — formerly Agentic Engine Optimization (AEO) — gives your website the ability to expose structured, discoverable capabilities to visiting AI agents. Secure your platform, control the agent UX, and stop bots from breaking on fragile DOM updates.
+**Agent Interaction Protocol (AIP)** — gives your website the ability to expose structured, discoverable capabilities to visiting AI agents. Secure your platform, control the agent UX, and stop bots from breaking on fragile DOM updates.
 
 [![Build](https://img.shields.io/badge/build-passing-brightgreen)]()
 [![Tests](https://img.shields.io/badge/tests-26%2F26-brightgreen)]()
@@ -18,17 +18,17 @@ Instead of allowing agents to scrape your DOM and simulate brittle clicks, aip.j
 
 ```
 ┌──────────────────────────────────────────────────────┐
-│                    Your Website                       │
+│                    Your Website                      │
 │                                                      │
-│  ┌─────────────┐  ┌─────────────┐  ┌──────────────┐ │
-│  │ Auto-Infer  │  │  Developer  │  │   Security   │ │
-│  │   Engine    │  │    API      │  │   (HITL)     │ │
-│  │             │  │             │  │              │ │
-│  │ DOM scan →  │  │ register    │  │ Prompt       │ │
-│  │ ToolSchema  │  │ Search()    │  │ Injection    │ │
-│  │             │  │ register    │  │ Protection   │ │
-│  │             │  │ Action()    │  │              │ │
-│  └──────┬──────┘  └──────┬──────┘  └──────┬───────┘ │
+│  ┌─────────────┐  ┌─────────────┐  ┌──────────────┐  │
+│  │ Auto-Infer  │  │  Developer  │  │   Security   │  │
+│  │   Engine    │  │    API      │  │   (HITL)     │  │
+│  │             │  │             │  │              │  │
+│  │ DOM scan →  │  │ register    │  │ Prompt       │  │
+│  │ ToolSchema  │  │ Search()    │  │ Injection    │  │
+│  │             │  │ register    │  │ Protection   │  │
+│  │             │  │ Action()    │  │              │  │
+│  └──────┬──────┘  └──────┬──────┘  └──────┬───────┘  │
 │         │                │                │          │
 │         └────────────────┼────────────────┘          │
 │                          ▼                           │
@@ -199,4 +199,4 @@ Apache 2.0 — see [LICENSE](LICENSE)
 
 ---
 
-**Built by [Jimish Bhayani](https://github.com/jimishbhayani)** — opening the web to agentic interaction.
+**Built by [Agent Interaction Labs](https://github.com/agent-interaction-labs)** — opening the web to agentic interaction.
