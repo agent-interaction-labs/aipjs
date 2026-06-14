@@ -1,4 +1,4 @@
-// @agentic-js/core — Shadow DOM & Web Component Support
+// @aipjs/core — Shadow DOM & Web Component Support
 // Extends the auto-inference engine into Shadow DOM boundaries
 // for frameworks using Web Components (Lit, Stencil, Fast, etc.)
 

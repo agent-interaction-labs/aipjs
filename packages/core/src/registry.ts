@@ -1,5 +1,5 @@
-import type { ToolSchema, ToolParameter } from '@agentic-js/types';
-import { RiskLevel, ActionCategory } from '@agentic-js/types';
+import type { ToolSchema, ToolParameter } from '@aipjs/types';
+import { RiskLevel, ActionCategory } from '@aipjs/types';
 
 interface RegisteredTool {
   schema: ToolSchema;

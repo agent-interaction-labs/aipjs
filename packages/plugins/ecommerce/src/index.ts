@@ -1,11 +1,11 @@
-// @agentic-js/plugin-ecommerce — Safe Search Abstraction
+// @aipjs/plugin-ecommerce — Safe Search Abstraction
 // Specialized for e-commerce, real estate, and travel sites.
 // Exposes search, filtering, and inventory queries with ZERO mutation risk.
 // Hooks into internal search APIs or window.dataLayer — no DOM scraping.
 
-import type { SearchQuery, SearchFilter, SortCriterion, Pagination, SearchResult, ToolParameter } from '@agentic-js/types';
-import { RiskLevel, ActionCategory } from '@agentic-js/types';
-import { registerSearch, registerAction } from '@agentic-js/core';
+import type { SearchQuery, SearchFilter, SortCriterion, Pagination, SearchResult, ToolParameter } from '@aipjs/types';
+import { RiskLevel, ActionCategory } from '@aipjs/types';
+import { registerSearch, registerAction } from '@aipjs/core';
 
 // ============================================================================
 // Search API Hook
@@ -37,7 +37,7 @@ export interface EcommercePluginInstance {
  * DOM scraping entirely. Zero mutation risk — only read operations.
  *
  * @example
- *   import { ecommercePlugin } from '@agentic-js/plugin-ecommerce';
+ *   import { ecommercePlugin } from '@aipjs/plugin-ecommerce';
  *   ecommercePlugin({
  *     searchEndpoint: '/api/v2/products/search',
  *     detailEndpoint: '/api/v2/products',

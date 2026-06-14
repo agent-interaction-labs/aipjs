@@ -1,4 +1,4 @@
-// @agentic-js/core — Memory Leak Protection
+// @aipjs/core — Memory Leak Protection
 // Guards against DOM MutationObserver leaks, dangling event listeners,
 // and orphaned injected elements in long-running SPAs.
 
