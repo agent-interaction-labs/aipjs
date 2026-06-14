@@ -5,6 +5,8 @@
 [![Build](https://img.shields.io/badge/build-passing-brightgreen)]()
 [![Tests](https://img.shields.io/badge/tests-26%2F26-brightgreen)]()
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)]()
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)]()
+[![Bundle Size](https://img.shields.io/badge/bundle-36KB-green)]()
 
 ## What is aip.js?
 
