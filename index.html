@@ -3,98 +3,445 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="aip.js — Agentic Engine Optimization SDK. Give your website an API for AI agents. Auto-infers JSON-RPC tools from semantic HTML.">
-  <meta property="og:title" content="aip.js — AEO SDK">
-  <meta property="og:description" content="Give your website an API for AI agents. Auto-infers structured tools from your HTML. Keeps you in control.">
+  <meta name="description" content="aip.js — Agent Interaction Protocol SDK. Auto-infers JSON-RPC tools from semantic HTML. Give any website a structured API for AI agents.">
+  <meta property="og:title" content="aip.js — Agent Interaction Protocol">
+  <meta property="og:description" content="The SDK that gives websites a structured API for AI agents. Auto-infers tools from your HTML. Keeps you in control.">
   <meta property="og:type" content="website">
-  <title>aip.js — Agentic Engine Optimization</title>
+  <title>aip.js — Agent Interaction Protocol</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg: #0a0a0f;
+      --bg-card: #111118;
+      --bg-code: #0d0d14;
+      --border: #1e1e2e;
+      --border-hover: #2e2e44;
+      --text: #f0f0f6;
+      --text-secondary: #9090a8;
+      --text-muted: #606078;
+      --accent: #6366f1;
+      --accent-glow: rgba(99,102,241,0.25);
+      --green: #22c55e;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background: #0f1117;
-      color: #e4e7ed;
-      min-height: 100vh;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Hero ─────────────────────────────────────── */
+    .hero {
+      min-height: 70vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 40px 20px;
-      line-height: 1.6;
+      text-align: center;
+      padding: 80px 24px 60px;
+      position: relative;
+      overflow: hidden;
     }
-    main { max-width: 680px; text-align: center; }
-    .logo { font-size: 48px; font-weight: 800; margin-bottom: 8px; }
-    .logo span { color: #6366f1; }
-    .tagline { font-size: 20px; color: #8b8fa3; margin-bottom: 32px; }
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 16px;
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -40%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+      position: relative;
+    }
+
+    .hero-badge .dot {
+      width: 8px;
+      height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .hero h1 {
+      font-size: clamp(42px, 7vw, 72px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, #6366f1 0%, #a78bfa 50%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 18px;
+      color: var(--text-secondary);
+      max-width: 600px;
       margin-bottom: 40px;
-      text-align: left;
+      position: relative;
     }
-    .feature {
-      background: #1a1d27;
-      border: 1px solid #2e3348;
-      border-radius: 10px;
-      padding: 20px;
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      position: relative;
     }
-    .feature .icon { font-size: 24px; margin-bottom: 8px; }
-    .feature h3 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-    .feature p { font-size: 13px; color: #8b8fa3; line-height: 1.5; }
-    .actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
     .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       padding: 12px 28px;
-      border-radius: 8px;
+      border-radius: var(--radius-sm);
       font-size: 15px;
       font-weight: 600;
+      font-family: var(--font);
       text-decoration: none;
-      transition: all 0.15s ease;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
     }
-    .btn-primary { background: #6366f1; color: white; box-shadow: 0 4px 14px rgba(99,102,241,0.35); }
-    .btn-primary:hover { background: #818cf8; transform: translateY(-1px); }
-    .btn-ghost { color: #8b8fa3; border: 1px solid #2e3348; }
-    .btn-ghost:hover { color: #e4e7ed; border-color: #3a3f55; background: #1a1d27; }
-    .footer {
-      margin-top: 48px;
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+
+    .btn-primary:hover {
+      background: #818cf8;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 28px rgba(99,102,241,0.4);
+    }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--border-hover);
+      background: #1a1a26;
+    }
+
+    /* ── Code preview ───────────────────────────── */
+    .code-preview {
+      max-width: 600px;
+      margin: 48px auto 0;
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      text-align: left;
+      position: relative;
+    }
+
+    .code-preview .lang-tag {
+      position: absolute;
+      top: -10px;
+      left: 16px;
+      background: var(--accent);
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+    }
+
+    .code-preview pre {
+      font-family: var(--font-mono);
       font-size: 13px;
-      color: #5a5e72;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      overflow-x: auto;
+      margin: 0;
     }
-    .footer a { color: #8b8fa3; text-decoration: none; }
-    .footer a:hover { color: #e4e7ed; }
+
+    .code-preview .kw { color: #c084fc; }
+    .code-preview .fn { color: #818cf8; }
+    .code-preview .str { color: #22c55e; }
+    .code-preview .cm { color: var(--text-muted); }
+
+    /* ── Features ───────────────────────────────── */
+    .section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 80px 24px;
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .section h2 {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .section .section-desc {
+      font-size: 16px;
+      color: var(--text-secondary);
+      max-width: 560px;
+      margin-bottom: 48px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      transition: all 0.2s ease;
+    }
+
+    .feature-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    }
+
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: 16px;
+    }
+
+    .feature-icon.purple { background: rgba(99,102,241,0.15); color: #818cf8; }
+    .feature-icon.green  { background: rgba(34,197,94,0.12); color: #22c55e; }
+    .feature-icon.amber { background: rgba(245,158,11,0.12); color: #f59e0b; }
+
+    .feature-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .feature-card p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ── How it works ──────────────────────────── */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2px;
+    }
+
+    .step {
+      background: var(--bg-card);
+      padding: 32px;
+      position: relative;
+    }
+
+    .step:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+    .step:last-child { border-radius: 0 var(--radius) var(--radius) 0); }
+
+    .step-number {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .step h4 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .step p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+      .steps { grid-template-columns: 1fr; gap: 1px; }
+      .step:first-child { border-radius: var(--radius) var(--radius) 0 0; }
+      .step:last-child { border-radius: 0 0 var(--radius) var(--radius); }
+    }
+
+    /* ── Footer ────────────────────────────────── */
+    .footer {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .footer a {
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+
+    .footer a:hover { color: var(--text); }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
   </style>
 </head>
 <body>
-  <main>
-    <div class="logo">aip<span>.</span>js</div>
-    <p class="tagline">Give your website an API for AI agents.<br>Auto-infers structured tools from your HTML. Keeps you in control.</p>
-
-    <div class="features">
-      <div class="feature">
-        <div class="icon">🔍</div>
-        <h3>Auto-Discovery</h3>
-        <p>Scans your semantic HTML and generates JSON-RPC tool schemas. Zero configuration needed.</p>
-      </div>
-      <div class="feature">
-        <div class="icon">🛡️</div>
-        <h3>You Stay in Control</h3>
-        <p>High-risk actions require human approval. Agents cannot bypass — it's enforced, not suggested.</p>
-      </div>
-      <div class="feature">
-        <div class="icon">📦</div>
-        <h3>One Script Tag</h3>
-        <p>&lt;30 KB. Works in every browser. React, Vue, Svelte, or plain HTML — framework agnostic.</p>
-      </div>
+  <section class="hero">
+    <div class="hero-badge">
+      <span class="dot"></span> Apache 2.0 — Open Source
     </div>
 
-    <div class="actions">
-      <a href="/aip.js/demo/" class="btn btn-primary">Live Demo</a>
-      <a href="https://github.com/agent-interaction-labs/aipjs" class="btn btn-ghost">GitHub →</a>
+    <h1>The <span class="gradient">Agent Interaction Protocol</span></h1>
+
+    <p>Auto-infers structured JSON-RPC tool schemas from your semantic HTML. Give any website a discoverable API for AI agents — with human-in-the-loop security.</p>
+
+    <div class="hero-actions">
+      <a href="demo/" class="btn btn-primary">Live Demo</a>
+      <a href="docs/" class="btn btn-secondary">Documentation</a>
+      <a href="https://github.com/agent-interaction-labs/aipjs" class="btn btn-secondary">GitHub</a>
     </div>
 
-    <div class="footer">
-      Apache 2.0 · <a href="https://github.com/agent-interaction-labs/aipjs">github.com/agent-interaction-labs/aipjs</a>
+    <div class="code-preview">
+      <span class="lang-tag">shell</span>
+      <pre><span class="cm"># One script tag. Your site now speaks to AI agents.</span>
+<span class="kw">import</span> { <span class="fn">AIP</span> } <span class="kw">from</span> <span class="str">'@aipjs/core'</span>;
+
+<span class="kw">const</span> aip = <span class="kw">new</span> <span class="fn">AIP</span>({ autoInfer: <span class="kw">true</span> });
+aip.<span class="fn">start</span>();
+
+<span class="cm">// Search, filter, and action tools — auto-discovered</span>
+console.<span class="fn">log</span>(aip.<span class="fn">getCapabilities</span>());
+<span class="cm">// { tools: [search_products, filter_by_category, …], … }</span></pre>
     </div>
-  </main>
+  </section>
+
+  <section class="section">
+    <div class="section-label">Capabilities</div>
+    <h2>What aip.js does</h2>
+    <p class="section-desc">Three layers that turn any website into an agent-friendly platform — without rewriting your backend.</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon purple">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </div>
+        <h3>Auto-Inference Engine</h3>
+        <p>Scans semantic HTML elements — search inputs, filter dropdowns, action buttons — and generates clean JSON-RPC tool schemas. Zero configuration for standard sites.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon green">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3>HITL Security</h3>
+        <p>Every tool is classified SAFE or HIGH_RISK. Mutations like "add to cart" freeze the page and show a modal — human must approve. Prompt injection sanitization built in.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon amber">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/></svg>
+        </div>
+        <h3>SPA-Ready Developer API</h3>
+        <p>React, Vue, Next.js, Svelte — register custom tools with TypeScript types. MutationObserver watches DOM changes. Route-aware tool refresh for single-page apps.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-label">How it works</div>
+    <h2>Three steps to agent compatibility</h2>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">01</div>
+        <h4>Add the script tag</h4>
+        <p>Drop aip.js into your page. The auto-inference engine scans your DOM for semantic HTML and builds tool schemas on the fly.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">02</div>
+        <h4>Agents discover capabilities</h4>
+        <p>Browser AI agents request what your site can do. aip.js responds with structured JSON-RPC tools — search, filter, sort, actions.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">03</div>
+        <h4>Safe interaction, human approval</h4>
+        <p>Read-only tools execute automatically. Mutations trigger a HITL modal — the user sees exactly what the agent wants to do and approves or denies.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <span>Built by <a href="https://github.com/agent-interaction-labs">Agent Interaction Labs</a></span>
+    <div class="footer-links">
+      <a href="docs/">Docs</a>
+      <a href="demo/">Demo</a>
+      <a href="https://github.com/agent-interaction-labs/aipjs">GitHub</a>
+    </div>
+  </footer>
 </body>
 </html>
