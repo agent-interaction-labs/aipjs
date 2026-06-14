@@ -1,18 +1,18 @@
-# agentic-js — The Agentic Engine Optimization (AEO) SDK
+# aip.js — The Agent Interaction Protocol (AIP) SDK
 
-Give your website the ability to broadcast searchable, structured capabilities to visiting AI agents. Secure your platform, control the agent UX, and stop bots from breaking on fragile DOM updates.
+**Agent Interaction Protocol (AIP)** — formerly Agentic Engine Optimization (AEO) — gives your website the ability to expose structured, discoverable capabilities to visiting AI agents. Secure your platform, control the agent UX, and stop bots from breaking on fragile DOM updates.
 
 [![Build](https://img.shields.io/badge/build-passing-brightgreen)]()
-[![Tests](https://img.shields.io/badge/tests-19%2F19-brightgreen)]()
+[![Tests](https://img.shields.io/badge/tests-26%2F26-brightgreen)]()
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)]()
 
-## What is agentic-js?
+## What is aip.js?
 
-**agentic-js** is an SDK that enables Agentic Engine Optimization (AEO). Just as SEO optimized websites for search crawlers, AEO optimizes websites for AI agents. 
+**aip.js** is the JavaScript SDK for the Agent Interaction Protocol. Just as SEO optimized websites for search crawlers, AIP optimizes websites for AI agents.
 
-Instead of allowing agents to scrape your DOM and simulate brittle clicks, agentic-js lets you expose your website's features (search, filter, checkout) as clean, structured JSON-RPC tools. It features auto-inference of your existing forms, developer overrides for SPAs, and built-in Human-in-the-Loop (HITL) security for high-risk actions.
+Instead of allowing agents to scrape your DOM and simulate brittle clicks, aip.js lets you expose your website's features (search, filter, checkout) as clean, structured JSON-RPC tools. It features auto-inference of your existing forms, developer overrides for SPAs, and built-in Human-in-the-Loop (HITL) security for high-risk actions.
 
-*Note: agentic-js is fully compatible with the emerging [WebMCP (Web Model Context Protocol)](https://webmachinelearning.github.io/webmcp) standard, ensuring your tool schemas remain valid as native browser adoption grows.*
+*Note: aip.js is fully compatible with the emerging [WebMCP (Web Model Context Protocol)](https://webmachinelearning.github.io/webmcp) standard, ensuring your tool schemas remain valid as native browser adoption grows.*
 
 ## How It Works
 
@@ -47,21 +47,21 @@ Instead of allowing agents to scrape your DOM and simulate brittle clicks, agent
 
 ### Three Core Capabilities
 
-1. **Auto-Inference Engine** — Scans your DOM for semantic HTML elements (search inputs, filter dropdowns, action buttons), ARIA attributes, and `data-agentic-*` hints, then automatically generates clean JSON-RPC tool schemas. Zero configuration needed.
+1. **Auto-Inference Engine** — Scans your DOM for semantic HTML elements (search inputs, filter dropdowns, action buttons), ARIA attributes, and `data-aip-*` hints, then automatically generates clean JSON-RPC tool schemas. Zero configuration needed.
 
 2. **Developer Override API** — For complex SPAs and custom endpoints, register tools explicitly:
    ```js
-   import { AgenticJS } from '@agentic-js/core';
+   import { AIP } from '@aipjs/core';
 
-   const agentic = new AgenticJS({ autoInfer: true, hitlEnabled: true });
-   agentic.registerSearch({
+   const aip = new AIP({ autoInfer: true, hitlEnabled: true });
+   aip.registerSearch({
      endpoint: '/api/v2/search',
      parameters: [
        { name: 'q', type: 'string', description: 'Search query', required: true },
        { name: 'category', type: 'string', description: 'Category filter', required: false },
      ]
    });
-   agentic.start();
+   aip.start();
    ```
 
 3. **Security & HITL** — Every tool is classified SAFE (read-only: search, filter, navigate) or HIGH_RISK (mutation: add to cart, checkout, profile changes). High-risk actions trigger a native DOM modal requiring explicit human approval before the payload touches your backend. Includes prompt injection sanitization to prevent malicious page data from hijacking agent instructions.
@@ -70,10 +70,10 @@ Instead of allowing agents to scrape your DOM and simulate brittle clicks, agent
 
 | Package | Description | Size |
 |---------|-------------|------|
-| `@agentic-js/types` | Shared types: JSON-RPC, ToolSchema, HITL, Config | <2 KB |
-| `@agentic-js/core` | Auto-inference, registry, UI mirroring, AgenticJS class | <8 KB |
-| `@agentic-js/security` | HITL modal, prompt injection sanitizer | <6 KB |
-| `@agentic-js/plugin-ecommerce` | Safe search abstraction for e-commerce, real estate, travel | <5 KB |
+| `@aipjs/types` | Shared types: JSON-RPC, ToolSchema, HITL, Config | <2 KB |
+| `@aipjs/core` | Auto-inference, registry, UI mirroring, AIP class | <8 KB |
+| `@aipjs/security` | HITL modal, prompt injection sanitizer | <6 KB |
+| `@aipjs/plugin-ecommerce` | Safe search abstraction for e-commerce, real estate, travel | <5 KB |
 
 ## Quick Start
 
@@ -81,14 +81,14 @@ Instead of allowing agents to scrape your DOM and simulate brittle clicks, agent
 
 ```html
 <script type="module">
-  import { AgenticJS } from 'https://cdn.agentic-js.dev/core/index.js';
+  import { AIP } from 'https://cdn.aipjs.dev/core/index.js';
 
-  const agentic = new AgenticJS({ autoInfer: true });
-  agentic.start();
+  const aip = new AIP({ autoInfer: true });
+  aip.start();
 
   // Your page now broadcasts tool schemas to browser agents
   // Search inputs, filters, sort controls — all auto-discovered
-  console.log(agentic.getCapabilities());
+  console.log(aip.getCapabilities());
   // { tools: [...], page: { title: "My Store", url: "..." }, ... }
 </script>
 ```
@@ -96,7 +96,7 @@ Instead of allowing agents to scrape your DOM and simulate brittle clicks, agent
 ### E-Commerce Plugin
 
 ```js
-import { ecommercePlugin } from '@agentic-js/plugin-ecommerce';
+import { ecommercePlugin } from '@aipjs/plugin-ecommerce';
 
 ecommercePlugin({
   searchEndpoint: '/api/v1/products/search',
@@ -112,15 +112,15 @@ ecommercePlugin({
 ### With Security Module
 
 ```js
-import { AgenticJS } from '@agentic-js/core';
-import { createHITLManager, sanitizePayload } from '@agentic-js/security';
+import { AIP } from '@aipjs/core';
+import { createHITLManager, sanitizePayload } from '@aipjs/security';
 
 // Agent actions trigger HITL approval for high-risk operations
-const hitl = createHITLManager({ cssPrefix: 'agentic-js', hitlTimeout: 30000 });
+const hitl = createHITLManager({ cssPrefix: 'aipjs', hitlTimeout: 30000 });
 hitl.listen();
 
-const agentic = new AgenticJS({ autoInfer: true, hitlEnabled: true });
-agentic.start();
+const aip = new AIP({ autoInfer: true, hitlEnabled: true });
+aip.start();
 ```
 
 ## Architecture
@@ -131,12 +131,12 @@ Agent-website communication uses CustomEvents on the window object:
 
 | Event | Direction | Purpose |
 |-------|-----------|---------|
-| `agentic:capabilities:request` | Agent → Site | Agent asks "what can you do?" |
-| `agentic:capabilities:response` | Site → Agent | Site replies with tool schemas |
-| `agentic:tool:invoke` | Agent → Site | Agent calls a tool with params |
-| `agentic:tool:result` | Site → Agent | Site returns tool result |
-| `agentic:hitl:request` | Site → User | High-risk action needs approval |
-| `agentic:hitl:response` | User → Site | User approves or denies |
+| `aip:capabilities:request` | Agent → Site | Agent asks "what can you do?" |
+| `aip:capabilities:response` | Site → Agent | Site replies with tool schemas |
+| `aip:tool:invoke` | Agent → Site | Agent calls a tool with params |
+| `aip:tool:result` | Site → Agent | Site returns tool result |
+| `aip:hitl:request` | Site → User | High-risk action needs approval |
+| `aip:hitl:response` | User → Site | User approves or denies |
 
 ### Risk Classification
 
@@ -162,10 +162,10 @@ Built for React, Vue, Next.js, and Svelte apps:
 
 ## WebMCP Compatibility
 
-| Feature | WebMCP Spec | agentic-js |
-|---------|------------|------------|
-| Imperative API (`registerTool`) | ✅ `document.modelContext.registerTool()` | ✅ `agentic.registerSearch()` / `registerAction()` |
-| Declarative API (HTML attrs) | ✅ `<form toolname="...">` | ✅ Auto-inference from semantic HTML + `data-agentic-*` |
+| Feature | WebMCP Spec | aip.js |
+|---------|------------|--------|
+| Imperative API (`registerTool`) | ✅ `document.modelContext.registerTool()` | ✅ `aip.registerSearch()` / `registerAction()` |
+| Declarative API (HTML attrs) | ✅ `<form toolname="...">` | ✅ Auto-inference from semantic HTML + `data-aip-*` |
 | JSON Schema input params | ✅ | ✅ `ToolParameter` type |
 | Read-only hints | ✅ `annotations.readOnlyHint` | ✅ `RiskLevel.SAFE` / `HIGH_RISK` |
 | Origin-based exposure | ✅ `exposedTo` | 🔜 Planned |
@@ -178,15 +178,15 @@ Built for React, Vue, Next.js, and Svelte apps:
 
 ```bash
 # Clone and install
-git clone https://github.com/agentic-js/agentic-js.git
-cd agentic-js
+git clone https://github.com/agent-interaction-labs/aipjs.git
+cd aipjs
 npm install
 
 # Build all packages
 npm run build        # tsc -b (incremental)
 
 # Run tests
-npm test             # vitest run — 19 tests across 3 suites
+npm test             # vitest run — 26 tests across 3 suites
 
 # Watch mode
 npm run build:watch  # tsc -b -w
@@ -199,4 +199,4 @@ Apache 2.0 — see [LICENSE](LICENSE)
 
 ---
 
-**Built by the Hermes Agent Swarm** — AI agents building tools for AI agents.
+**Built by [Jimish Bhayani](https://github.com/jimishbhayani)** — opening the web to agentic interaction.

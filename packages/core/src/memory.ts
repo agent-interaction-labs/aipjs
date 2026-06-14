@@ -85,20 +85,20 @@ export function startLeakDetection(intervalMs = 30000): () => void {
     // Warning thresholds
     if (counts.observer > 20) {
       console.warn(
-        `[agentic-js] Memory leak warning: ${counts.observer} active MutationObservers. ` +
-        'Consider calling agentic.stop() on route changes.',
+        `[aip.js] Memory leak warning: ${counts.observer} active MutationObservers. ` +
+        'Consider calling aip.stop() on route changes.',
       );
     }
     if (counts.listener > 50) {
       console.warn(
-        `[agentic-js] Memory leak warning: ${counts.listener} active event listeners.`,
+        `[aip.js] Memory leak warning: ${counts.listener} active event listeners.`,
       );
     }
 
     if (counts.observer + counts.listener + counts.element + counts.timer > 100) {
       console.error(
-        `[agentic-js] CRITICAL: ${counts.observer + counts.listener + counts.element + counts.timer} total tracked resources. ` +
-        'Possible memory leak. Call agentic.stop() and re-initialize.',
+        `[aip.js] CRITICAL: ${counts.observer + counts.listener + counts.element + counts.timer} total tracked resources. ` +
+        'Possible memory leak. Call aip.stop() and re-initialize.',
       );
     }
   }, intervalMs);

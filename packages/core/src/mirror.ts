@@ -1,7 +1,7 @@
 const state = {
   active: new Map<string, { tool: { name: string; description: string }; startTime: number; params: Record<string, unknown> }>(),
   indicator: null as HTMLElement | null,
-  cssPrefix: 'agentic-js',
+  cssPrefix: 'aipjs',
   enabled: true,
 };
 

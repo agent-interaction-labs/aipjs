@@ -287,7 +287,7 @@ async function executeTool(name, params) {
 var state = {
   active: /* @__PURE__ */ new Map(),
   indicator: null,
-  cssPrefix: "agentic-js",
+  cssPrefix: "aipjs",
   enabled: true
 };
 function ensureIndicator() {

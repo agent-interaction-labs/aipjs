@@ -30,7 +30,7 @@ export interface EcommercePluginInstance {
 }
 
 /**
- * Register e-commerce search capabilities with the agentic-js SDK.
+ * Register e-commerce search capabilities with the aip.js SDK.
  *
  * This is the primary plugin for e-commerce, real estate, and travel sites.
  * It hooks into the site's existing search infrastructure, bypassing
