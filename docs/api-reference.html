@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Reference — aip.js</title>
+  <link rel="stylesheet" href="assets/docs.css">
+</head>
+<body>
+  <div class="docs-shell">
+    <aside class="docs-sidebar" id="docs-nav"></aside>
+    <main class="docs-content">
+
+      <h1>API Reference</h1>
+
+      <p>Complete reference of every public function, class, and type exported by aip.js. This page covers the core SDK — see <a href="ecommerce-plugin.html">E-Commerce Plugin</a> for the <code>@aipjs/plugin-ecommerce</code> package.</p>
+
+      <h2>AIP Class</h2>
+
+      <p>The main entry point. Create an instance to configure and control the AIP runtime.</p>
+
+      <h3>Constructor</h3>
+
+      <pre><code>new AIP(config: AIPConfig)</code></pre>
+
+      <p>Creates a new AIP instance with the provided configuration. See <a href="#aipconfig">AIPConfig</a> for all options.</p>
+
+      <pre><code>import { AIP } from '@aipjs/sdk';
+
+const aip = new AIP({
+  siteId: 'my-store',
+  inference: { autoDetect: true },
+});</code></pre>
+
+      <h3>Methods</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>Signature</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>start()</code></td>
+            <td><code>start(): Promise&lt;void&gt;</code></td>
+            <td>Initializes the AIP runtime: runs auto-inference (if enabled), sets up event listeners, and broadcasts capabilities. Call once after construction.</td>
+          </tr>
+          <tr>
+            <td><code>stop()</code></td>
+            <td><code>stop(): void</code></td>
+            <td>Shuts down the AIP runtime: removes event listeners, clears registrations, and stops broadcasting.</td>
+          </tr>
+          <tr>
+            <td><code>refreshTools()</code></td>
+            <td><code>refreshTools(): Promise&lt;InferenceResult&gt;</code></td>
+            <td>Re-runs the auto-inference engine to pick up DOM changes. Useful after dynamic content loads (SPA navigation, AJAX updates). Returns updated inference results.</td>
+          </tr>
+          <tr>
+            <td><code>getCapabilities()</code></td>
+            <td><code>getCapabilities(): AgentCapability</code></td>
+            <td>Returns a snapshot of all currently registered capabilities (inferred + manually registered tools).</td>
+          </tr>
+          <tr>
+            <td><code>broadcastCapabilities()</code></td>
+            <td><code>broadcastCapabilities(): void</code></td>
+            <td>Dispatches an <code>aip:capabilities:response</code> event with the current capabilities snapshot. Called automatically by <code>start()</code>, but can be invoked manually to re-announce after registration changes.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Tool Registration</h2>
+
+      <p>Register capabilities that agents can discover and invoke. All registration methods are chainable (they return the AIP instance).</p>
+
+      <h3>registerSearch()</h3>
+
+      <pre><code>registerSearch(config: {
+  endpoint: string;
+  parameters: ToolParameter[];
+  handler?: (params: Record&lt;string, any&gt;) =&gt; Promise&lt;any&gt;;
+  method?: 'GET' | 'POST';
+}): AIP</code></pre>
+
+      <p>Registers a search endpoint. This is a convenience wrapper that creates a <code>SEARCH</code>-category tool with standard parameter handling. If no <code>handler</code> is provided, aip.js will <code>fetch()</code> the <code>endpoint</code> with parameters serialized as query string (GET) or JSON body (POST).</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>endpoint</code></td>
+            <td><code>string</code></td>
+            <td>Yes</td>
+            <td>URL for the search API. Parameters are appended as query string for GET, sent as JSON body for POST.</td>
+          </tr>
+          <tr>
+            <td><code>parameters</code></td>
+            <td><code>ToolParameter[]</code></td>
+            <td>Yes</td>
+            <td>Array of parameter definitions. See <a href="#toolparameter">ToolParameter</a>.</td>
+          </tr>
+          <tr>
+            <td><code>handler</code></td>
+            <td><code>function</code></td>
+            <td>No</td>
+            <td>Custom handler function. Receives params object, must return results. Overrides the default fetch behavior.</td>
+          </tr>
+          <tr>
+            <td><code>method</code></td>
+            <td><code>'GET' | 'POST'</code></td>
+            <td>No</td>
+            <td>HTTP method for the default fetch handler. Default: <code>'GET'</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <pre><code>aip.registerSearch({
+  endpoint: '/api/products/search',
+  parameters: [
+    { name: 'q', type: 'string', description: 'Search query', required: true },
+    { name: 'category', type: 'string', description: 'Category filter' },
+    { name: 'maxPrice', type: 'number', description: 'Maximum price' },
+  ],
+  method: 'GET',
+});</code></pre>
+
+      <h3>registerAction()</h3>
+
+      <pre><code>registerAction(config: {
+  name: string;
+  description: string;
+  parameters: ToolParameter[];
+  handler: (params: Record&lt;string, any&gt;) =&gt; Promise&lt;any&gt;;
+  requiresConfirmation?: boolean;
+}): AIP</code></pre>
+
+      <p>Registers a named action with a required handler. Use this for custom logic beyond simple fetch — database queries, calculations, third-party API calls with auth, etc.</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>name</code></td>
+            <td><code>string</code></td>
+            <td>Yes</td>
+            <td>Unique name for the action. Used by agents to invoke it.</td>
+          </tr>
+          <tr>
+            <td><code>description</code></td>
+            <td><code>string</code></td>
+            <td>Yes</td>
+            <td>Human-readable description. Shown to agents so they understand what the action does.</td>
+          </tr>
+          <tr>
+            <td><code>parameters</code></td>
+            <td><code>ToolParameter[]</code></td>
+            <td>Yes</td>
+            <td>Array of parameter definitions. See <a href="#toolparameter">ToolParameter</a>.</td>
+          </tr>
+          <tr>
+            <td><code>handler</code></td>
+            <td><code>function</code></td>
+            <td>Yes</td>
+            <td>Async function that executes the action. Receives params object, must return the result.</td>
+          </tr>
+          <tr>
+            <td><code>requiresConfirmation</code></td>
+            <td><code>boolean</code></td>
+            <td>No</td>
+            <td>If <code>true</code>, the HITL modal prompts the user before execution. Default: <code>false</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <pre><code>aip.registerAction({
+  name: 'get_article',
+  description: 'Fetch full article content by ID',
+  parameters: [
+    { name: 'id', type: 'string', description: 'Article ID', required: true },
+  ],
+  handler: async ({ id }) => {
+    const res = await fetch(`/api/articles/${id}`);
+    return res.json();
+  },
+});</code></pre>
+
+      <h3>registerTool()</h3>
+
+      <pre><code>registerTool(config: {
+  name: string;
+  description: string;
+  parameters: ToolParameter[];
+  handler?: (params: Record&lt;string, any&gt;) =&gt; Promise&lt;any&gt;;
+  endpoint?: string;
+  method?: 'GET' | 'POST';
+  riskLevel?: RiskLevel;
+  category?: ActionCategory;
+}): AIP</code></pre>
+
+      <p>The low-level registration method. <code>registerSearch()</code> and <code>registerAction()</code> are convenience wrappers around this. Use <code>registerTool()</code> when you need full control over all properties.</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>name</code></td>
+            <td><code>string</code></td>
+            <td>Yes</td>
+            <td>Unique tool name.</td>
+          </tr>
+          <tr>
+            <td><code>description</code></td>
+            <td><code>string</code></td>
+            <td>Yes</td>
+            <td>Human-readable description.</td>
+          </tr>
+          <tr>
+            <td><code>parameters</code></td>
+            <td><code>ToolParameter[]</code></td>
+            <td>Yes</td>
+            <td>Array of parameter definitions.</td>
+          </tr>
+          <tr>
+            <td><code>handler</code></td>
+            <td><code>function</code></td>
+            <td>No</td>
+            <td>Custom handler. If omitted and <code>endpoint</code> is provided, uses default fetch.</td>
+          </tr>
+          <tr>
+            <td><code>endpoint</code></td>
+            <td><code>string</code></td>
+            <td>No</td>
+            <td>URL for default fetch handler.</td>
+          </tr>
+          <tr>
+            <td><code>method</code></td>
+            <td><code>'GET' | 'POST'</code></td>
+            <td>No</td>
+            <td>HTTP method for default fetch. Default: <code>'GET'</code>.</td>
+          </tr>
+          <tr>
+            <td><code>riskLevel</code></td>
+            <td><code>RiskLevel</code></td>
+            <td>No</td>
+            <td>Risk classification. See <a href="#risklevel">RiskLevel</a>. Default: <code>'SAFE'</code>.</td>
+          </tr>
+          <tr>
+            <td><code>category</code></td>
+            <td><code>ActionCategory</code></td>
+            <td>No</td>
+            <td>Functional category. See <a href="#actioncategory">ActionCategory</a>. Default: <code>'CUSTOM'</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>unregisterTool()</h3>
+
+      <pre><code>unregisterTool(name: string): boolean</code></pre>
+
+      <p>Removes a previously registered tool by name. Returns <code>true</code> if the tool was found and removed, <code>false</code> if no tool with that name was registered.</p>
+
+      <h3>clearRegistry()</h3>
+
+      <pre><code>clearRegistry(): void</code></pre>
+
+      <p>Removes all manually registered tools. Does not affect tools discovered via auto-inference (those will be re-inferred on next <code>refreshTools()</code> call).</p>
+
+      <h3>getRegisteredTools()</h3>
+
+      <pre><code>getRegisteredTools(): ToolSchema[]</code></pre>
+
+      <p>Returns an array of all currently registered tools (both manually registered and auto-inferred).</p>
+
+      <h3>executeTool()</h3>
+
+      <pre><code>executeTool(name: string, params: Record&lt;string, any&gt;): Promise&lt;any&gt;</code></pre>
+
+      <p>Programmatically executes a registered tool by name with the given parameters. Returns the tool's result. Use this for testing or for chaining tool calls.</p>
+
+      <pre><code>const results = await aip.executeTool('search_catalog', {
+  q: 'blue shirt',
+  maxPrice: 100,
+});</code></pre>
+
+      <h2 id="inference">Inference</h2>
+
+      <h3>inferTools()</h3>
+
+      <pre><code>inferTools(options?: {
+  rootSelector?: string;
+  tagAllowlist?: string[];
+}): InferenceResult</code></pre>
+
+      <p>Scans the DOM for interactive elements (forms, search inputs, filters, select dropdowns) and automatically generates tool schemas. This is the "zero-config" path — no registration code needed for standard UI patterns.</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Option</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>rootSelector</code></td>
+            <td><code>string</code></td>
+            <td><code>'body'</code></td>
+            <td>CSS selector for the root element to scan. Limit the scope for performance on large pages.</td>
+          </tr>
+          <tr>
+            <td><code>tagAllowlist</code></td>
+            <td><code>string[]</code></td>
+            <td><code>['form', 'input', 'select', 'button']</code></td>
+            <td>HTML tag names to scan. Narrow the list to only relevant elements.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p><strong>Returns:</strong> <code>InferenceResult</code></p>
+
+      <pre><code>{
+  tools: ToolSchema[];       // All inferred tools
+  total: number;             // Total count
+  safe: number;              // Count of SAFE tools
+  highRisk: number;          // Count of HIGH_RISK tools
+  categories: Record&lt;ActionCategory, number&gt;;  // Count by category
+}</code></pre>
+
+      <pre><code>const result = aip.inferTools({ rootSelector: '#search-section' });
+console.log(`Found ${result.total} tools (${result.safe} safe, ${result.highRisk} high-risk)`);</code></pre>
+
+      <h2>UI Mirroring</h2>
+
+      <h3>mirrorElementValue()</h3>
+
+      <pre><code>mirrorElementValue(selector: string, value: string): boolean</code></pre>
+
+      <p>Programmatically sets the value of a DOM element and dispatches appropriate events (input, change) so that framework bindings (React, Vue, etc.) detect the change. Returns <code>true</code> if the element was found and updated, <code>false</code> if no element matched the selector.</p>
+
+      <pre><code>// Agent fills in a search field
+aip.mirrorElementValue('#search-input', 'blue shirt');</code></pre>
+
+      <h2>E-Commerce Plugin</h2>
+
+      <h3>ecommercePlugin()</h3>
+
+      <pre><code>ecommercePlugin(config: EcommercePluginConfig): { register(): void; unregister(): void }</code></pre>
+
+      <p>Factory function for the e-commerce plugin. See the full <a href="ecommerce-plugin.html">E-Commerce Plugin</a> documentation for details.</p>
+
+      <h3>VERTICAL_TEMPLATES</h3>
+
+      <pre><code>const VERTICAL_TEMPLATES: {
+  ecommerce: Partial&lt;EcommercePluginConfig&gt;;
+  realEstate: Partial&lt;EcommercePluginConfig&gt;;
+  travel: Partial&lt;EcommercePluginConfig&gt;;
+}</code></pre>
+
+      <p>Pre-configured parameter sets for common verticals. Spread into your plugin config:</p>
+
+      <pre><code>ecommercePlugin({
+  ...VERTICAL_TEMPLATES.realEstate,
+  searchEndpoint: '/api/properties',
+}).register();</code></pre>
+
+      <h2>Security</h2>
+
+      <h3>createHITLManager()</h3>
+
+      <pre><code>createHITLManager(options?: {
+  cssPrefix?: string;
+  hitlTimeout?: number;
+}): {
+  listen(): void;
+  destroy(): void;
+}</code></pre>
+
+      <p>Creates a Human-in-the-Loop (HITL) manager that intercepts high-risk actions and presents a confirmation modal to the user.</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Option</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>cssPrefix</code></td>
+            <td><code>string</code></td>
+            <td><code>'aip-hiTL'</code></td>
+            <td>CSS class prefix for modal elements. Customize to match your site's styling.</td>
+          </tr>
+          <tr>
+            <td><code>hitlTimeout</code></td>
+            <td><code>number</code></td>
+            <td><code>30000</code></td>
+            <td>Timeout in milliseconds before auto-denying an unresponded confirmation. Set to <code>0</code> to disable timeout.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p><strong>Returns:</strong> An object with:</p>
+
+      <ul>
+        <li><code>listen()</code> — Starts listening for HITL events and shows the modal when needed.</li>
+        <li><code>destroy()</code> — Removes the modal from the DOM and stops listening.</li>
+      </ul>
+
+      <pre><code>const hitl = createHITLManager({ hitlTimeout: 15000 });
+hitl.listen();
+
+// Later, when cleaning up:
+hitl.destroy();</code></pre>
+
+      <h3>sanitizePayload()</h3>
+
+      <pre><code>sanitizePayload(data: any): any</code></pre>
+
+      <p>Returns a sanitized deep copy of the input, with prompt injection patterns neutralized. Use this before passing agent-provided data to sensitive operations.</p>
+
+      <pre><code>const safeParams = sanitizePayload(agentProvidedParams);
+// safeParams is a clean copy — original is untouched</code></pre>
+
+      <h2 id="types">Types</h2>
+
+      <h3 id="aipconfig">AIPConfig</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>siteId</code></td>
+            <td><code>string</code></td>
+            <td><em>required</em></td>
+            <td>Unique identifier for your site. Used for capability announcements and agent routing.</td>
+          </tr>
+          <tr>
+            <td><code>inference</code></td>
+            <td><code>{ autoDetect?: boolean; rootSelector?: string; tagAllowlist?: string[] }</code></td>
+            <td><code>{ autoDetect: true }</code></td>
+            <td>Auto-inference configuration. Set <code>autoDetect: false</code> to disable automatic DOM scanning on <code>start()</code>.</td>
+          </tr>
+          <tr>
+            <td><code>security</code></td>
+            <td><code>{ sanitizeInput?: boolean; hitl?: HITLManagerOptions }</code></td>
+            <td><code>{ sanitizeInput: true }</code></td>
+            <td>Security configuration. <code>sanitizeInput</code> enables auto-sanitization. <code>hitl</code> passes options to the HITL manager.</td>
+          </tr>
+          <tr>
+            <td><code>debug</code></td>
+            <td><code>boolean</code></td>
+            <td><code>false</code></td>
+            <td>Enable verbose console logging for development.</td>
+          </tr>
+          <tr>
+            <td><code>plugins</code></td>
+            <td><code>AIPPlugin[]</code></td>
+            <td><code>[]</code></td>
+            <td>Array of plugin instances to register on <code>start()</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="toolschema">ToolSchema</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>name</code></td>
+            <td><code>string</code></td>
+            <td>Unique tool name.</td>
+          </tr>
+          <tr>
+            <td><code>description</code></td>
+            <td><code>string</code></td>
+            <td>Human-readable description.</td>
+          </tr>
+          <tr>
+            <td><code>parameters</code></td>
+            <td><code>ToolParameter[]</code></td>
+            <td>Array of parameter definitions.</td>
+          </tr>
+          <tr>
+            <td><code>endpoint</code></td>
+            <td><code>string | undefined</code></td>
+            <td>Associated API endpoint, if any.</td>
+          </tr>
+          <tr>
+            <td><code>method</code></td>
+            <td><code>'GET' | 'POST'</code></td>
+            <td>HTTP method for the endpoint.</td>
+          </tr>
+          <tr>
+            <td><code>riskLevel</code></td>
+            <td><code>RiskLevel</code></td>
+            <td>Risk classification.</td>
+          </tr>
+          <tr>
+            <td><code>category</code></td>
+            <td><code>ActionCategory</code></td>
+            <td>Functional category.</td>
+          </tr>
+          <tr>
+            <td><code>requiresConfirmation</code></td>
+            <td><code>boolean</code></td>
+            <td>Whether the tool requires HITL confirmation.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="toolparameter">ToolParameter</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>name</code></td>
+            <td><code>string</code></td>
+            <td>Yes</td>
+            <td>Parameter name (used as key in params object).</td>
+          </tr>
+          <tr>
+            <td><code>type</code></td>
+            <td><code>'string' | 'number' | 'boolean' | 'enum'</code></td>
+            <td>Yes</td>
+            <td>Expected JavaScript type.</td>
+          </tr>
+          <tr>
+            <td><code>description</code></td>
+            <td><code>string</code></td>
+            <td>Yes</td>
+            <td>Description of what the parameter does.</td>
+          </tr>
+          <tr>
+            <td><code>required</code></td>
+            <td><code>boolean</code></td>
+            <td>No</td>
+            <td>Whether the parameter is required. Default: <code>false</code>.</td>
+          </tr>
+          <tr>
+            <td><code>enum</code></td>
+            <td><code>string[]</code></td>
+            <td>No</td>
+            <td>Allowed values when <code>type</code> is <code>'enum'</code>.</td>
+          </tr>
+          <tr>
+            <td><code>default</code></td>
+            <td><code>any</code></td>
+            <td>No</td>
+            <td>Default value if not provided.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="agentcapability">AgentCapability</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>siteId</code></td>
+            <td><code>string</code></td>
+            <td>The site identifier from AIPConfig.</td>
+          </tr>
+          <tr>
+            <td><code>tools</code></td>
+            <td><code>ToolSchema[]</code></td>
+            <td>All registered and inferred tools.</td>
+          </tr>
+          <tr>
+            <td><code>version</code></td>
+            <td><code>string</code></td>
+            <td>aip.js SDK version.</td>
+          </tr>
+          <tr>
+            <td><code>timestamp</code></td>
+            <td><code>number</code></td>
+            <td>Unix timestamp of when capabilities were computed.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="risklevel">RiskLevel</h3>
+
+      <pre><code>enum RiskLevel {
+  SAFE = 'SAFE',
+  HIGH_RISK = 'HIGH_RISK',
+}</code></pre>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Value</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>SAFE</code></td>
+            <td>Read-only operation. No confirmation needed. Always safe for agents to invoke.</td>
+          </tr>
+          <tr>
+            <td><code>HIGH_RISK</code></td>
+            <td>Mutation or sensitive operation. Triggers HITL confirmation modal before execution.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="actioncategory">ActionCategory</h3>
+
+      <pre><code>enum ActionCategory {
+  SEARCH = 'SEARCH',
+  FILTER = 'FILTER',
+  SORT = 'SORT',
+  FETCH = 'FETCH',
+  NAVIGATE = 'NAVIGATE',
+  MUTATE = 'MUTATE',
+  CUSTOM = 'CUSTOM',
+}</code></pre>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Value</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>SEARCH</code></td>
+            <td>Full-text search operations.</td>
+          </tr>
+          <tr>
+            <td><code>FILTER</code></td>
+            <td>Faceted or parametric filtering.</td>
+          </tr>
+          <tr>
+            <td><code>SORT</code></td>
+            <td>Result ordering operations.</td>
+          </tr>
+          <tr>
+            <td><code>FETCH</code></td>
+            <td>Single-item retrieval by ID.</td>
+          </tr>
+          <tr>
+            <td><code>NAVIGATE</code></td>
+            <td>Page or section navigation.</td>
+          </tr>
+          <tr>
+            <td><code>MUTATE</code></td>
+            <td>Write operations (create, update, delete).</td>
+          </tr>
+          <tr>
+            <td><code>CUSTOM</code></td>
+            <td>Any other operation not covered above.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="agentbridgeevent">AgentBridgeEvent</h3>
+
+      <pre><code>enum AgentBridgeEvent {
+  CAPABILITIES_REQUEST = 'aip:capabilities:request',
+  CAPABILITIES_RESPONSE = 'aip:capabilities:response',
+  TOOL_INVOKE = 'aip:tool:invoke',
+  TOOL_RESULT = 'aip:tool:result',
+  HITL_REQUEST = 'aip:hitl:request',
+  HITL_RESPONSE = 'aip:hitl:response',
+}</code></pre>
+
+      <h3 id="hitlrequest">HITLRequest</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>id</code></td>
+            <td><code>string</code></td>
+            <td>Unique request identifier.</td>
+          </tr>
+          <tr>
+            <td><code>tool</code></td>
+            <td><code>ToolSchema</code></td>
+            <td>The tool being invoked.</td>
+          </tr>
+          <tr>
+            <td><code>params</code></td>
+            <td><code>Record&lt;string, any&gt;</code></td>
+            <td>The parameters the agent wants to pass.</td>
+          </tr>
+          <tr>
+            <td><code>reason</code></td>
+            <td><code>string</code></td>
+            <td>Human-readable explanation of why this action needs confirmation.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="hitlresponse">HITLResponse</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>id</code></td>
+            <td><code>string</code></td>
+            <td>Matches the HITLRequest id.</td>
+          </tr>
+          <tr>
+            <td><code>action</code></td>
+            <td><code>HITLAction</code></td>
+            <td>The user's decision.</td>
+          </tr>
+          <tr>
+            <td><code>modifiedParams</code></td>
+            <td><code>Record&lt;string, any&gt; | undefined</code></td>
+            <td>If the user modified the parameters before approving.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="hitlaction">HITLAction</h3>
+
+      <pre><code>enum HITLAction {
+  APPROVE = 'approve',
+  DENY = 'deny',
+  MODIFY = 'modify',
+}</code></pre>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Value</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>approve</code></td>
+            <td>User approved the action as-is.</td>
+          </tr>
+          <tr>
+            <td><code>deny</code></td>
+            <td>User denied the action entirely.</td>
+          </tr>
+          <tr>
+            <td><code>modify</code></td>
+            <td>User approved but with modified parameters.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 id="events">Events</h2>
+
+      <p>All events are dispatched as <code>CustomEvent</code> on <code>window</code>. Use <code>window.addEventListener()</code> to listen.</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Event Name</th>
+            <th>Direction</th>
+            <th>Payload Type</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>aip:capabilities:request</code></td>
+            <td>Agent → Site</td>
+            <td><code>{ siteId?: string }</code></td>
+            <td>An agent is requesting the site's capabilities. The AIP runtime responds automatically.</td>
+          </tr>
+          <tr>
+            <td><code>aip:capabilities:response</code></td>
+            <td>Site → Agent</td>
+            <td><code>AgentCapability</code></td>
+            <td>The site's capability listing. Automatically dispatched by <code>broadcastCapabilities()</code>.</td>
+          </tr>
+          <tr>
+            <td><code>aip:tool:invoke</code></td>
+            <td>Agent → Site</td>
+            <td><code>{ tool: string; params: Record&lt;string, any&gt; }</code></td>
+            <td>An agent is invoking a tool. The AIP runtime executes the handler automatically.</td>
+          </tr>
+          <tr>
+            <td><code>aip:tool:result</code></td>
+            <td>Site → Agent</td>
+            <td><code>{ tool: string; result: any; error?: string }</code></td>
+            <td>The result (or error) of a tool invocation.</td>
+          </tr>
+          <tr>
+            <td><code>aip:hitl:request</code></td>
+            <td>Agent → Site</td>
+            <td><code>HITLRequest</code></td>
+            <td>A high-risk action needs user confirmation. The HITL manager shows the modal.</td>
+          </tr>
+          <tr>
+            <td><code>aip:hitl:response</code></td>
+            <td>Site → Agent</td>
+            <td><code>HITLResponse</code></td>
+            <td>The user's decision on a HITL request.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <pre><code>// Listen for tool invocations
+window.addEventListener('aip:tool:invoke', (event) => {
+  const { tool, params } = event.detail;
+  console.log(`Tool invoked: ${tool}`, params);
+});
+
+// Listen for capabilities responses
+window.addEventListener('aip:capabilities:response', (event) => {
+  const capabilities = event.detail;
+  console.log(`Site has ${capabilities.tools.length} tools available`);
+});</code></pre>
+
+      <nav class="page-nav">
+        <a href="webmcp.html" class="prev">← WebMCP Compatibility</a>
+      </nav>
+
+    </main>
+  </div>
+  <script src="assets/nav.js"></script>
+</body>
+</html>

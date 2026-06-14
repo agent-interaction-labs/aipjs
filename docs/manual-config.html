@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manual Configuration — aip.js</title>
+  <link rel="stylesheet" href="assets/docs.css">
+</head>
+<body>
+  <div class="docs-shell">
+    <aside class="docs-sidebar" id="docs-nav"></aside>
+    <main class="docs-content">
+
+      <h1>Manual Configuration</h1>
+
+      <p>
+        Manual configuration gives you full control over what tools AI agents can access.
+        Use it when you need to expose custom APIs, handle complex SPA workflows, enforce
+        strict security policies, or integrate with services that don't have corresponding
+        DOM elements.
+      </p>
+
+      <p>
+        All manual registrations take precedence over auto-inferred tools. If a manually
+        registered tool shares a name with an auto-inferred one, the manual definition wins.
+      </p>
+
+      <nav class="page-nav" aria-label="Page navigation">
+        <a href="auto-inference.html">← Previous: Auto-Inference</a>
+        <a href="hitl-security.html">Next: HITL Security →</a>
+      </nav>
+
+      <h2>registerSearch()</h2>
+
+      <p>
+        <code>registerSearch()</code> registers a read-only search/query tool. It is the
+        simplest registration method and is ideal for any operation that retrieves data
+        without side effects.
+      </p>
+
+      <h3>Signature</h3>
+      <pre><code>aip.registerSearch(
+  name: string,
+  parameters: ParamDef[],
+  endpoint?: string,
+  method?: string
+)</code></pre>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>name</code></td>
+            <td><code>string</code></td>
+            <td>Yes</td>
+            <td>Unique tool name. Prefixed with <code>search_</code> automatically if not already present.</td>
+          </tr>
+          <tr>
+            <td><code>parameters</code></td>
+            <td><code>ParamDef[]</code></td>
+            <td>Yes</td>
+            <td>Array of parameter definitions. Each includes <code>name</code>, <code>type</code>, <code>description</code>, and optional <code>required</code> and <code>enum</code>.</td>
+          </tr>
+          <tr>
+            <td><code>endpoint</code></td>
+            <td><code>string</code></td>
+            <td>No</td>
+            <td>API endpoint URL. If omitted, calls are dispatched as events on the page.</td>
+          </tr>
+          <tr>
+            <td><code>method</code></td>
+            <td><code>string</code></td>
+            <td>No</td>
+            <td>HTTP method for the endpoint. Defaults to <code>"GET"</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Example: E-Commerce Product Search</h3>
+
+      <pre><code>aip.registerSearch('product_search', [
+  {
+    name: 'q',
+    type: 'string',
+    description: 'Search query — matches against product name and description',
+    required: true
+  },
+  {
+    name: 'category',
+    type: 'string',
+    description: 'Filter by product category',
+    enum: ['electronics', 'clothing', 'home', 'sports']
+  },
+  {
+    name: 'minPrice',
+    type: 'number',
+    description: 'Minimum price in USD'
+  },
+  {
+    name: 'maxPrice',
+    type: 'number',
+    description: 'Maximum price in USD'
+  },
+  {
+    name: 'sortBy',
+    type: 'string',
+    description: 'Sort order for results',
+    enum: ['relevance', 'price_asc', 'price_desc', 'rating', 'newest']
+  }
+], 'https://api.example.com/products/search');</code></pre>
+
+      <h2>registerAction()</h2>
+
+      <p>
+        <code>registerAction()</code> registers a tool that performs a state-changing
+        (mutation) operation. Actions support an optional confirmation gate for
+        human-in-the-loop workflows.
+      </p>
+
+      <h3>Signature</h3>
+      <pre><code>aip.registerAction(
+  name: string,
+  description: string,
+  parameters: ParamDef[],
+  handler: (params: object) =&gt; Promise&lt;void&gt; | void,
+  requiresConfirmation?: boolean
+)</code></pre>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>name</code></td>
+            <td><code>string</code></td>
+            <td>Yes</td>
+            <td>Unique action name.</td>
+          </tr>
+          <tr>
+            <td><code>description</code></td>
+            <td><code>string</code></td>
+            <td>Yes</td>
+            <td>Human-readable description of what the action does (shown in confirmation prompts).</td>
+          </tr>
+          <tr>
+            <td><code>parameters</code></td>
+            <td><code>ParamDef[]</code></td>
+            <td>Yes</td>
+            <td>Array of parameter definitions, same format as <code>registerSearch()</code>.</td>
+          </tr>
+          <tr>
+            <td><code>handler</code></td>
+            <td><code>function</code></td>
+            <td>Yes</td>
+            <td>Async or sync function that executes the action. Receives the parsed parameters object.</td>
+          </tr>
+          <tr>
+            <td><code>requiresConfirmation</code></td>
+            <td><code>boolean</code></td>
+            <td>No</td>
+            <td>If <code>true</code>, the agent must present a confirmation prompt to the user before the action executes. Defaults to <code>false</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Example: Add to Cart with Confirmation</h3>
+
+      <pre><code>aip.registerAction(
+  'add_to_cart',
+  'Add a product to the shopping cart',
+  [
+    {
+      name: 'productId',
+      type: 'string',
+      description: 'Unique product identifier',
+      required: true
+    },
+    {
+      name: 'quantity',
+      type: 'number',
+      description: 'Number of items to add',
+      required: true
+    },
+    {
+      name: 'variantId',
+      type: 'string',
+      description: 'Product variant (size, color, etc.)'
+    }
+  ],
+  async (params) =&gt; {
+    const response = await fetch('/api/cart/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to add to cart: ${response.statusText}`);
+    }
+
+    const cart = await response.json();
+    window.dispatchEvent(new CustomEvent('cart:updated', { detail: cart }));
+  },
+  true  // requiresConfirmation — user must approve before execution
+);</code></pre>
+
+      <h2>registerTool()</h2>
+
+      <p>
+        <code>registerTool()</code> is the base registration function. It offers the
+        most flexibility, exposing every field of the tool schema. Use this when
+        <code>registerSearch()</code> or <code>registerAction()</code> don't provide
+        enough control — for example, when you need custom risk levels, categories,
+        or a tool that doesn't fit the search/action dichotomy.
+      </p>
+
+      <h3>Signature</h3>
+      <pre><code>aip.registerTool(
+  name: string,
+  description: string,
+  parameters: ParamDef[],
+  handlerOrEndpoint: function | string,
+  riskLevel?: 'safe' | 'high',
+  category?: string
+)</code></pre>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>name</code></td>
+            <td><code>string</code></td>
+            <td>Yes</td>
+            <td>Unique tool name.</td>
+          </tr>
+          <tr>
+            <td><code>description</code></td>
+            <td><code>string</code></td>
+            <td>Yes</td>
+            <td>What the tool does. Displayed to agents and in confirmation dialogs.</td>
+          </tr>
+          <tr>
+            <td><code>parameters</code></td>
+            <td><code>ParamDef[]</code></td>
+            <td>Yes</td>
+            <td>Parameter definitions.</td>
+          </tr>
+          <tr>
+            <td><code>handlerOrEndpoint</code></td>
+            <td><code>function | string</code></td>
+            <td>Yes</td>
+            <td>Either a handler function or an endpoint URL string. If a URL is given, requests are forwarded as HTTP calls.</td>
+          </tr>
+          <tr>
+            <td><code>riskLevel</code></td>
+            <td><code>'safe' | 'high'</code></td>
+            <td>No</td>
+            <td>Defaults to <code>'safe'</code> for endpoint URLs and <code>'high'</code> for handler functions.</td>
+          </tr>
+          <tr>
+            <td><code>category</code></td>
+            <td><code>string</code></td>
+            <td>No</td>
+            <td>Logical grouping for the tool (e.g., <code>'shopping'</code>, <code>'account'</code>).</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>When to Use registerTool()</h3>
+
+      <ul>
+        <li>
+          <strong>Custom risk levels</strong> — You need a <code>'safe'</code> mutation tool
+          or a <code>'high'</code> query tool.
+        </li>
+        <li>
+          <strong>Non-standard categories</strong> — Your tool doesn't fit <code>search</code>,
+          <code>filter</code>, <code>sort</code>, <code>navigate</code>, or <code>mutation</code>.
+        </li>
+        <li>
+          <strong>Direct handler + custom response</strong> — You want complete control over
+          response serialization and error handling.
+        </li>
+        <li>
+          <strong>Streaming or WebSocket tools</strong> — Your handler manages a persistent
+          connection instead of a request/response cycle.
+        </li>
+      </ul>
+
+      <h2>Unregistering</h2>
+
+      <p>Remove tools from the registry when they are no longer available:</p>
+
+      <pre><code>// Remove a single tool by name
+aip.unregisterTool('search_product_search');
+
+// Remove all registered tools (auto-inferred and manual)
+aip.clearRegistry();</code></pre>
+
+      <p>
+        <strong>Note:</strong> <code>clearRegistry()</code> removes <em>all</em> tools.
+        Auto-inferred tools will be re-discovered on the next <code>refreshTools()</code> call.
+        Manual tools must be re-registered explicitly.
+      </p>
+
+      <h2>Override Behavior</h2>
+
+      <p>
+        When both auto-inference and manual registration produce tools with the same name,
+        the manual tool wins. This is by design — it lets you replace auto-inferred
+        behavior with custom logic without modifying your HTML.
+      </p>
+
+      <div class="callout callout-warning">
+        <strong>Important:</strong> Tool names must be unique. If you register two manual
+        tools with the same name, the second registration will overwrite the first with
+        a console warning. Use unique names or call <code>unregisterTool()</code> before
+        re-registering.
+      </div>
+
+      <h2>Example: Full E-Commerce Setup</h2>
+
+      <p>
+        A complete e-commerce configuration combining search and multiple guarded
+        actions:
+      </p>
+
+      <pre><code>import { AIP } from '@aipjs/core';
+
+const aip = new AIP();
+
+// --- Search: browse products ---
+aip.registerSearch('product_search', [
+  { name: 'q', type: 'string', description: 'Search query', required: true },
+  { name: 'category', type: 'string', description: 'Product category',
+    enum: ['electronics', 'clothing', 'home', 'sports'] },
+  { name: 'minPrice', type: 'number', description: 'Minimum price' },
+  { name: 'maxPrice', type: 'number', description: 'Maximum price' },
+  { name: 'sortBy', type: 'string', description: 'Sort order',
+    enum: ['relevance', 'price_asc', 'price_desc', 'rating'] }
+], 'https://api.example.com/products/search');
+
+// --- Action: add to cart (HITL) ---
+aip.registerAction(
+  'add_to_cart',
+  'Add items to the shopping cart',
+  [
+    { name: 'productId', type: 'string', description: 'Product ID', required: true },
+    { name: 'quantity', type: 'number', description: 'Quantity', required: true },
+    { name: 'variantId', type: 'string', description: 'Variant (size/color)' }
+  ],
+  async (params) =&gt; {
+    const res = await fetch('/api/cart/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params)
+    });
+    if (!res.ok) throw new Error(`Cart error: ${res.statusText}`);
+    return res.json();
+  },
+  true  // requiresConfirmation
+);
+
+// --- Action: checkout (HITL) ---
+aip.registerAction(
+  'checkout',
+  'Complete the purchase and place the order',
+  [
+    { name: 'paymentMethodId', type: 'string', description: 'Saved payment method ID', required: true },
+    { name: 'shippingAddressId', type: 'string', description: 'Saved shipping address ID', required: true },
+    { name: 'couponCode', type: 'string', description: 'Optional discount code' }
+  ],
+  async (params) =&gt; {
+    const res = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params)
+    });
+    if (!res.ok) throw new Error(`Checkout failed: ${res.statusText}`);
+    const order = await res.json();
+    window.location.href = `/orders/${order.id}/confirmation`;
+    return order;
+  },
+  true  // requiresConfirmation — highest sensitivity
+);
+
+// --- Start the SDK ---
+aip.start();</code></pre>
+
+      <p>
+        With this setup, an AI agent can search products, add items to the cart (after
+        user confirmation), and complete checkout (after a separate user confirmation).
+        The human-in-the-loop gates ensure the user stays in control of all
+        state-changing operations.
+      </p>
+
+    </main>
+  </div>
+  <script src="assets/nav.js"></script>
+</body>
+</html>

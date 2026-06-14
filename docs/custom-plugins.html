@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom Plugins — aip.js</title>
+  <link rel="stylesheet" href="assets/docs.css">
+</head>
+<body>
+  <div class="docs-shell">
+    <aside class="docs-sidebar" id="docs-nav"></aside>
+    <main class="docs-content">
+
+      <h1>Writing Custom Plugins</h1>
+
+      <p>The plugin system lets you package reusable AEO capabilities for specific industries or use cases. A plugin is just a plain object with a <code>register()</code> method — you can build one in minutes.</p>
+
+      <h2>Plugin Interface</h2>
+
+      <p>Every plugin must conform to this minimal interface:</p>
+
+      <pre><code>interface AIPPlugin {
+  register(): void;
+  unregister(): void;
+}</code></pre>
+
+      <ul>
+        <li><strong><code>register()</code></strong> — Called when the plugin is activated. Use it to register search endpoints, actions, or other tools via the AIP SDK.</li>
+        <li><strong><code>unregister()</code></strong> — Called when the plugin is deactivated. Use it to clean up registrations and event listeners.</li>
+      </ul>
+
+      <p>Internally, <code>register()</code> typically calls <code>aip.registerSearch()</code> or <code>aip.registerAction()</code> to expose capabilities to agents. <code>unregister()</code> calls <code>aip.unregisterTool()</code> for cleanup.</p>
+
+      <h2>Example: SaaS Knowledge Base</h2>
+
+      <p>A plugin that exposes a knowledge base search to agents. Users can search articles and fetch full article content. All read-only.</p>
+
+      <pre><code>/**
+ * SaaS Knowledge Base Plugin
+ * Exposes search_kb and get_article to agents.
+ */
+export function kbPlugin(config) {
+  const { apiBase, apiKey } = config;
+
+  return {
+    register() {
+      // Register knowledge base search
+      aip.registerSearch({
+        endpoint: `${apiBase}/kb/search`,
+        parameters: [
+          { name: 'query', type: 'string', description: 'Search query', required: true },
+          { name: 'category', type: 'string', description: 'Article category' },
+          { name: 'product', type: 'string', description: 'Filter by product area' },
+        ],
+        method: 'GET',
+      });
+
+      // Register article detail fetch
+      aip.registerAction({
+        name: 'get_article',
+        description: 'Fetch the full content of a knowledge base article by ID',
+        parameters: [
+          { name: 'id', type: 'string', description: 'Article ID', required: true },
+        ],
+        handler: async ({ id }) => {
+          const response = await fetch(`${apiBase}/kb/articles/${id}`, {
+            headers: { Authorization: `Bearer ${apiKey}` },
+          });
+          if (!response.ok) {
+            throw new Error(`Article not found: ${id}`);
+          }
+          const article = await response.json();
+          return {
+            id: article.id,
+            title: article.title,
+            content: article.body,
+            category: article.category,
+            lastUpdated: article.updated_at,
+          };
+        },
+      });
+    },
+
+    unregister() {
+      aip.unregisterTool('search_kb');
+      aip.unregisterTool('get_article');
+    },
+  };
+}
+
+// Usage:
+import { kbPlugin } from './kb-plugin';
+
+const kb = kbPlugin({
+  apiBase: 'https://help.myapp.com/api/v1',
+  apiKey: 'sk-...',
+});
+
+kb.register();</code></pre>
+
+      <div class="callout callout-safe">
+        <strong>SAFE:</strong> This plugin only exposes read operations. Agents can search and read articles but cannot create, edit, or delete content.
+      </div>
+
+      <h2>Example: Booking System</h2>
+
+      <p>A plugin that lets agents check availability and list open time slots. Perfect for salons, clinics, or consultation services.</p>
+
+      <pre><code>/**
+ * Booking System Plugin
+ * Exposes check_availability and get_available_slots to agents.
+ */
+export function bookingPlugin(config) {
+  const { apiBase, calendarId } = config;
+
+  return {
+    register() {
+      // Check availability for a specific date and service
+      aip.registerAction({
+        name: 'check_availability',
+        description: 'Check if a date is available for a given service',
+        parameters: [
+          { name: 'date', type: 'string', description: 'Date in YYYY-MM-DD format', required: true },
+          { name: 'service', type: 'string', description: 'Service type (e.g., "haircut", "consultation")', required: true },
+        ],
+        handler: async ({ date, service }) => {
+          const response = await fetch(
+            `${apiBase}/calendars/${calendarId}/availability?date=${date}&service=${service}`
+          );
+          const data = await response.json();
+          return {
+            date,
+            service,
+            available: data.slots.length > 0,
+            remainingSlots: data.slots.length,
+          };
+        },
+      });
+
+      // Get all available time slots for a date
+      aip.registerAction({
+        name: 'get_available_slots',
+        description: 'Get all available time slots for a specific date',
+        parameters: [
+          { name: 'date', type: 'string', description: 'Date in YYYY-MM-DD format', required: true },
+        ],
+        handler: async ({ date }) => {
+          const response = await fetch(
+            `${apiBase}/calendars/${calendarId}/slots?date=${date}`
+          );
+          const data = await response.json();
+          return {
+            date,
+            slots: data.slots.map(slot => ({
+              time: slot.start_time,
+              duration: slot.duration_minutes,
+              available: slot.status === 'open',
+            })),
+          };
+        },
+      });
+    },
+
+    unregister() {
+      aip.unregisterTool('check_availability');
+      aip.unregisterTool('get_available_slots');
+    },
+  };
+}</code></pre>
+
+      <div class="callout callout-safe">
+        <strong>SAFE:</strong> Read-only availability checks. Agents cannot book, cancel, or modify appointments.
+      </div>
+
+      <h2>Publishing Plugins</h2>
+
+      <p>To share your plugin with the community:</p>
+
+      <ol>
+        <li><strong>Package it</strong> as an npm module following the naming convention <code>@aipjs/plugin-&lt;name&gt;</code>.</li>
+        <li><strong>Export a factory function</strong> that returns <code>{ register, unregister }</code>.</li>
+        <li><strong>Publish to npm</strong> with clear documentation on configuration options.</li>
+      </ol>
+
+      <pre><code>// package.json
+{
+  "name": "@aipjs/plugin-kb",
+  "version": "1.0.0",
+  "description": "Knowledge base plugin for aip.js agents",
+  "main": "index.js",
+  "keywords": ["aipjs", "plugin", "knowledge-base"],
+  "peerDependencies": {
+    "@aipjs/sdk": "^1.0.0"
+  }
+}</code></pre>
+
+      <p>Users then install and use your plugin in two lines:</p>
+
+      <pre><code>import { kbPlugin } from '@aipjs/plugin-kb';
+
+kbPlugin({ apiBase: '...' }).register();</code></pre>
+
+      <h2>Best Practices</h2>
+
+      <ul>
+        <li><strong>Always SAFE by default.</strong> Design plugins to be read-only unless the use case absolutely requires writes. This builds trust with site owners who are understandably cautious about granting agent capabilities.</li>
+        <li><strong>Use <code>requiresConfirmation</code> for mutations.</strong> If your plugin must perform writes (e.g., adding an item to a wishlist), set <code>requiresConfirmation: true</code> on the action so the HITL (Human-in-the-Loop) modal prompts the user before execution.</li>
+        <li><strong>Document your parameters.</strong> Every parameter should have a clear <code>description</code> — this is what the agent reads to understand how to use your tools. Vague descriptions lead to bad agent behavior.</li>
+        <li><strong>Use TypeScript.</strong> Export type definitions for your configuration and return types so users get IDE autocompletion.</li>
+        <li><strong>Handle errors gracefully.</strong> Return meaningful error messages. Agents use error messages to correct their next attempt.</li>
+        <li><strong>Clean up in <code>unregister()</code>.</strong> Remove event listeners, clear intervals, and unregister all tools. Leaving stale registrations causes agents to call dead endpoints.</li>
+      </ul>
+
+      <nav class="page-nav">
+        <a href="ecommerce-plugin.html" class="prev">← E-Commerce Plugin</a>
+        <a href="webmcp.html" class="next">WebMCP Compatibility →</a>
+      </nav>
+
+    </main>
+  </div>
+  <script src="assets/nav.js"></script>
+</body>
+</html>

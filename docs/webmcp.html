@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebMCP Compatibility — aip.js</title>
+  <link rel="stylesheet" href="assets/docs.css">
+</head>
+<body>
+  <div class="docs-shell">
+    <aside class="docs-sidebar" id="docs-nav"></aside>
+    <main class="docs-content">
+
+      <h1>WebMCP Compatibility</h1>
+
+      <p>WebMCP (Web Model Context Protocol) is a W3C Community Group specification for how websites expose capabilities to browser-based AI agents. aip.js was designed with WebMCP alignment in mind — we use the same tool schema format and event model so that migration is seamless when browsers ship native support.</p>
+
+      <div class="callout callout-info">
+        <strong>This is a reference page.</strong> Most users don't need to care about WebMCP. aip.js works today in all modern browsers with no flags required.
+      </div>
+
+      <h2>Spec Status</h2>
+
+      <ul>
+        <li><strong>Current stage:</strong> W3C Community Group Draft</li>
+        <li><strong>Browser support:</strong> Chrome origin trial only (behind a flag). No stable browser ships WebMCP natively.</li>
+        <li><strong>Timeline:</strong> No announced ship date for any browser. Expect 12–24 months before stable support.</li>
+      </ul>
+
+      <p>Until browsers ship native WebMCP, aip.js provides a production-ready polyfill that works in all modern browsers today.</p>
+
+      <h2>Compatibility Table</h2>
+
+      <p>The table below maps WebMCP concepts to their aip.js equivalents:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>WebMCP Feature</th>
+            <th>Native API</th>
+            <th>aip.js Equivalent</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Tool registration</td>
+            <td><code>navigator.mcp.registerTool()</code></td>
+            <td><code>aip.registerTool()</code> / <code>aip.registerSearch()</code> / <code>aip.registerAction()</code></td>
+          </tr>
+          <tr>
+            <td>Declarative HTML</td>
+            <td><code>&lt;meta name="mcp-tool"&gt;</code> elements</td>
+            <td>Auto-inference engine (<code>aip.inferTools()</code>) — scans the DOM and auto-generates tool schemas</td>
+          </tr>
+          <tr>
+            <td>JSON Schema params</td>
+            <td>JSON Schema <code>inputSchema</code></td>
+            <td>Identical JSON Schema format for tool parameters</td>
+          </tr>
+          <tr>
+            <td>Read-only hints</td>
+            <td><code>risk: "safe"</code> annotation</td>
+            <td><code>riskLevel: "SAFE"</code> on tool registration — identical semantics</td>
+          </tr>
+          <tr>
+            <td>HITL interaction</td>
+            <td>WebMCP confirmation flow</td>
+            <td>Built-in HITL modal via <code>createHITLManager()</code> — rendered in-page for user approval</td>
+          </tr>
+          <tr>
+            <td>Transport</td>
+            <td>Browser-native message channel</td>
+            <td>Custom DOM events (<code>aip:tool:invoke</code>, <code>aip:tool:result</code>) plus direct function calls</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Migration Path</h2>
+
+      <p>When browsers ship native WebMCP support, aip.js is designed to detect it and delegate to the native API automatically. Here's what that means for you:</p>
+
+      <ul>
+        <li><strong>Same developer-facing API.</strong> Your calls to <code>aip.registerTool()</code>, <code>aip.registerSearch()</code>, etc. remain unchanged. aip.js routes them to the native WebMCP API when available, or uses its own implementation as a fallback.</li>
+        <li><strong>Zero migration work.</strong> Sites already using aip.js will automatically gain native WebMCP integration when browsers ship it. No code changes, no re-deployment.</li>
+        <li><strong>Graceful degradation.</strong> If a browser doesn't support WebMCP (or supports an older version), aip.js falls back to its own implementation seamlessly.</li>
+      </ul>
+
+      <pre><code>// Your code stays the same — forever
+aip.registerTool({
+  name: 'search_catalog',
+  description: 'Search the product catalog',
+  parameters: [
+    { name: 'q', type: 'string' },
+  ],
+  handler: async ({ q }) => { /* ... */ },
+});
+
+// aip.js handles the rest:
+// - Today: uses custom DOM events and direct calls
+// - Future: delegates to navigator.mcp.registerTool() when available</code></pre>
+
+      <h2>Beyond the Spec</h2>
+
+      <p>WebMCP defines the minimum viable protocol. aip.js adds several capabilities that the current WebMCP draft does not address:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Capability</th>
+            <th>What it does</th>
+            <th>Why WebMCP doesn't cover it</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Auto-inference engine</strong></td>
+            <td>Scans your existing HTML (forms, search inputs, filters) and automatically generates tool schemas — no registration code needed.</td>
+            <td>WebMCP requires explicit registration. Auto-inference is a higher-level convenience.</td>
+          </tr>
+          <tr>
+            <td><strong>HITL modal UI</strong></td>
+            <td>A pre-built, accessible modal that prompts users to approve or deny high-risk agent actions.</td>
+            <td>WebMCP defines the protocol but not the UI. aip.js ships the full UX.</td>
+          </tr>
+          <tr>
+            <td><strong>Prompt injection sanitization</strong></td>
+            <td>Automatic sanitization of agent-provided input to prevent prompt injection attacks.</td>
+            <td>Security is out of scope for the WebMCP spec.</td>
+          </tr>
+          <tr>
+            <td><strong>Plugin architecture</strong></td>
+            <td>Reusable, publishable plugin packages (<code>@aipjs/plugin-*</code>) for common use cases like e-commerce, booking, and knowledge bases.</td>
+            <td>WebMCP is a protocol spec, not an ecosystem.</td>
+          </tr>
+          <tr>
+            <td><strong>E-commerce templates</strong></td>
+            <td>Ready-made parameter schemas and handlers for retail, real estate, and travel verticals.</td>
+            <td>Domain-specific templates are out of scope.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>Even after WebMCP ships, these higher-level features remain valuable — they're not meant to be replaced by the browser, they're meant to be built on top of it.</p>
+
+      <nav class="page-nav">
+        <a href="custom-plugins.html" class="prev">← Custom Plugins</a>
+        <a href="api-reference.html" class="next">API Reference →</a>
+      </nav>
+
+    </main>
+  </div>
+  <script src="assets/nav.js"></script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UI Mirroring — aip.js</title>
+  <link rel="stylesheet" href="assets/docs.css">
+</head>
+<body>
+  <div class="docs-shell">
+    <aside class="docs-sidebar" id="docs-nav"></aside>
+    <main class="docs-content">
+      <h1>UI Mirroring</h1>
+      <p>
+        When an agent interacts with your site, mirroring shows you exactly what's happening
+        in real time. Every tool call, every field interaction, every value change — all
+        surfaced as visual feedback for website owners. You see what the agent sees.
+      </p>
+
+      <h2>Visual Indicators</h2>
+      <ul>
+        <li>
+          <strong>Blue dot (bottom-right corner)</strong> — pulses green when the agent is
+          actively working, static blue when idle. Always present as a subtle status indicator.
+        </li>
+        <li>
+          <strong>Element highlighting</strong> — affected fields receive a blue outline for
+          1.5 seconds, making it obvious which element the agent is interacting with.
+        </li>
+        <li>
+          <strong>Form population</strong> — agent-provided values appear directly in the
+          actual form fields. You can watch forms fill out in real time as the agent works.
+        </li>
+      </ul>
+
+      <h2>How It Works</h2>
+      <p>
+        Mirroring is event-driven. Three core hooks manage the visual feedback loop:
+      </p>
+      <ul>
+        <li>
+          <strong><code>onToolStart()</code></strong> — adds the focus CSS class to the target
+          element and mirrors the initial value. This is when the blue outline appears.
+        </li>
+        <li>
+          <strong><code>onToolComplete()</code></strong> — removes all visual indicators after
+          the tool finishes. The outline fades and the dot returns to idle.
+        </li>
+        <li>
+          <strong><code>watchNavigation()</code></strong> — re-scans the DOM on SPA route
+          changes so mirroring stays accurate across page transitions.
+        </li>
+      </ul>
+
+      <h2>mirrorElementValue()</h2>
+      <p>
+        Manual API for mirroring any element's value. Useful when you need precise control
+        over what the user sees during agent interaction.
+      </p>
+      <p><strong>Signature:</strong> <code>mirrorElementValue(selector, value)</code></p>
+      <p>Supports all standard form elements:</p>
+      <ul>
+        <li><code>&lt;input&gt;</code> — text, number, email, password, etc.</li>
+        <li><code>&lt;select&gt;</code> — sets the selected option</li>
+        <li><code>&lt;checkbox&gt;</code> — toggles checked state</li>
+      </ul>
+      <pre><code>// Mirror a value into a text input
+aip.mirrorElementValue('#search-box', 'wireless headphones');
+
+// Mirror a select dropdown
+aip.mirrorElementValue('#category-select', 'electronics');
+
+// Mirror a checkbox
+aip.mirrorElementValue('#agree-terms', true);</code></pre>
+
+      <h2>CSS Classes</h2>
+      <p>All mirroring classes use the configured <code>cssPrefix</code> (default: <code>"aipjs"</code>):</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Class</th>
+            <th>Effect</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>.aipjs-mirror-focus</code></td>
+            <td>Blue outline on the targeted element, visible for 1.5 seconds</td>
+          </tr>
+          <tr>
+            <td><code>.aipjs-mirror-changed</code></td>
+            <td>Brief flash animation when a value is programmatically set</td>
+          </tr>
+          <tr>
+            <td><code>#aipjs-indicator</code></td>
+            <td>The bottom-right dot indicator (pulses green when active)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>SPA Support</h2>
+      <p>
+        Single-page applications receive special treatment. Mirroring stays accurate even
+        through client-side navigation:
+      </p>
+      <ul>
+        <li>
+          <strong><code>watchNavigation()</code></strong> intercepts <code>pushState</code> and
+          <code>replaceState</code> calls, and listens for <code>popstate</code> events.
+        </li>
+        <li>
+          <strong>Automatic re-scan:</strong> calls <code>refreshTools()</code> on every route
+          change so the agent always sees the current page state.
+        </li>
+        <li>
+          <strong>MutationObserver:</strong> watches for DOM changes caused by framework
+          re-renders (React, Vue, Svelte), ensuring indicators stay attached to the right elements.
+        </li>
+      </ul>
+
+      <h2>Disabling</h2>
+      <p>
+        To turn off all visual mirroring, set <code>uiMirroring: false</code> in your AIP
+        configuration. The agent will still function normally — you just won't see the visual
+        feedback.
+      </p>
+      <pre><code>const aip = new AIP({
+  uiMirroring: false
+});</code></pre>
+
+    </main>
+  </div>
+  <script src="assets/nav.js"></script>
+</body>
+</html>

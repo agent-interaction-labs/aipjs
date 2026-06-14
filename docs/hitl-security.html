@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HITL Security — aip.js</title>
+  <link rel="stylesheet" href="assets/docs.css">
+</head>
+<body>
+  <div class="docs-shell">
+    <aside class="docs-sidebar" id="docs-nav"></aside>
+    <main class="docs-content">
+      <h1>Human-in-the-Loop Security</h1>
+      <p>
+        aip.js classifies <strong>every</strong> tool as either <code>SAFE</code> or <code>HIGH_RISK</code>.
+        For <code>HIGH_RISK</code> tools, agents <strong>cannot proceed</strong> without human approval.
+        This is not a suggestion — it is enforced at the framework level. No tool call tagged
+        <code>HIGH_RISK</code> will ever execute until a human explicitly clicks <em>Approve</em>.
+      </p>
+
+      <h2>How Risk Is Classified</h2>
+      <p>The inference engine automatically detects risk by analyzing DOM elements. Here's how:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Detection Method</th>
+            <th>Risk Level</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Auto-inference from <code>form[action*="cart"]</code></td>
+            <td><strong>HIGH_RISK</strong></td>
+          </tr>
+          <tr>
+            <td>Auto-inference from <code>button[type="submit"]</code></td>
+            <td><strong>HIGH_RISK</strong></td>
+          </tr>
+          <tr>
+            <td><code>data-aip-confirm</code> attribute present</td>
+            <td><strong>HIGH_RISK</strong></td>
+          </tr>
+          <tr>
+            <td>Everything else</td>
+            <td><strong>SAFE</strong></td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        You can explicitly mark any element as high-risk by adding a <code>data-aip-confirm</code>
+        attribute. The inference engine will respect it regardless of the element type.
+      </p>
+
+      <h2>The HITL Modal</h2>
+      <p>When a <code>HIGH_RISK</code> tool is invoked, a modal intercepts execution with this lifecycle:</p>
+      <ol>
+        <li><strong>Agent invokes HIGH_RISK tool</strong> — the tool call is intercepted before execution.</li>
+        <li><strong>Page freezes</strong> — all background interaction is blocked. No other actions can run.</li>
+        <li>
+          <strong>Modal appears at <code>z-index: 2147483647</code></strong> — showing the tool name,
+          parameters, and risk level. Nothing can render above it.
+        </li>
+        <li><strong>Human clicks Approve or Deny</strong> — the decision is final and immediate.</li>
+        <li>
+          <strong>If approved</strong>, the action proceeds normally.
+          <strong>If denied</strong>, the agent receives an error and the action is discarded.
+        </li>
+        <li><strong>Everything is logged</strong> — full audit trail: tool name, parameters, timestamp, and the human's decision.</li>
+      </ol>
+
+      <h2>What Agents See</h2>
+      <p>
+        When a human denies a <code>HIGH_RISK</code> tool call, the agent receives a JSON-RPC error
+        response. This is the standard error shape:
+      </p>
+      <pre><code>{
+  "jsonrpc": "2.0",
+  "id": "request-id-here",
+  "error": {
+    "code": -32000,
+    "message": "Human approval required"
+  }
+}</code></pre>
+      <p>
+        The agent can handle this gracefully — retrying with different parameters, asking the
+        human for clarification, or proceeding with an alternative SAFE tool.
+      </p>
+
+      <h2>Configuration</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Option</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>hitlEnabled</code></td>
+            <td><code>boolean</code></td>
+            <td><code>true</code></td>
+            <td>Enable Human-in-the-Loop for HIGH_RISK tools</td>
+          </tr>
+          <tr>
+            <td><code>hitlTimeout</code></td>
+            <td><code>number</code></td>
+            <td><code>30000</code></td>
+            <td>HITL modal timeout in milliseconds</td>
+          </tr>
+          <tr>
+            <td><code>hitlRiskLevels</code></td>
+            <td><code>RiskLevel[]</code></td>
+            <td><code>[HIGH_RISK]</code></td>
+            <td>Which risk levels trigger the HITL modal</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Prompt Injection Protection</h2>
+      <p>
+        The <code>sanitizePayload()</code> function provides defense-in-depth against prompt injection
+        attacks. It detects and neutralizes:
+      </p>
+      <ul>
+        <li>Patterns like <code>"IGNORE PREVIOUS INSTRUCTIONS"</code> and similar override attempts</li>
+        <li>Token smuggling — hidden control characters and escape sequences</li>
+        <li>HTML tags embedded in payloads (<code>&lt;script&gt;</code>, <code>&lt;img&gt;</code>, etc.)</li>
+        <li>Recursive sanitization of nested objects and arrays — every level is checked</li>
+      </ul>
+      <p>
+        Sanitization runs <em>before</em> any payload reaches the agent, ensuring that malicious
+        inputs are neutralized at the boundary.
+      </p>
+
+      <h2>Risk Policies</h2>
+      <p>aip.js supports three risk policy modes to match your security posture:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Policy</th>
+            <th>Behavior</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Permissive</strong></td>
+            <td>Allow all SAFE tools. HITL only for explicit <code>HIGH_RISK</code>.</td>
+          </tr>
+          <tr>
+            <td><strong>Strict</strong></td>
+            <td>Unknown capabilities are blocked. Even <code>LOW_RISK</code> tools trigger HITL.</td>
+          </tr>
+          <tr>
+            <td><strong>Lockdown</strong></td>
+            <td>Block everything. No tool executes without manual approval.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout callout-info">
+        <strong>Try it live:</strong> See HITL in action with our
+        <a href="demos/ecommerce.html">e-commerce demo</a>. Add items to a cart and watch the
+        agent request your approval before checking out.
+      </div>
+    </main>
+  </div>
+  <script src="assets/nav.js"></script>
+</body>
+</html>

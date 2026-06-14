@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuration — aip.js</title>
+  <link rel="stylesheet" href="assets/docs.css">
+</head>
+<body>
+  <div class="docs-shell">
+    <aside class="docs-sidebar" id="docs-nav"></aside>
+    <main class="docs-content">
+      <h1>Configuration Reference</h1>
+      <p>
+        Every option you can pass to <code>new AIP({...})</code>. All options are optional —
+        the defaults are designed for immediate productivity with strong security defaults.
+      </p>
+
+      <h2>Full Configuration Options</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Option</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>autoInfer</code></td>
+            <td><code>boolean</code></td>
+            <td><code>true</code></td>
+            <td>Auto-scan the DOM for semantic elements and register them as tools automatically</td>
+          </tr>
+          <tr>
+            <td><code>developerOverrides</code></td>
+            <td><code>boolean</code></td>
+            <td><code>true</code></td>
+            <td>Enable manual <code>registerSearch</code> and <code>registerAction</code> calls for custom tools</td>
+          </tr>
+          <tr>
+            <td><code>hitlEnabled</code></td>
+            <td><code>boolean</code></td>
+            <td><code>true</code></td>
+            <td>Enable Human-in-the-Loop approval for HIGH_RISK tools</td>
+          </tr>
+          <tr>
+            <td><code>hitlTimeout</code></td>
+            <td><code>number</code></td>
+            <td><code>30000</code></td>
+            <td>HITL modal timeout in milliseconds before auto-deny</td>
+          </tr>
+          <tr>
+            <td><code>hitlRiskLevels</code></td>
+            <td><code>RiskLevel[]</code></td>
+            <td><code>[HIGH_RISK]</code></td>
+            <td>Which risk levels trigger the HITL modal</td>
+          </tr>
+          <tr>
+            <td><code>sanitizePayloads</code></td>
+            <td><code>boolean</code></td>
+            <td><code>true</code></td>
+            <td>Enable prompt injection sanitization on all tool payloads</td>
+          </tr>
+          <tr>
+            <td><code>uiMirroring</code></td>
+            <td><code>boolean</code></td>
+            <td><code>true</code></td>
+            <td>Show agent activity in the UI with visual indicators</td>
+          </tr>
+          <tr>
+            <td><code>debug</code></td>
+            <td><code>boolean</code></td>
+            <td><code>false</code></td>
+            <td>Enable verbose console logging for development</td>
+          </tr>
+          <tr>
+            <td><code>cssPrefix</code></td>
+            <td><code>string</code></td>
+            <td><code>"aipjs"</code></td>
+            <td>CSS class prefix for all injected elements (e.g., <code>.aipjs-mirror-focus</code>)</td>
+          </tr>
+          <tr>
+            <td><code>inferenceRoot</code></td>
+            <td><code>string</code></td>
+            <td><code>"body"</code></td>
+            <td>CSS selector for the DOM subtree to scan during auto-inference</td>
+          </tr>
+          <tr>
+            <td><code>inferenceTagAllowlist</code></td>
+            <td><code>string[]</code></td>
+            <td><code>[]</code></td>
+            <td>Limit auto-inference to specific HTML tags (empty array = all tags allowed)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Common Configurations</h2>
+
+      <h3>1. Everything On (Default)</h3>
+      <p>The default configuration. All features enabled with secure defaults:</p>
+      <pre><code>const aip = new AIP({
+  autoInfer: true,
+  developerOverrides: true,
+  hitlEnabled: true,
+  hitlTimeout: 30000,
+  hitlRiskLevels: ['HIGH_RISK'],
+  sanitizePayloads: true,
+  uiMirroring: true,
+  debug: false,
+  cssPrefix: 'aipjs',
+  inferenceRoot: 'body',
+  inferenceTagAllowlist: []
+});</code></pre>
+
+      <h3>2. Auto-Inference Only, No HITL</h3>
+      <p>
+        A minimal configuration for rapid prototyping. The agent can freely interact with the
+        page, but there is no human oversight on risky actions:
+      </p>
+      <pre><code>const aip = new AIP({
+  autoInfer: true,
+  hitlEnabled: false,
+  uiMirroring: false
+});</code></pre>
+
+      <h3>3. Production E-Commerce with Strict Security</h3>
+      <p>
+        Locked-down configuration for production e-commerce sites. Fast timeout, HITL enabled,
+        and all sanitization active:
+      </p>
+      <pre><code>const aip = new AIP({
+  autoInfer: true,
+  hitlEnabled: true,
+  hitlTimeout: 15000,
+  sanitizePayloads: true,
+  debug: false
+});</code></pre>
+
+    </main>
+  </div>
+  <script src="assets/nav.js"></script>
+</body>
+</html>

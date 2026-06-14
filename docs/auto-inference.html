@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auto-Inference — aip.js</title>
+  <link rel="stylesheet" href="assets/docs.css">
+</head>
+<body>
+  <div class="docs-shell">
+    <aside class="docs-sidebar" id="docs-nav"></aside>
+    <main class="docs-content">
+
+      <h1>Auto-Inference</h1>
+
+      <p>
+        Auto-inference is the zero-configuration mode of aip.js. When enabled, the SDK
+        walks the DOM at startup and automatically generates JSON-RPC tool schemas from
+        semantic HTML elements. You get agent-accessible tools with no manual registration —
+        perfect for server-rendered pages, static sites, and simple SPAs.
+      </p>
+
+      <p>
+        Enable it by passing <code>{ autoInfer: true }</code> to the <code>AIP</code>
+        constructor and calling <code>aip.start()</code>.
+      </p>
+
+      <nav class="page-nav" aria-label="Page navigation">
+        <a href="getting-started.html">← Previous: Installation</a>
+        <a href="manual-config.html">Next: Manual Configuration →</a>
+      </nav>
+
+      <h2>How It Works</h2>
+
+      <p>The auto-inference pipeline runs through four stages:</p>
+
+      <ol>
+        <li>
+          <strong><code>aip.start()</code> is called</strong> — The SDK initializes and
+          begins the discovery phase.
+        </li>
+        <li>
+          <strong><code>inferTools()</code> walks the DOM</strong> — The scanner traverses
+          the document, matching elements against known semantic patterns.
+        </li>
+        <li>
+          <strong>Each matching element becomes a <code>ToolSchema</code></strong> —
+          The SDK extracts the element's label, parameters, and behavior to build a
+          complete JSON-RPC tool definition.
+        </li>
+        <li>
+          <strong>Tools are broadcast via <code>CustomEvent</code></strong> — The
+          <code>aip:tools-ready</code> event fires on <code>window</code>, carrying
+          the full tool registry. AI agents listening on the page can then query and
+          invoke these tools.
+        </li>
+      </ol>
+
+      <h2>Elements Detected</h2>
+
+      <p>
+        The DOM scanner recognizes the following element patterns. Each generates a
+        tool with a name prefix and a risk level:
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Element</th>
+            <th>Selector Pattern</th>
+            <th>Generated Tool</th>
+            <th>Risk Level</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>&lt;input type="search"&gt;</code></td>
+            <td><code>input[type="search"]</code></td>
+            <td><code>search_*</code></td>
+            <td><span class="badge badge-safe">SAFE</span></td>
+          </tr>
+          <tr>
+            <td><code>&lt;select&gt;</code> with filter/sort names</td>
+            <td><code>select[name*="filter"], select[name*="sort"]</code></td>
+            <td><code>filter_*</code> / <code>sort_*</code></td>
+            <td><span class="badge badge-safe">SAFE</span></td>
+          </tr>
+          <tr>
+            <td><code>&lt;form role="search"&gt;</code> inputs</td>
+            <td><code>form[role="search"] input</code></td>
+            <td><code>search_*</code></td>
+            <td><span class="badge badge-safe">SAFE</span></td>
+          </tr>
+          <tr>
+            <td>Links <code>&lt;a&gt;</code></td>
+            <td><code>a[href]</code></td>
+            <td><code>navigate_*</code></td>
+            <td><span class="badge badge-safe">SAFE</span></td>
+          </tr>
+          <tr>
+            <td><code>&lt;button type="submit"&gt;</code></td>
+            <td><code>button[type="submit"]</code></td>
+            <td><code>mutation_*</code></td>
+            <td><span class="badge badge-high">HIGH_RISK</span></td>
+          </tr>
+          <tr>
+            <td><code>&lt;form action="*/cart/*"&gt;</code> buttons</td>
+            <td><code>form[action*="/cart/"] button</code></td>
+            <td><code>mutation_*</code></td>
+            <td><span class="badge badge-high">HIGH_RISK</span></td>
+          </tr>
+          <tr>
+            <td>Elements with <code>data-aip-confirm</code></td>
+            <td><code>[data-aip-confirm]</code></td>
+            <td><code>mutation_*</code></td>
+            <td><span class="badge badge-high">HIGH_RISK</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>data-aip-* Attributes</h2>
+
+      <p>
+        Use these <code>data-aip-*</code> attributes to annotate your HTML and give the
+        auto-inference engine richer context. They're optional — the scanner works fine
+        without them — but they improve the quality of generated tool schemas.
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Attribute</th>
+            <th>Purpose</th>
+            <th>Example</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>data-aip-search</code></td>
+            <td>Marks a form or input as a search endpoint</td>
+            <td><code>&lt;form data-aip-search="product-search"&gt;</code></td>
+          </tr>
+          <tr>
+            <td><code>data-aip-filter</code></td>
+            <td>Marks a <code>&lt;select&gt;</code> as a filter control</td>
+            <td><code>&lt;select data-aip-filter="category"&gt;</code></td>
+          </tr>
+          <tr>
+            <td><code>data-aip-sort</code></td>
+            <td>Marks a <code>&lt;select&gt;</code> as a sort control</td>
+            <td><code>&lt;select data-aip-sort="price-order"&gt;</code></td>
+          </tr>
+          <tr>
+            <td><code>data-aip-confirm</code></td>
+            <td>Requires human confirmation before this tool is invoked</td>
+            <td><code>&lt;button data-aip-confirm&gt;Delete&lt;/button&gt;</code></td>
+          </tr>
+          <tr>
+            <td><code>data-aip-name</code></td>
+            <td>Overrides the auto-generated tool name</td>
+            <td><code>&lt;input data-aip-name="find-products"&gt;</code></td>
+          </tr>
+          <tr>
+            <td><code>data-aip-description</code></td>
+            <td>Provides a human-readable description for the tool</td>
+            <td><code>&lt;form data-aip-description="Search the product catalog by keyword"&gt;</code></td>
+          </tr>
+          <tr>
+            <td><code>data-aip-category</code></td>
+            <td>Assigns the tool to a logical category</td>
+            <td><code>&lt;div data-aip-category="shopping"&gt;</code></td>
+          </tr>
+          <tr>
+            <td><code>data-aip-risk</code></td>
+            <td>Explicitly sets the risk level (<code>safe</code> or <code>high</code>)</td>
+            <td><code>&lt;button data-aip-risk="high"&gt;</code></td>
+          </tr>
+          <tr>
+            <td><code>data-aip-params</code></td>
+            <td>JSON string defining additional or override parameters</td>
+            <td><code>&lt;input data-aip-params='{"limit":{"type":"number"}}'&gt;</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>ARIA Support</h2>
+
+      <p>
+        The scanner uses ARIA attributes to generate human-readable labels and
+        improve tool descriptions. The following ARIA features are recognized:
+      </p>
+
+      <ul>
+        <li>
+          <strong><code>aria-label</code></strong> — Used as the primary label for
+          tool names and descriptions. Takes precedence over text content.
+        </li>
+        <li>
+          <strong><code>role</code></strong> — The element's ARIA role refines the
+          tool's purpose and behavior classification:
+          <ul>
+            <li><code>role="search"</code> — Form or region is a search tool</li>
+            <li><code>role="searchbox"</code> — Input is a search field</li>
+            <li><code>role="combobox"</code> — Input is a filterable selection</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Associated <code>&lt;label&gt;</code> elements</strong> — Labels
+          connected via <code>for</code> attributes are used as parameter descriptions.
+        </li>
+      </ul>
+
+      <h2>Limitations</h2>
+
+      <p>Auto-inference is powerful but has some important caveats:</p>
+
+      <ul>
+        <li>
+          <strong>Standard HTML only</strong> — The scanner recognizes semantic HTML
+          patterns. Custom Web Components and framework-specific syntax (JSX, Svelte
+          templates, etc.) are not detected unless they render standard DOM elements.
+        </li>
+        <li>
+          <strong>Dynamic content</strong> — Content loaded after <code>aip.start()</code>
+          (e.g., infinite scroll, lazy-loaded sections) is not automatically discovered.
+          Call <code>aip.refreshTools()</code> to re-scan the DOM after dynamic updates.
+        </li>
+        <li>
+          <strong>Shadow DOM</strong> — Elements inside shadow roots are not traversed
+          by default. To scan shadow DOM content, pass an explicit <code>root</code>
+          option referencing the shadow host.
+        </li>
+        <li>
+          <strong>Overlapping tools</strong> — Multiple elements matching the same
+          pattern may produce duplicate tool names. Use <code>data-aip-name</code> to
+          disambiguate.
+        </li>
+      </ul>
+
+      <h2>Example</h2>
+
+      <p>Given this search form in your HTML:</p>
+
+      <pre><code>&lt;form role="search" aria-label="Product search"&gt;
+  &lt;input type="search" name="q" placeholder="Search products..."&gt;
+  &lt;select name="category"&gt;
+    &lt;option value=""&gt;All Categories&lt;/option&gt;
+    &lt;option value="electronics"&gt;Electronics&lt;/option&gt;
+    &lt;option value="clothing"&gt;Clothing&lt;/option&gt;
+  &lt;/select&gt;
+  &lt;input type="number" name="minPrice" placeholder="Min price"&gt;
+  &lt;input type="number" name="maxPrice" placeholder="Max price"&gt;
+  &lt;button type="submit"&gt;Search&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+
+      <p>The auto-inference engine generates this JSON-RPC tool schema:</p>
+
+      <pre><code>{
+  "name": "search_product_search",
+  "description": "Search for products by keyword, category, and price range",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "q": {
+        "type": "string",
+        "description": "Search query"
+      },
+      "category": {
+        "type": "string",
+        "description": "Filter by product category",
+        "enum": ["", "electronics", "clothing"]
+      },
+      "minPrice": {
+        "type": "number",
+        "description": "Minimum price filter"
+      },
+      "maxPrice": {
+        "type": "number",
+        "description": "Maximum price filter"
+      }
+    },
+    "required": ["q"]
+  },
+  "riskLevel": "safe",
+  "category": "search"
+}</code></pre>
+
+      <div class="callout callout-info">
+        <strong>Try it live:</strong> The <a href="../demo/">demo application</a>
+        showcases auto-inference in action. Inspect the page source to see how
+        semantic HTML maps to tool definitions.
+      </div>
+
+    </main>
+  </div>
+  <script src="assets/nav.js"></script>
+</body>
+</html>
