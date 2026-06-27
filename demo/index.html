@@ -15,100 +15,64 @@
 
   <!-- General Website scenario template -->
   <template id="general-template"><style>
-  /* TechCrunch Daily — Blog Design */
-  .techcrunch {
-    font-family: var(--font-sans);
-    color: var(--text-primary);
-    max-width: 800px;
-    margin: 0 auto;
-  }
-  .blog-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: var(--space-md) 0; border-bottom: 1px solid var(--border);
-    margin-bottom: var(--space-lg);
-  }
-  .blog-logo { font-size: 22px; font-weight: 800; }
-  .blog-logo span { color: var(--accent); }
-  .blog-nav { display: flex; gap: var(--space-md); }
-  .blog-nav a {
-    color: var(--text-secondary); text-decoration: none;
-    font-size: 13px; font-weight: 500; transition: color var(--transition);
-  }
-  .blog-nav a:hover { color: var(--text-primary); }
-  .blog-search-section {
-    display: flex; gap: var(--space-sm); align-items: center;
-    padding: var(--space-md); background: var(--bg-tertiary);
-    border-radius: var(--radius); margin-bottom: var(--space-lg);
-  }
-  .blog-search-section input[type="search"] {
-    flex: 1; padding: 8px 12px; background: var(--bg-primary);
-    border: 1px solid var(--border); border-radius: var(--radius-sm);
-    color: var(--text-primary); font-size: 14px; outline: none;
-  }
-  .blog-search-section input[type="search"]:focus { border-color: var(--accent); }
-  .blog-search-section select {
-    padding: 8px 12px; background: var(--bg-primary);
-    border: 1px solid var(--border); border-radius: var(--radius-sm);
-    color: var(--text-primary); font-size: 13px; outline: none;
-  }
-  .blog-search-section select:focus { border-color: var(--accent); }
-  .article-card {
-    background: var(--bg-secondary); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: var(--space-md);
-    margin-bottom: var(--space-md);
-  }
-  .article-card h3 { font-size: 17px; margin-bottom: 4px; }
-  .article-card h3 a { color: var(--text-primary); text-decoration: none; }
-  .article-card h3 a:hover { color: var(--accent); }
-  .article-meta {
-    font-size: 12px; color: var(--text-muted); margin-bottom: var(--space-sm);
-  }
-  .article-excerpt { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
-  .article-tags { display: flex; gap: var(--space-xs); margin-top: var(--space-sm); }
-  .tag {
-    padding: 2px 8px; background: var(--bg-tertiary);
-    border-radius: 4px; font-size: 11px; color: var(--text-muted);
-  }
-  .blog-forms-section {
-    display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);
-    margin-top: var(--space-xl); padding-top: var(--space-lg);
-    border-top: 1px solid var(--border);
-  }
-  .blog-form {
-    background: var(--bg-secondary); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: var(--space-md);
-  }
-  .blog-form h3 { font-size: 15px; margin-bottom: var(--space-md); }
-  .blog-form input, .blog-form textarea {
-    width: 100%; padding: 8px 10px; margin-bottom: var(--space-sm);
-    background: var(--bg-primary); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); color: var(--text-primary);
-    font-size: 13px; font-family: var(--font-sans); outline: none;
-  }
-  .blog-form textarea { resize: vertical; min-height: 80px; }
-  .blog-form input:focus, .blog-form textarea:focus { border-color: var(--accent); }
-  .blog-form button {
-    padding: 8px 20px; background: var(--accent); color: white;
-    border: none; border-radius: var(--radius-sm); font-size: 13px;
-    font-weight: 600; cursor: pointer; transition: all var(--transition);
-  }
-  .blog-form button:hover { background: var(--accent-hover); }
-  @media (max-width: 600px) { .blog-forms-section { grid-template-columns: 1fr; } }
+  /* TechCrunch Daily — Real blog design */
+  .tc-site { font-family: var(--font-sans); color: var(--text-primary); max-width: 860px; margin: 0 auto; }
+  .tc-topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 2px solid var(--accent); margin-bottom: 20px; }
+  .tc-logo { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; display: flex; align-items: baseline; gap: 4px; }
+  .tc-logo-sub { font-size: 14px; font-weight: 500; color: var(--accent); margin-left: 2px; }
+  .tc-nav { display: flex; gap: 24px; }
+  .tc-nav a { color: var(--text-secondary); text-decoration: none; font-size: 13px; font-weight: 500; padding: 4px 0; border-bottom: 2px solid transparent; transition: all var(--transition); }
+  .tc-nav a:hover, .tc-nav a.active { color: var(--text-primary); border-bottom-color: var(--accent); }
+  .tc-hero { background: linear-gradient(135deg, var(--bg-card), var(--bg-code)); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; margin-bottom: 24px; }
+  .tc-hero-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); margin-bottom: 8px; }
+  .tc-hero h2 { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 8px; }
+  .tc-hero-meta { font-size: 13px; color: var(--text-muted); }
+  .tc-search-bar { display: flex; gap: 8px; align-items: center; padding: 14px 18px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 28px; }
+  .tc-search-bar input[type="search"] { flex: 1; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 14px; outline: none; min-width: 0; }
+  .tc-search-bar input[type="search"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-bg); }
+  .tc-search-bar select { padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 13px; outline: none; cursor: pointer; }
+  .tc-search-bar select:focus { border-color: var(--accent); }
+  .tc-article { display: flex; gap: 16px; padding: 20px 0; border-bottom: 1px solid var(--border); }
+  .tc-article:last-child { border-bottom: none; }
+  .tc-article-img { width: 120px; height: 80px; border-radius: var(--radius-sm); background: linear-gradient(135deg, var(--bg-card), var(--bg-tertiary)); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+  .tc-article-body { flex: 1; min-width: 0; }
+  .tc-article h3 { font-size: 18px; font-weight: 700; margin-bottom: 4px; line-height: 1.3; }
+  .tc-article h3 a { color: var(--text-primary); text-decoration: none; }
+  .tc-article h3 a:hover { color: var(--accent); }
+  .tc-article .meta { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+  .tc-article .excerpt { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+  .tc-article .tags { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .tc-tag { padding: 3px 10px; background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: 20px; font-size: 11px; color: var(--text-muted); font-weight: 500; }
+  .tc-forms { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 32px; padding-top: 24px; border-top: 2px solid var(--border); }
+  .tc-form-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+  .tc-form-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .tc-form-card input, .tc-form-card textarea { width: 100%; padding: 9px 12px; margin-bottom: 10px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 13px; font-family: var(--font-sans); outline: none; }
+  .tc-form-card textarea { resize: vertical; min-height: 90px; }
+  .tc-form-card input:focus, .tc-form-card textarea:focus { border-color: var(--accent); }
+  .tc-form-card button { padding: 10px 24px; background: var(--accent); color: white; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: all var(--transition); }
+  .tc-form-card button:hover { background: var(--accent-hover); transform: translateY(-1px); }
+  @media (max-width: 600px) { .tc-forms { grid-template-columns: 1fr; } .tc-article-img { display: none; } }
 </style>
 
-<div class="techcrunch">
-  <header class="blog-header">
-    <div class="blog-logo">TechCrunch <span>Daily</span></div>
-    <nav class="blog-nav" role="navigation" aria-label="Main navigation">
-      <a href="/">Home</a>
+<div class="tc-site">
+  <header class="tc-topbar">
+    <div class="tc-logo">TechCrunch<span class="tc-logo-sub">Daily</span></div>
+    <nav class="tc-nav" role="navigation" aria-label="Main navigation">
+      <a href="/" class="active">Home</a>
       <a href="/articles">Articles</a>
+      <a href="/topics">Topics</a>
       <a href="/about">About</a>
-      <a href="/contact">Contact</a>
     </nav>
   </header>
 
-  <form class="blog-search-section" role="search" aria-label="Search articles">
-    <input type="search" name="q" placeholder="Search articles..." aria-label="Search articles">
+  <div class="tc-hero">
+    <div class="tc-hero-label">Featured</div>
+    <h2>The Agentic Web Is Coming — Are You Ready?</h2>
+    <div class="tc-hero-meta">June 15, 2026 · 8 min read · James Chen</div>
+  </div>
+
+  <form class="tc-search-bar" role="search" aria-label="Search articles">
+    <input type="search" name="q" placeholder="Search articles, topics, authors..." aria-label="Search articles">
     <select name="category" aria-label="Filter by category">
       <option value="">All Categories</option>
       <option value="ai-ml">AI &amp; Machine Learning</option>
@@ -118,28 +82,40 @@
       <option value="cybersecurity">Cybersecurity</option>
     </select>
     <select name="sort" aria-label="Sort articles">
-      <option value="newest">Newest First</option>
-      <option value="oldest">Oldest First</option>
+      <option value="newest">Newest</option>
+      <option value="oldest">Oldest</option>
       <option value="popular">Most Popular</option>
     </select>
   </form>
 
-  <div class="article-card"><h3><a href="/articles/agentic-web">The Agentic Web Is Coming — Are You Ready?</a></h3><div class="article-meta">June 12, 2026 · 8 min read</div><p class="article-excerpt">AI agents are about to become the dominant consumers of the web. Here's what that means for website owners and how to prepare for the shift from human-first to agent-first design.</p><div class="article-tags"><span class="tag">AI/ML</span><span class="tag">Web Dev</span></div></div>
-  <div class="article-card"><h3><a href="/articles/kubernetes-2026">Kubernetes in 2026: Wasm, eBPF, and the Death of YAML</a></h3><div class="article-meta">June 10, 2026 · 12 min read</div><p class="article-excerpt">The container orchestration landscape has shifted dramatically. WebAssembly, eBPF, and new declarative paradigms are reshaping how we deploy and manage workloads.</p><div class="article-tags"><span class="tag">DevOps</span><span class="tag">Cloud</span></div></div>
-  <div class="article-card"><h3><a href="/articles/css-has-layout">CSS :has() Changed Everything — Here's What You Missed</a></h3><div class="article-meta">June 8, 2026 · 6 min read</div><p class="article-excerpt">The :has() selector isn't just a parent selector — it's a paradigm shift in CSS architecture. Learn the patterns that are replacing JavaScript-heavy solutions.</p><div class="article-tags"><span class="tag">Web Dev</span><span class="tag">UX Design</span></div></div>
-  <div class="article-card"><h3><a href="/articles/zero-trust-ai">Zero Trust for AI Agents: Security Patterns for the Agentic Web</a></h3><div class="article-meta">June 5, 2026 · 10 min read</div><p class="article-excerpt">When any website visitor could be an AI agent, traditional security models break down. Here's how to implement zero-trust architectures that protect both humans and agents.</p><div class="article-tags"><span class="tag">Cybersecurity</span><span class="tag">AI/ML</span></div></div>
+  <div class="tc-article">
+    <div class="tc-article-img">🤖</div>
+    <div class="tc-article-body"><h3><a href="/articles/agentic-web">The Agentic Web Is Coming — Are You Ready?</a></h3><div class="meta">Jun 15, 2026 · 8 min · James Chen</div><p class="excerpt">AI agents are about to become the dominant consumers of the web. Website owners must prepare for the shift from human-first to agent-first design.</p><div class="tags"><span class="tc-tag">AI/ML</span><span class="tc-tag">Web Dev</span></div></div>
+  </div>
+  <div class="tc-article">
+    <div class="tc-article-img">☸️</div>
+    <div class="tc-article-body"><h3><a href="/articles/kubernetes-2026">Kubernetes in 2026: Wasm, eBPF, and the Death of YAML</a></h3><div class="meta">Jun 12, 2026 · 12 min · Maria Torres</div><p class="excerpt">The container orchestration landscape shifted dramatically. WebAssembly and eBPF are reshaping how we deploy workloads at scale.</p><div class="tags"><span class="tc-tag">DevOps</span><span class="tc-tag">Cloud</span></div></div>
+  </div>
+  <div class="tc-article">
+    <div class="tc-article-img">🎨</div>
+    <div class="tc-article-body"><h3><a href="/articles/css-subgrid">CSS Subgrid Is Finally Here — Real-World Patterns</a></h3><div class="meta">Jun 10, 2026 · 6 min · Alex Kim</div><p class="excerpt">Subgrid support landed in all major browsers. These 5 patterns replace hundreds of lines of layout hacks.</p><div class="tags"><span class="tc-tag">Web Dev</span><span class="tc-tag">UX Design</span></div></div>
+  </div>
+  <div class="tc-article">
+    <div class="tc-article-img">🔒</div>
+    <div class="tc-article-body"><h3><a href="/articles/zero-trust-ai">Zero Trust for AI Agents: Security Patterns for the Agentic Web</a></h3><div class="meta">Jun 8, 2026 · 10 min · Sarah Park</div><p class="excerpt">When any visitor could be an AI agent, traditional security breaks. Here's how zero-trust architectures protect both humans and agents.</p><div class="tags"><span class="tc-tag">Cybersecurity</span><span class="tc-tag">AI/ML</span></div></div>
+  </div>
 
-  <div class="blog-forms-section">
-    <form class="blog-form" data-aip-confirm="true" action="/newsletter/subscribe" aria-label="Newsletter signup">
+  <div class="tc-forms">
+    <form class="tc-form-card" data-aip-confirm="true" action="/newsletter/subscribe" aria-label="Newsletter signup">
       <h3>📬 Newsletter</h3>
-      <input type="email" name="email" placeholder="your@email.com" required aria-label="Email address for newsletter">
-      <button type="submit">Subscribe</button>
+      <input type="email" name="email" placeholder="you@company.com" required aria-label="Email address">
+      <button type="submit">Subscribe — Free</button>
     </form>
-    <form class="blog-form" data-aip-confirm="true" action="/contact/submit" aria-label="Contact form">
+    <form class="tc-form-card" data-aip-confirm="true" action="/contact/submit" aria-label="Contact form">
       <h3>✉️ Contact Us</h3>
       <input type="text" name="name" placeholder="Your name" required aria-label="Your name">
-      <input type="email" name="email" placeholder="your@email.com" required aria-label="Your email">
-      <textarea name="message" placeholder="Your message..." required aria-label="Your message"></textarea>
+      <input type="email" name="email" placeholder="you@company.com" required aria-label="Your email">
+      <textarea name="message" placeholder="Tell us about your story or tip..." required aria-label="Your message"></textarea>
       <button type="submit">Send Message</button>
     </form>
   </div>
@@ -148,203 +124,72 @@
 
   <!-- E-Commerce scenario template -->
   <template id="ecommerce-template"><style>
-  /* ── NovaStore Design System ───────────────────────────────────────── */
-  .novastore {
-    font-family: var(--font-sans);
-    color: var(--text-primary);
-    max-width: 900px;
-    margin: 0 auto;
-  }
-  .store-header {
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-    padding: var(--space-md) 0;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: var(--space-lg);
-  }
-  .store-logo {
-    font-size: 22px;
-    font-weight: 800;
-    color: var(--accent);
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-  }
-  .store-spacer { flex: 1; }
-  .store-cart {
-    display: flex;
-    align-items: center;
-    gap: var(--space-xs);
-    padding: 6px 14px;
-    background: var(--bg-tertiary);
-    border-radius: var(--radius);
-    font-size: 14px;
-    border: 1px solid var(--border);
-    color: var(--text-secondary);
-  }
-  .store-cart .cart-count {
-    background: var(--accent);
-    color: white;
-    padding: 1px 7px;
-    border-radius: 10px;
-    font-size: 11px;
-    font-weight: 700;
-  }
-  .store-checkout-btn {
-    padding: 8px 18px;
-    background: var(--green);
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  .store-checkout-btn:hover { filter: brightness(1.1); }
-  .store-search-bar {
-    display: flex;
-    gap: var(--space-sm);
-    align-items: center;
-    padding: var(--space-md);
-    background: var(--bg-tertiary);
-    border-radius: var(--radius);
-    margin-bottom: var(--space-lg);
-    flex-wrap: wrap;
-  }
-  .store-search-bar input[type="search"] {
-    flex: 1;
-    min-width: 180px;
-    padding: 8px 12px;
-    background: var(--bg-primary);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    color: var(--text-primary);
-    font-size: 14px;
-    outline: none;
-  }
-  .store-search-bar input[type="search"]:focus { border-color: var(--accent); }
-  .store-search-bar select {
-    padding: 8px 12px;
-    background: var(--bg-primary);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    color: var(--text-primary);
-    font-size: 13px;
-    outline: none;
-  }
-  .store-search-bar select:focus { border-color: var(--accent); }
-  .filter-group {
-    display: flex;
-    align-items: center;
-    gap: var(--space-xs);
-    font-size: 12px;
-    color: var(--text-secondary);
-  }
-  .filter-group input[type="range"] {
-    width: 100px;
-    accent-color: var(--accent);
-  }
-  .price-label {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--green);
-    min-width: 50px;
-  }
-  .checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: var(--space-xs);
-    font-size: 12px;
-    color: var(--text-secondary);
-    cursor: pointer;
-    white-space: nowrap;
-  }
-  .product-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: var(--space-md);
-  }
-  .product-card {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: var(--space-md);
-    display: flex;
-    flex-direction: column;
-  }
-  .product-image {
-    height: 100px;
-    background: var(--bg-tertiary);
-    border-radius: var(--radius-sm);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 40px;
-    margin-bottom: var(--space-sm);
-  }
-  .product-card h3 {
-    font-size: 14px;
-    margin-bottom: 2px;
-  }
-  .product-card .desc {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-bottom: var(--space-sm);
-    flex: 1;
-  }
-  .product-card .price {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--green);
-    margin-bottom: 4px;
-  }
-  .product-card .rating {
-    color: var(--amber);
-    font-size: 13px;
-    margin-bottom: var(--space-sm);
-  }
-  .product-card button {
-    padding: 8px 0;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all var(--transition);
-    width: 100%;
-  }
-  .product-card button:hover { background: var(--accent-hover); }
+  /* NovaStore — Real e-commerce design */
+  .ns-site { font-family: var(--font-sans); color: var(--text-primary); max-width: 960px; margin: 0 auto; }
+  .ns-header { display: flex; align-items: center; gap: 20px; padding: 16px 0; border-bottom: 1px solid var(--border); margin-bottom: 22px; }
+  .ns-logo { font-size: 24px; font-weight: 800; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+  .ns-logo-dot { width: 10px; height: 10px; background: var(--accent); border-radius: 3px; }
+  .ns-spacer { flex: 1; }
+  .ns-header-actions { display: flex; align-items: center; gap: 12px; }
+  .ns-cart-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; color: var(--text-secondary); cursor: default; }
+  .ns-cart-count { background: var(--accent); color: white; padding: 1px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+  .ns-checkout-btn { padding: 9px 20px; background: var(--green); color: white; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: all var(--transition); }
+  .ns-checkout-btn:hover { filter: brightness(1.1); }
+  .ns-search-bar { display: flex; gap: 10px; align-items: center; padding: 16px 18px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 24px; flex-wrap: wrap; }
+  .ns-search-bar input[type="search"] { flex: 1; min-width: 180px; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 14px; outline: none; }
+  .ns-search-bar input[type="search"]:focus { border-color: var(--accent); }
+  .ns-search-bar select { padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 13px; outline: none; cursor: pointer; }
+  .ns-price-filter { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary); }
+  .ns-price-filter input[type="range"] { width: 90px; accent-color: var(--accent); }
+  .ns-price-val { font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--green); min-width: 45px; }
+  .ns-stock-label { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-secondary); cursor: pointer; white-space: nowrap; }
+  .ns-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .ns-product { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; transition: all var(--transition); }
+  .ns-product:hover { border-color: var(--border-hover); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+  .ns-product-img { height: 140px; background: linear-gradient(135deg, var(--bg-code), var(--bg-tertiary)); display: flex; align-items: center; justify-content: center; font-size: 48px; }
+  .ns-product-body { padding: 14px; flex: 1; display: flex; flex-direction: column; }
+  .ns-product h3 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .ns-product .desc { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; flex: 1; }
+  .ns-price-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+  .ns-price { font-size: 20px; font-weight: 800; color: var(--green); }
+  .ns-price-old { font-size: 13px; color: var(--text-muted); text-decoration: line-through; }
+  .ns-rating { font-size: 12px; color: var(--amber); margin-bottom: 10px; }
+  .ns-rating span { color: var(--text-muted); }
+  .ns-product button { width: 100%; padding: 10px 0; background: var(--accent); color: white; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: all var(--transition); }
+  .ns-product button:hover { background: var(--accent-hover); }
+  .ns-product button.in-cart { background: var(--green); }
+  .ns-badge { position: absolute; top: 10px; left: 10px; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+  .ns-badge-sale { background: var(--red); color: white; }
+  .ns-badge-new { background: var(--accent); color: white; }
 </style>
 
-<div class="novastore">
-  <header class="store-header">
-    <div class="store-logo"><span class="logo-icon">✦</span> NovaStore</div>
-    <div class="store-spacer"></div>
-    <div class="store-cart">🛒 Cart <span class="cart-count">0</span></div>
-    <form action="/cart/checkout" style="display:inline;">
-      <button type="submit" class="store-checkout-btn">Checkout</button>
-    </form>
+<div class="ns-site">
+  <header class="ns-header">
+    <div class="ns-logo"><span class="ns-logo-dot"></span>NovaStore</div>
+    <div class="ns-spacer"></div>
+    <div class="ns-header-actions">
+      <div class="ns-cart-btn">🛒 Cart <span class="ns-cart-count">0</span></div>
+      <form action="/cart/checkout" style="display:inline">
+        <button type="submit" class="ns-checkout-btn">Checkout →</button>
+      </form>
+    </div>
   </header>
 
-  <form class="store-search-bar" role="search" aria-label="Search products">
-    <input type="search" name="q" placeholder="Search products..." aria-label="Search products">
+  <form class="ns-search-bar" role="search" aria-label="Search products">
+    <input type="search" name="q" placeholder="Search products, brands, categories..." aria-label="Search products">
     <select name="category" aria-label="Filter by category">
-      <option value="">All</option>
+      <option value="">All Departments</option>
       <option value="electronics">Electronics</option>
       <option value="clothing">Clothing</option>
       <option value="home">Home &amp; Garden</option>
       <option value="sports">Sports</option>
     </select>
-    <div class="filter-group">
+    <div class="ns-price-filter">
       <label>Max $</label>
       <input type="range" name="maxPrice" min="0" max="1000" value="1000">
-      <span class="price-label">$1000</span>
+      <span class="ns-price-val">$1000</span>
     </div>
-    <label class="checkbox-label">
+    <label class="ns-stock-label">
       <input type="checkbox" name="inStock" checked>
       In Stock Only
     </label>
@@ -357,13 +202,73 @@
     </select>
   </form>
 
-  <div class="product-grid">
-    <div class="product-card"><div class="product-image">🎧</div><h3>Wireless Headphones Pro</h3><div class="desc">Active noise cancelling, 30hr battery, premium sound</div><div class="price">$149.99</div><div class="rating">★★★★☆ 4.2</div><button type="submit" form="add-cart-1">Add to Cart</button><form id="add-cart-1" action="/cart/add" style="display:none"><input type="hidden" name="product_id" value="WH-001"><input type="hidden" name="quantity" value="1"></form></div>
-    <div class="product-card"><div class="product-image">⌚</div><h3>Smart Watch X</h3><div class="desc">Health tracking, GPS, 7-day battery, always-on display</div><div class="price">$299.99</div><div class="rating">★★★★★ 4.8</div><button type="submit" form="add-cart-2">Add to Cart</button><form id="add-cart-2" action="/cart/add" style="display:none"><input type="hidden" name="product_id" value="SW-002"><input type="hidden" name="quantity" value="1"></form></div>
-    <div class="product-card"><div class="product-image">👟</div><h3>Running Shoes Ultra</h3><div class="desc">Carbon plate, breathable mesh, sizes 7–13</div><div class="price">$129.99</div><div class="rating">★★★★☆ 4.5</div><button type="submit" form="add-cart-3">Add to Cart</button><form id="add-cart-3" action="/cart/add" style="display:none"><input type="hidden" name="product_id" value="RS-003"><input type="hidden" name="quantity" value="1"></form></div>
-    <div class="product-card"><div class="product-image">🪑</div><h3>Ergonomic Desk Chair</h3><div class="desc">Lumbar support, adjustable armrests, mesh back</div><div class="price">$449.99</div><div class="rating">★★★★☆ 4.3</div><button type="submit" form="add-cart-4">Add to Cart</button><form id="add-cart-4" action="/cart/add" style="display:none"><input type="hidden" name="product_id" value="DC-004"><input type="hidden" name="quantity" value="1"></form></div>
-    <div class="product-card"><div class="product-image">📷</div><h3>4K Webcam Pro</h3><div class="desc">Auto-framing, low-light correction, dual mic</div><div class="price">$89.99</div><div class="rating">★★★★☆ 4.1</div><button type="submit" form="add-cart-5">Add to Cart</button><form id="add-cart-5" action="/cart/add" style="display:none"><input type="hidden" name="product_id" value="WC-005"><input type="hidden" name="quantity" value="1"></form></div>
-    <div class="product-card"><div class="product-image">⌨️</div><h3>Mechanical Keyboard RGB</h3><div class="desc">Cherry MX switches, per-key RGB, aluminum frame</div><div class="price">$159.99</div><div class="rating">★★★★★ 4.7</div><button type="submit" form="add-cart-6">Add to Cart</button><form id="add-cart-6" action="/cart/add" style="display:none"><input type="hidden" name="product_id" value="KB-006"><input type="hidden" name="quantity" value="1"></form></div>
+  <div class="ns-grid">
+    <div class="ns-product">
+      <div class="ns-product-img" style="position:relative"><span class="ns-badge ns-badge-sale">Sale</span>🎧</div>
+      <div class="ns-product-body">
+        <h3>Wireless Headphones Pro</h3>
+        <div class="desc">Active noise cancelling, 30hr battery, premium sound with spatial audio</div>
+        <div class="ns-price-row"><span class="ns-price">$149.99</span><span class="ns-price-old">$199.99</span></div>
+        <div class="ns-rating">★★★★☆ <span>(1,247)</span></div>
+        <button type="submit" form="ac1">Add to Cart</button>
+        <form id="ac1" action="/cart/add" style="display:none"><input type="hidden" name="product_id" value="WH-001"><input type="hidden" name="quantity" value="1"></form>
+      </div>
+    </div>
+    <div class="ns-product">
+      <div class="ns-product-img">⌚</div>
+      <div class="ns-product-body">
+        <h3>Smart Watch X</h3>
+        <div class="desc">Health tracking, GPS, always-on display, 7-day battery</div>
+        <div class="ns-price-row"><span class="ns-price">$299.99</span></div>
+        <div class="ns-rating">★★★★★ <span>(3,421)</span></div>
+        <button type="submit" form="ac2">Add to Cart</button>
+        <form id="ac2" action="/cart/add" style="display:none"><input type="hidden" name="product_id" value="SW-002"><input type="hidden" name="quantity" value="1"></form>
+      </div>
+    </div>
+    <div class="ns-product">
+      <div class="ns-product-img" style="position:relative"><span class="ns-badge ns-badge-new">New</span>👟</div>
+      <div class="ns-product-body">
+        <h3>Running Shoes Ultra</h3>
+        <div class="desc">Carbon fiber plate, breathable knit upper, sizes 7–13</div>
+        <div class="ns-price-row"><span class="ns-price">$129.99</span></div>
+        <div class="ns-rating">★★★★☆ <span>(892)</span></div>
+        <button type="submit" form="ac3">Add to Cart</button>
+        <form id="ac3" action="/cart/add" style="display:none"><input type="hidden" name="product_id" value="RS-003"><input type="hidden" name="quantity" value="1"></form>
+      </div>
+    </div>
+    <div class="ns-product">
+      <div class="ns-product-img">🪑</div>
+      <div class="ns-product-body">
+        <h3>Ergonomic Desk Chair</h3>
+        <div class="desc">Adjustable lumbar, 4D armrests, mesh back, 150kg capacity</div>
+        <div class="ns-price-row"><span class="ns-price">$449.99</span><span class="ns-price-old">$549.99</span></div>
+        <div class="ns-rating">★★★★☆ <span>(456)</span></div>
+        <button type="submit" form="ac4">Add to Cart</button>
+        <form id="ac4" action="/cart/add" style="display:none"><input type="hidden" name="product_id" value="DC-004"><input type="hidden" name="quantity" value="1"></form>
+      </div>
+    </div>
+    <div class="ns-product">
+      <div class="ns-product-img">📷</div>
+      <div class="ns-product-body">
+        <h3>4K Webcam Pro</h3>
+        <div class="desc">Auto-framing, dual noise-cancelling mics, low-light correction</div>
+        <div class="ns-price-row"><span class="ns-price">$89.99</span></div>
+        <div class="ns-rating">★★★★☆ <span>(2,103)</span></div>
+        <button type="submit" form="ac5">Add to Cart</button>
+        <form id="ac5" action="/cart/add" style="display:none"><input type="hidden" name="product_id" value="WC-005"><input type="hidden" name="quantity" value="1"></form>
+      </div>
+    </div>
+    <div class="ns-product">
+      <div class="ns-product-img">⌨️</div>
+      <div class="ns-product-body">
+        <h3>Mechanical Keyboard RGB</h3>
+        <div class="desc">Cherry MX Brown, per-key RGB, aluminum frame, USB-C</div>
+        <div class="ns-price-row"><span class="ns-price">$159.99</span></div>
+        <div class="ns-rating">★★★★★ <span>(1,876)</span></div>
+        <button type="submit" form="ac6">Add to Cart</button>
+        <form id="ac6" action="/cart/add" style="display:none"><input type="hidden" name="product_id" value="KB-006"><input type="hidden" name="quantity" value="1"></form>
+      </div>
+    </div>
   </div>
 </div>
 </template>

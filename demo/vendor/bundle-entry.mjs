@@ -1,6 +1,7 @@
 // aip.js — Agentic Engine Optimization SDK — self-contained ESM bundle
 
 // packages/types/dist/index.js
+var AIP_PROTOCOL_VERSION = "1.0.0";
 var RiskLevel;
 (function(RiskLevel4) {
   RiskLevel4["SAFE"] = "safe";
@@ -16,24 +17,72 @@ var ActionCategory;
   ActionCategory3["MUTATE"] = "mutate";
   ActionCategory3["CUSTOM"] = "custom";
 })(ActionCategory || (ActionCategory = {}));
+var HITLPolicy;
+(function(HITLPolicy2) {
+  HITLPolicy2["ALWAYS"] = "always";
+  HITLPolicy2["ONCE"] = "once";
+  HITLPolicy2["DELEGATED"] = "delegated";
+  HITLPolicy2["CONDITIONAL"] = "conditional";
+})(HITLPolicy || (HITLPolicy = {}));
 var HITLAction;
 (function(HITLAction3) {
   HITLAction3["APPROVE"] = "approve";
   HITLAction3["DENY"] = "deny";
   HITLAction3["TIMEOUT"] = "timeout";
 })(HITLAction || (HITLAction = {}));
+var AIPErrorCode;
+(function(AIPErrorCode2) {
+  AIPErrorCode2[AIPErrorCode2["TOOL_NOT_FOUND"] = -32001] = "TOOL_NOT_FOUND";
+  AIPErrorCode2[AIPErrorCode2["TOOL_DISABLED"] = -32002] = "TOOL_DISABLED";
+  AIPErrorCode2[AIPErrorCode2["TOOL_TIMEOUT"] = -32003] = "TOOL_TIMEOUT";
+  AIPErrorCode2[AIPErrorCode2["TOOL_RATE_LIMITED"] = -32004] = "TOOL_RATE_LIMITED";
+  AIPErrorCode2[AIPErrorCode2["TOOL_DEPENDENCY_FAIL"] = -32005] = "TOOL_DEPENDENCY_FAIL";
+  AIPErrorCode2[AIPErrorCode2["HITL_EXPIRED"] = -32020] = "HITL_EXPIRED";
+  AIPErrorCode2[AIPErrorCode2["HITL_DENIED"] = -32021] = "HITL_DENIED";
+  AIPErrorCode2[AIPErrorCode2["HITL_REQUIRED"] = -32022] = "HITL_REQUIRED";
+  AIPErrorCode2[AIPErrorCode2["HITL_UNAVAILABLE"] = -32023] = "HITL_UNAVAILABLE";
+  AIPErrorCode2[AIPErrorCode2["UNAUTHORIZED_AGENT"] = -32030] = "UNAUTHORIZED_AGENT";
+  AIPErrorCode2[AIPErrorCode2["FORBIDDEN_ACTION"] = -32031] = "FORBIDDEN_ACTION";
+  AIPErrorCode2[AIPErrorCode2["AGENT_NOT_IDENTIFIED"] = -32032] = "AGENT_NOT_IDENTIFIED";
+  AIPErrorCode2[AIPErrorCode2["UNSUPPORTED_VERSION"] = -32040] = "UNSUPPORTED_VERSION";
+  AIPErrorCode2[AIPErrorCode2["FEATURE_NOT_AVAILABLE"] = -32041] = "FEATURE_NOT_AVAILABLE";
+  AIPErrorCode2[AIPErrorCode2["MALFORMED_REQUEST"] = -32042] = "MALFORMED_REQUEST";
+  AIPErrorCode2[AIPErrorCode2["VALIDATION_ERROR"] = -32043] = "VALIDATION_ERROR";
+  AIPErrorCode2[AIPErrorCode2["RATE_LIMITED_GLOBAL"] = -32050] = "RATE_LIMITED_GLOBAL";
+  AIPErrorCode2[AIPErrorCode2["QUOTA_EXCEEDED"] = -32051] = "QUOTA_EXCEEDED";
+})(AIPErrorCode || (AIPErrorCode = {}));
 var DEFAULT_CONFIG = {
-  autoInfer: true,
-  developerOverrides: true,
-  hitlEnabled: true,
-  hitlTimeout: 3e4,
-  hitlRiskLevels: [RiskLevel.HIGH_RISK],
-  sanitizePayloads: true,
-  uiMirroring: true,
   debug: false,
-  cssPrefix: "aipjs",
-  inferenceRoot: "body",
-  inferenceTagAllowlist: []
+  inference: {
+    enabled: true,
+    rootSelector: "body",
+    tagAllowlist: []
+  },
+  security: {
+    hitl: {
+      enabled: true,
+      timeoutMs: 3e4,
+      defaultPolicy: HITLPolicy.ALWAYS
+    },
+    sanitizePayloads: true
+  },
+  agents: {
+    mode: "open"
+  },
+  rateLimit: {
+    enabled: true,
+    perMinute: 60,
+    scope: "global"
+  },
+  session: {
+    enabled: false,
+    storage: "memory",
+    ttlMs: 18e5
+  },
+  ui: {
+    mirroring: true,
+    cssPrefix: "aipjs"
+  }
 };
 var AgentBridgeEvent;
 (function(AgentBridgeEvent3) {
@@ -41,8 +90,14 @@ var AgentBridgeEvent;
   AgentBridgeEvent3["CAPABILITIES_RESPONSE"] = "aip:capabilities:response";
   AgentBridgeEvent3["TOOL_INVOKE"] = "aip:tool:invoke";
   AgentBridgeEvent3["TOOL_RESULT"] = "aip:tool:result";
+  AgentBridgeEvent3["TOOL_CANCEL"] = "aip:tool:cancel";
   AgentBridgeEvent3["HITL_REQUEST"] = "aip:hitl:request";
   AgentBridgeEvent3["HITL_RESPONSE"] = "aip:hitl:response";
+  AgentBridgeEvent3["AGENT_INTRODUCE"] = "aip:agent:introduce";
+  AgentBridgeEvent3["AGENT_INTRODUCE_ACK"] = "aip:agent:introduce:ack";
+  AgentBridgeEvent3["TOOL_STREAM_START"] = "aip:tool:stream:start";
+  AgentBridgeEvent3["TOOL_STREAM_CHUNK"] = "aip:tool:stream:chunk";
+  AgentBridgeEvent3["TOOL_STREAM_END"] = "aip:tool:stream:end";
 })(AgentBridgeEvent || (AgentBridgeEvent = {}));
 
 // packages/core/src/inference.ts
@@ -76,6 +131,12 @@ var MUTATION_SELECTORS = [
   'form[action*="cart" i] button[type="submit"]',
   'form[action*="checkout" i] button[type="submit"]',
   "[data-aip-confirm]"
+];
+var NAVIGATION_SELECTORS = [
+  'a[href]:not([href="#"]):not([href^="javascript:"])',
+  "[data-aip-navigate]",
+  "nav a[href]",
+  '[role="navigation"] a[href]'
 ];
 function getElementLabel(el) {
   const ariaLabel = el.getAttribute("aria-label");
@@ -181,7 +242,8 @@ function generateToolSchema(el, index) {
   const category = classifyCategory(el);
   const label = getElementLabel(el);
   const name = el.getAttribute("data-aip-name") || `${category}_${label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}_${index}`;
-  const description = el.getAttribute("data-aip-description") || `${category === ActionCategory.MUTATE ? "[REQUIRES HUMAN APPROVAL] " : ""}${label}`;
+  const description = el.getAttribute("data-aip-description") || `${classifyRisk(el) === RiskLevel.HIGH_RISK ? "[REQUIRES HUMAN APPROVAL] " : ""}${label}`;
+  const handler = buildAutoHandler(el, category);
   return {
     name,
     description,
@@ -189,7 +251,66 @@ function generateToolSchema(el, index) {
     category,
     parameters: extractParameters(el),
     sourceElement: getElementSelector(el),
-    metadata: { inferred: true, url: window.location.href }
+    metadata: { inferred: true, url: window.location.href, _handler: handler }
+  };
+}
+function buildAutoHandler(el, category) {
+  return async (params) => {
+    const tag = el.tagName.toLowerCase();
+    const input = el;
+    const select = el;
+    const form = el.closest("form");
+    const keys = Object.keys(params);
+    const firstVal = keys.length > 0 ? params[keys[0]] : null;
+    if (tag === "select" && firstVal !== null && firstVal !== void 0) {
+      select.value = String(firstVal);
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+    } else if (tag === "input") {
+      const type = input.type;
+      if (type === "checkbox") {
+        input.checked = Boolean(firstVal);
+      } else if (type === "radio") {
+        input.checked = true;
+      } else if (type === "range") {
+        input.value = String(firstVal ?? input.value);
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+      } else {
+        if (firstVal !== null && firstVal !== void 0) {
+          input.value = String(firstVal);
+        }
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    } else if (tag === "button" && form) {
+      const hiddenInputs = form.querySelectorAll('input[type="hidden"]');
+      for (const hi of Array.from(hiddenInputs)) {
+        const key = hi.getAttribute("name") || hi.id;
+        if (key && params[key] !== void 0) {
+          hi.value = String(params[key]);
+        }
+      }
+      form.requestSubmit ? form.requestSubmit(el) : form.submit();
+    } else if (tag === "a" && el.href) {
+      window.location.href = el.href;
+    } else if (form) {
+      for (const [key, val] of Object.entries(params)) {
+        let hidden = form.querySelector(`input[name="${key}"]`);
+        if (!hidden) {
+          hidden = document.createElement("input");
+          hidden.type = "hidden";
+          hidden.name = key;
+          form.appendChild(hidden);
+        }
+        hidden.value = String(val);
+      }
+      form.requestSubmit ? form.requestSubmit() : form.submit();
+    }
+    return {
+      success: true,
+      action: category,
+      element: getElementSelector(el),
+      params
+    };
   };
 }
 function inferTools(config = {}) {
@@ -197,7 +318,7 @@ function inferTools(config = {}) {
   const toolSchemas = [];
   const seen = /* @__PURE__ */ new Set();
   let idx = 0;
-  const selectors = [...SEARCH_SELECTORS, ...FILTER_SELECTORS, ...SORT_SELECTORS, ...MUTATION_SELECTORS];
+  const selectors = [...SEARCH_SELECTORS, ...FILTER_SELECTORS, ...SORT_SELECTORS, ...MUTATION_SELECTORS, ...NAVIGATION_SELECTORS];
   for (const sel of selectors) {
     try {
       root.querySelectorAll(sel).forEach((el) => {
@@ -226,7 +347,13 @@ function registerTool(options) {
       riskLevel: options.riskLevel || RiskLevel.SAFE,
       category: options.category || ActionCategory.CUSTOM,
       parameters: options.parameters,
-      metadata: { registered: true, timestamp: Date.now() }
+      metadata: { registered: true, timestamp: Date.now() },
+      hitlPolicy: options.hitlPolicy,
+      hitlCondition: options.hitlCondition,
+      requires: options.requires,
+      conflicts: options.conflicts,
+      ordering: options.ordering,
+      workflowId: options.workflowId
     },
     handler: options.handler,
     endpoint: options.endpoint,
@@ -242,7 +369,8 @@ function registerSearch(options) {
     method: options.method || "POST",
     handler: options.handler,
     riskLevel: RiskLevel.SAFE,
-    category: ActionCategory.SEARCH
+    category: ActionCategory.SEARCH,
+    hitlPolicy: options.hitlPolicy
   });
 }
 function registerAction(options) {
@@ -261,21 +389,31 @@ function clearRegistry() {
 function getRegisteredTools() {
   return Array.from(toolRegistry.values()).map((r) => r.schema);
 }
-async function executeTool(name, params) {
+function hasRegisteredTool(name) {
+  return toolRegistry.has(name);
+}
+async function executeTool(name, params, signal) {
   const registered = toolRegistry.get(name);
   if (!registered) throw new Error(`Tool "${name}" not registered`);
-  if (registered.handler) return registered.handler(params);
+  if (registered.handler) {
+    if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
+    return registered.handler(params, signal);
+  }
   if (registered.endpoint) {
+    if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
     const method = registered.method || "GET";
     let url = registered.endpoint;
     if (method === "GET") {
-      const qs = new URLSearchParams(Object.entries(params).map(([k, v]) => [k, String(v)])).toString();
+      const qs = new URLSearchParams(
+        Object.entries(params).map(([k, v]) => [k, String(v)])
+      ).toString();
       url = `${url}?${qs}`;
     }
     const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: method !== "GET" ? JSON.stringify(params) : void 0
+      body: method !== "GET" ? JSON.stringify(params) : void 0,
+      signal
     });
     if (!res.ok) throw new Error(`Tool execution failed: ${res.status}`);
     return res.json();
@@ -403,37 +541,142 @@ function initMirroring(config) {
 }
 
 // packages/core/src/index.ts
+function resolveConfig(partial) {
+  const d = DEFAULT_CONFIG;
+  const inf = partial.inference ?? {};
+  const sec = partial.security ?? {};
+  const secHitl = sec.hitl ?? {};
+  const ag = partial.agents ?? {};
+  const rl = partial.rateLimit ?? {};
+  const ssn = partial.session ?? {};
+  const u = partial.ui ?? {};
+  return {
+    debug: partial.debug ?? d.debug ?? false,
+    inference: {
+      enabled: inf.enabled ?? d.inference.enabled,
+      rootSelector: inf.rootSelector ?? d.inference.rootSelector,
+      tagAllowlist: inf.tagAllowlist ?? d.inference.tagAllowlist
+    },
+    security: {
+      hitl: {
+        enabled: secHitl.enabled ?? d.security.hitl.enabled,
+        timeoutMs: secHitl.timeoutMs ?? d.security.hitl.timeoutMs,
+        defaultPolicy: secHitl.defaultPolicy ?? d.security.hitl.defaultPolicy,
+        auditCallback: secHitl.auditCallback ?? d.security.hitl.auditCallback
+      },
+      sanitizePayloads: sec.sanitizePayloads ?? d.security.sanitizePayloads
+    },
+    agents: {
+      mode: ag.mode ?? d.agents.mode,
+      allowlist: ag.allowlist ?? d.agents.allowlist,
+      blocklist: ag.blocklist ?? d.agents.blocklist,
+      onIntroduce: ag.onIntroduce ?? d.agents.onIntroduce
+    },
+    rateLimit: {
+      enabled: rl.enabled ?? d.rateLimit.enabled,
+      perMinute: rl.perMinute ?? d.rateLimit.perMinute,
+      scope: rl.scope ?? d.rateLimit.scope
+    },
+    session: {
+      enabled: ssn.enabled ?? d.session.enabled,
+      storage: ssn.storage ?? d.session.storage,
+      ttlMs: ssn.ttlMs ?? d.session.ttlMs
+    },
+    ui: {
+      mirroring: u.mirroring ?? d.ui.mirroring,
+      cssPrefix: u.cssPrefix ?? d.ui.cssPrefix
+    }
+  };
+}
+var TokenBucket = class {
+  tokens;
+  lastRefill;
+  refillRate;
+  // tokens per ms
+  constructor(tokensPerMinute) {
+    this.tokens = tokensPerMinute;
+    this.lastRefill = Date.now();
+    this.refillRate = tokensPerMinute / 6e4;
+  }
+  tryConsume(count = 1) {
+    this.refill();
+    this.tokens -= count;
+    if (this.tokens < 0) {
+      const msUntilRefill = Math.ceil(Math.abs(this.tokens) / this.refillRate);
+      return { allowed: false, retryAfterMs: msUntilRefill };
+    }
+    return { allowed: true, retryAfterMs: 0 };
+  }
+  getInfo(total) {
+    this.refill();
+    return {
+      limit: total,
+      remaining: Math.max(0, Math.floor(this.tokens)),
+      reset: this.lastRefill + 6e4,
+      windowMs: 6e4,
+      scope: "global"
+    };
+  }
+  refill() {
+    const now = Date.now();
+    const elapsed = now - this.lastRefill;
+    this.tokens = Math.min(this.tokens + elapsed * this.refillRate, this.refillRate * 6e4);
+    this.lastRefill = now;
+  }
+};
 var AIP = class {
   config;
   tools = [];
   started = false;
   cleanupFns = [];
+  globalLimiter;
+  perToolLimiters = /* @__PURE__ */ new Map();
+  hitlSession = { approvedTools: /* @__PURE__ */ new Set(), auditLog: [] };
+  toolExecutions = /* @__PURE__ */ new Map();
   constructor(config = {}) {
-    this.config = { ...DEFAULT_CONFIG, ...config };
+    this.config = resolveConfig(config);
+    this.globalLimiter = new TokenBucket(this.config.rateLimit.perMinute);
   }
+  // ── Lifecycle ────────────────────────────────────────────────────────────
   start() {
     if (this.started) return;
     this.started = true;
-    initMirroring({ cssPrefix: this.config.cssPrefix, enabled: this.config.uiMirroring });
+    initMirroring({ cssPrefix: this.config.ui.cssPrefix, enabled: this.config.ui.mirroring });
     this.refreshTools();
     window.addEventListener(AgentBridgeEvent.CAPABILITIES_REQUEST, this.handleCapReq);
     window.addEventListener(AgentBridgeEvent.TOOL_INVOKE, this.handleToolInvoke);
-    if (this.config.autoInfer) this.cleanupFns.push(watchNavigation(() => this.refreshTools()));
+    window.addEventListener(AgentBridgeEvent.TOOL_CANCEL, this.handleToolCancel);
+    window.addEventListener(AgentBridgeEvent.AGENT_INTRODUCE, this.handleAgentIntroduce);
+    if (this.config.inference.enabled) {
+      this.cleanupFns.push(watchNavigation(() => this.refreshTools()));
+    }
     this.broadcastCapabilities();
-    if (this.config.debug) console.log(`[aip.js] Started \u2014 ${this.tools.length} tools`);
+    if (this.config.debug) {
+      console.log(`[aip.js] Started \u2014 ${this.tools.length} tools, protocol v${AIP_PROTOCOL_VERSION}`);
+    }
   }
   stop() {
     this.started = false;
     window.removeEventListener(AgentBridgeEvent.CAPABILITIES_REQUEST, this.handleCapReq);
     window.removeEventListener(AgentBridgeEvent.TOOL_INVOKE, this.handleToolInvoke);
+    window.removeEventListener(AgentBridgeEvent.TOOL_CANCEL, this.handleToolCancel);
+    window.removeEventListener(AgentBridgeEvent.AGENT_INTRODUCE, this.handleAgentIntroduce);
     for (const fn of this.cleanupFns) fn();
     this.cleanupFns = [];
+    for (const [name, ctrl] of this.toolExecutions) {
+      ctrl.abort();
+    }
+    this.toolExecutions.clear();
   }
+  // ── Tool Management ──────────────────────────────────────────────────────
   refreshTools() {
     const tools = [];
-    if (this.config.developerOverrides) tools.push(...getRegisteredTools());
-    if (this.config.autoInfer) {
-      const inferred = inferTools({ rootSelector: this.config.inferenceRoot, tagAllowlist: this.config.inferenceTagAllowlist });
+    tools.push(...getRegisteredTools());
+    if (this.config.inference.enabled) {
+      const inferred = inferTools({
+        rootSelector: this.config.inference.rootSelector,
+        tagAllowlist: this.config.inference.tagAllowlist
+      });
       const names = new Set(tools.map((t) => t.name));
       for (const t of inferred.tools) {
         if (!names.has(t.name)) tools.push(t);
@@ -441,6 +684,7 @@ var AIP = class {
     }
     this.tools = tools;
   }
+  // ── Capabilities ─────────────────────────────────────────────────────────
   getCapabilities() {
     return {
       tools: this.tools,
@@ -449,69 +693,273 @@ var AIP = class {
         url: window.location.href,
         description: document.querySelector('meta[name="description"]')?.getAttribute("content") || void 0
       },
-      protocolVersion: "0.1.0",
-      allowsMutations: this.config.hitlEnabled,
-      generatedAt: Date.now()
+      protocolVersion: AIP_PROTOCOL_VERSION,
+      allowsMutations: this.config.security.hitl.enabled,
+      generatedAt: Date.now(),
+      capabilities: {
+        version: AIP_PROTOCOL_VERSION,
+        features: {
+          hitl: this.config.security.hitl.enabled,
+          nestedParams: true,
+          streaming: false,
+          rateLimit: this.config.rateLimit.enabled,
+          agentAuth: false,
+          // spec-defined, no enforcement yet — agents don't identify themselves
+          multiPage: this.config.session.enabled
+        },
+        limits: {
+          maxToolsPerPage: 500,
+          maxParamsPerTool: 20,
+          maxParamDepth: 3,
+          hitlTimeoutMs: this.config.security.hitl.timeoutMs,
+          rateLimitPerMinute: this.config.rateLimit.perMinute,
+          rateLimitWindowMs: 6e4
+        }
+      }
     };
   }
   broadcastCapabilities() {
     const caps = this.getCapabilities();
-    window.dispatchEvent(new CustomEvent(AgentBridgeEvent.CAPABILITIES_RESPONSE, { detail: caps, bubbles: true }));
+    window.dispatchEvent(new CustomEvent(AgentBridgeEvent.CAPABILITIES_RESPONSE, {
+      detail: caps,
+      bubbles: true
+    }));
   }
+  // ── Agent Identity ───────────────────────────────────────────────────────
+  handleAgentIntroduce = (event) => {
+    const identity = event.detail;
+    if (!identity?.id) return;
+    let accepted = true;
+    let reason;
+    if (this.config.agents.mode === "filtered") {
+      if (this.config.agents.blocklist?.includes(identity.id)) {
+        accepted = false;
+        reason = `Agent ${identity.name} is blocked`;
+      } else if (this.config.agents.allowlist?.length) {
+        accepted = this.config.agents.allowlist.some(
+          (a) => (!a.vendor || a.vendor === identity.vendor) && (!a.name || a.name === identity.name)
+        );
+        if (!accepted) reason = `Agent ${identity.name} (${identity.vendor}) not in allowlist`;
+      }
+    }
+    if (accepted && this.config.agents.onIntroduce) {
+      const result = this.config.agents.onIntroduce(identity);
+      if (result instanceof Promise) {
+        result.then((r) => {
+          if (!r) this.sendAgentAck(identity.id, false, "Rejected by site policy");
+          else this.sendAgentAck(identity.id, true);
+        });
+        return;
+      }
+      accepted = result;
+    }
+    this.sendAgentAck(identity.id, accepted, reason);
+  };
+  sendAgentAck(agentId, accepted, reason) {
+    window.dispatchEvent(new CustomEvent(AgentBridgeEvent.AGENT_INTRODUCE_ACK, {
+      detail: { agentId, accepted, reason, timestamp: Date.now() },
+      bubbles: true
+    }));
+  }
+  // ── Tool Execution ───────────────────────────────────────────────────────
   handleCapReq = () => {
     this.broadcastCapabilities();
+  };
+  handleToolCancel = (event) => {
+    const detail = event.detail;
+    if (!detail?.toolName) return;
+    const ctrl = this.toolExecutions.get(detail.toolName);
+    if (ctrl) {
+      ctrl.abort();
+      this.toolExecutions.delete(detail.toolName);
+    }
   };
   handleToolInvoke = async (event) => {
     const detail = event.detail;
     if (!detail?.method) return;
     const tool = this.tools.find((t) => t.name === detail.method);
     if (!tool) {
-      this.respondError(detail.id, -32601, `Tool not found: ${detail.method}`);
+      this.respondAIPError(detail.id, AIPErrorCode.TOOL_NOT_FOUND, `Tool not found: ${detail.method}`, { toolName: detail.method });
       return;
     }
     const params = detail.params || {};
-    if (this.config.hitlEnabled && tool.riskLevel === RiskLevel.HIGH_RISK) {
+    if (this.config.rateLimit.enabled) {
+      if (this.config.rateLimit.scope === "per-tool") {
+        let limiter = this.perToolLimiters.get(tool.name);
+        if (!limiter) {
+          limiter = new TokenBucket(this.config.rateLimit.perMinute);
+          this.perToolLimiters.set(tool.name, limiter);
+        }
+        const check = limiter.tryConsume();
+        if (!check.allowed) {
+          this.respondAIPError(detail.id, AIPErrorCode.TOOL_RATE_LIMITED, `Rate limited: ${tool.name}`, { toolName: tool.name, retryAfterMs: check.retryAfterMs });
+          return;
+        }
+      } else {
+        const check = this.globalLimiter.tryConsume();
+        if (!check.allowed) {
+          this.respondAIPError(detail.id, AIPErrorCode.RATE_LIMITED_GLOBAL, "Global rate limit reached", { retryAfterMs: check.retryAfterMs });
+          return;
+        }
+      }
+    }
+    if (tool.requires?.length) {
+      for (const dep of tool.requires) {
+        if (!hasRegisteredTool(dep) && !this.tools.find((t) => t.name === dep)) {
+          this.respondAIPError(detail.id, AIPErrorCode.TOOL_DEPENDENCY_FAIL, `Tool "${tool.name}" requires "${dep}" to be called first`, { toolName: tool.name, requiredTools: tool.requires });
+          return;
+        }
+      }
+    }
+    const shouldHITL = this.shouldRequestHITL(tool);
+    if (shouldHITL) {
       const approved = await this.requestHITL(tool, params);
       if (!approved) {
-        this.respondError(detail.id, -32e3, "Human approval required");
         return;
       }
     }
-    if (this.config.uiMirroring) onToolStart(tool.name, tool, params);
+    if (this.config.ui.mirroring) onToolStart(tool.name, tool, params);
+    const timeout = detail.timeout ?? this.config.security.hitl.timeoutMs;
+    const abortCtrl = new AbortController();
+    this.toolExecutions.set(tool.name, abortCtrl);
+    const timeoutId = setTimeout(() => {
+      abortCtrl.abort();
+    }, timeout);
     try {
-      const result = await executeTool(tool.name, params);
+      const autoHandler = tool.metadata?._handler;
+      const result = autoHandler ? await autoHandler(params, abortCtrl.signal) : await executeTool(tool.name, params, abortCtrl.signal);
+      clearTimeout(timeoutId);
+      this.toolExecutions.delete(tool.name);
       onToolComplete(tool.name);
       this.respondSuccess(detail.id, result);
     } catch (err) {
+      clearTimeout(timeoutId);
+      this.toolExecutions.delete(tool.name);
       onToolComplete(tool.name);
-      this.respondError(detail.id, -32e3, err instanceof Error ? err.message : "Execution failed");
+      if (err.name === "AbortError") {
+        this.respondAIPError(detail.id, AIPErrorCode.TOOL_TIMEOUT, `Tool "${tool.name}" timed out`, { toolName: tool.name });
+      } else {
+        this.respondAIPError(detail.id, AIPErrorCode.TOOL_RATE_LIMITED, err instanceof Error ? err.message : "Execution failed", { toolName: tool.name });
+      }
     }
   };
+  // ── HITL ─────────────────────────────────────────────────────────────────
+  shouldRequestHITL(tool) {
+    if (!this.config.security.hitl.enabled) return false;
+    if (tool.riskLevel !== RiskLevel.HIGH_RISK) return false;
+    const policy = tool.hitlPolicy ?? this.config.security.hitl.defaultPolicy;
+    switch (policy) {
+      case HITLPolicy.DELEGATED:
+        return false;
+      case HITLPolicy.ONCE:
+        return !this.hitlSession.approvedTools.has(tool.name);
+      case HITLPolicy.CONDITIONAL:
+        return true;
+      case HITLPolicy.ALWAYS:
+      default:
+        return true;
+    }
+  }
   requestHITL(tool, params) {
+    const policy = tool.hitlPolicy ?? this.config.security.hitl.defaultPolicy;
     return new Promise((resolve) => {
-      const reqId = `hitl-${Date.now()}`;
+      const reqId = `hitl-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      const startTime = Date.now();
       const timeout = setTimeout(() => {
+        this.recordHITLAudit(tool, policy, HITLAction.TIMEOUT, void 0, Date.now() - startTime, params);
         resolve(false);
-      }, this.config.hitlTimeout);
+        this.dispatchHITLError(reqId);
+      }, this.config.security.hitl.timeoutMs);
       const handler = (e) => {
         const d = e.detail;
-        if (d?.requestId === reqId) {
-          clearTimeout(timeout);
-          resolve(d.action === "approve");
+        if (d?.requestId !== reqId) return;
+        clearTimeout(timeout);
+        const duration = Date.now() - startTime;
+        const action = d.action;
+        this.recordHITLAudit(tool, policy, action, d.reason, duration, params);
+        if (d.action === "approve") {
+          if (policy === HITLPolicy.ONCE) {
+            this.hitlSession.approvedTools.add(tool.name);
+          }
+          resolve(true);
+        } else {
+          this.respondAIPError(reqId, AIPErrorCode.HITL_DENIED, `Human denied: ${tool.name}`, { toolName: tool.name });
+          resolve(false);
         }
       };
       window.addEventListener(AgentBridgeEvent.HITL_RESPONSE, handler, { once: false });
       window.dispatchEvent(new CustomEvent(AgentBridgeEvent.HITL_REQUEST, {
-        detail: { id: reqId, toolName: tool.name, riskLevel: tool.riskLevel, payload: params, description: tool.description, timestamp: Date.now(), timeout: this.config.hitlTimeout },
+        detail: {
+          id: reqId,
+          toolName: tool.name,
+          riskLevel: tool.riskLevel,
+          payload: params,
+          description: tool.description,
+          timestamp: Date.now(),
+          timeout: this.config.security.hitl.timeoutMs,
+          policy
+        },
         bubbles: true
       }));
     });
   }
+  recordHITLAudit(tool, policy, action, reason, durationMs, payload) {
+    const entry = {
+      id: `audit-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      timestamp: Date.now(),
+      toolName: tool.name,
+      riskLevel: tool.riskLevel,
+      policy,
+      action,
+      reason,
+      payload,
+      durationMs
+    };
+    this.hitlSession.auditLog.push(entry);
+    this.config.security.hitl.auditCallback?.(entry);
+  }
+  dispatchHITLError(reqId) {
+    window.dispatchEvent(new CustomEvent(AgentBridgeEvent.TOOL_RESULT, {
+      detail: {
+        jsonrpc: "2.0",
+        id: reqId,
+        error: { code: AIPErrorCode.HITL_EXPIRED, message: "HITL approval window expired" }
+      },
+      bubbles: true
+    }));
+  }
+  // ── Response Helpers ─────────────────────────────────────────────────────
   respondSuccess(id, result) {
-    window.dispatchEvent(new CustomEvent(AgentBridgeEvent.TOOL_RESULT, { detail: { jsonrpc: "2.0", id, result }, bubbles: true }));
+    window.dispatchEvent(new CustomEvent(AgentBridgeEvent.TOOL_RESULT, {
+      detail: { jsonrpc: "2.0", id, result },
+      bubbles: true
+    }));
+  }
+  respondAIPError(id, code, message, data) {
+    window.dispatchEvent(new CustomEvent(AgentBridgeEvent.TOOL_RESULT, {
+      detail: {
+        jsonrpc: "2.0",
+        id,
+        error: { code, message, data }
+      },
+      bubbles: true
+    }));
   }
   respondError(id, code, message) {
-    window.dispatchEvent(new CustomEvent(AgentBridgeEvent.TOOL_RESULT, { detail: { jsonrpc: "2.0", id, error: { code, message } }, bubbles: true }));
+    window.dispatchEvent(new CustomEvent(AgentBridgeEvent.TOOL_RESULT, {
+      detail: { jsonrpc: "2.0", id, error: { code, message } },
+      bubbles: true
+    }));
+  }
+  // ── Public Getters ───────────────────────────────────────────────────────
+  getTools() {
+    return [...this.tools];
+  }
+  getHITLAuditLog() {
+    return [...this.hitlSession.auditLog];
+  }
+  getRateLimitInfo() {
+    return this.globalLimiter.getInfo(this.config.rateLimit.perMinute);
   }
 };
 
@@ -561,6 +1009,32 @@ function escapeHTML(str) {
   div.textContent = str;
   return div.innerHTML;
 }
+function policyLabel(policy) {
+  switch (policy) {
+    case HITLPolicy.ONCE:
+      return "Approve once this session";
+    case HITLPolicy.DELEGATED:
+      return "Agent can auto-approve";
+    case HITLPolicy.CONDITIONAL:
+      return "Conditional approval";
+    case HITLPolicy.ALWAYS:
+    default:
+      return "Every invocation requires approval";
+  }
+}
+function policyHint(policy) {
+  switch (policy) {
+    case HITLPolicy.ONCE:
+      return "After you approve, this agent can repeat this action without asking again during this session.";
+    case HITLPolicy.DELEGATED:
+      return "You have delegated this action to the agent. It will auto-approve.";
+    case HITLPolicy.CONDITIONAL:
+      return "This action will auto-approve only if certain conditions are met.";
+    case HITLPolicy.ALWAYS:
+    default:
+      return "This action requires explicit human approval every time it is invoked.";
+  }
+}
 function injectHITLStyles(prefix) {
   if (document.getElementById(`${prefix}-hitl-styles`)) return;
   const s = document.createElement("style");
@@ -577,6 +1051,11 @@ function injectHITLStyles(prefix) {
     .${prefix}-hitl-detail strong{min-width:80px;color:#6b7280}
     .${prefix}-hitl-risk{padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700}
     .${prefix}-hitl-risk.high_risk{background:#fee2e2;color:#dc2626}
+    .${prefix}-hitl-policy{padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+    .${prefix}-hitl-policy.once{background:#dbeafe;color:#1d4ed8}
+    .${prefix}-hitl-policy.always{background:#fef3c7;color:#92400e}
+    .${prefix}-hitl-policy.delegated{background:#dcfce7;color:#166534}
+    .${prefix}-hitl-policy-hint{font-size:12px;color:#9ca3af;margin:4px 0 0;font-style:italic}
     .${prefix}-hitl-payload summary{cursor:pointer;color:#6b7280;font-size:12px;font-weight:500}
     .${prefix}-hitl-payload pre{background:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;padding:12px;margin-top:8px;font-size:12px;max-height:200px;overflow:auto;color:#1f2937}
     .${prefix}-hitl-timer{margin:12px 0 0;font-size:13px;color:#9ca3af;text-align:center}
@@ -600,6 +1079,8 @@ function createHITLModal(prefix, timeout) {
         backdrop.setAttribute("role", "dialog");
         backdrop.setAttribute("aria-modal", "true");
         const secs = Math.ceil(timeout / 1e3);
+        const policy = request.policy || HITLPolicy.ALWAYS;
+        const policyClass = policy;
         backdrop.innerHTML = `
           <div class="${prefix}-hitl-modal">
             <div class="${prefix}-hitl-header">
@@ -610,7 +1091,14 @@ function createHITLModal(prefix, timeout) {
               <p><strong>An AI agent wants to perform a high-risk action:</strong></p>
               <div class="${prefix}-hitl-detail"><strong>Action:</strong><span>${escapeHTML(request.description)}</span></div>
               <div class="${prefix}-hitl-detail"><strong>Tool:</strong><code>${escapeHTML(request.toolName)}</code></div>
-              <div class="${prefix}-hitl-detail"><strong>Risk:</strong><span class="${prefix}-hitl-risk high_risk">HIGH RISK</span></div>
+              <div class="${prefix}-hitl-detail">
+                <strong>Risk:</strong><span class="${prefix}-hitl-risk high_risk">HIGH RISK</span>
+              </div>
+              <div class="${prefix}-hitl-detail">
+                <strong>Policy:</strong>
+                <span class="${prefix}-hitl-policy ${policyClass}">${escapeHTML(policyLabel(policy))}</span>
+              </div>
+              <p class="${prefix}-hitl-policy-hint">${policyHint(policy)}</p>
               <details class="${prefix}-hitl-payload"><summary>View Payload</summary><pre>${escapeHTML(JSON.stringify(request.payload, null, 2))}</pre></details>
               <p class="${prefix}-hitl-timer">Auto-denying in <span id="${prefix}-countdown">${secs}</span> seconds...</p>
             </div>
@@ -706,7 +1194,13 @@ function registerTool2(options) {
       riskLevel: options.riskLevel || RiskLevel.SAFE,
       category: options.category || ActionCategory.CUSTOM,
       parameters: options.parameters,
-      metadata: { registered: true, timestamp: Date.now() }
+      metadata: { registered: true, timestamp: Date.now() },
+      hitlPolicy: options.hitlPolicy,
+      hitlCondition: options.hitlCondition,
+      requires: options.requires,
+      conflicts: options.conflicts,
+      ordering: options.ordering,
+      workflowId: options.workflowId
     },
     handler: options.handler,
     endpoint: options.endpoint,
@@ -722,7 +1216,8 @@ function registerSearch2(options) {
     method: options.method || "POST",
     handler: options.handler,
     riskLevel: RiskLevel.SAFE,
-    category: ActionCategory.SEARCH
+    category: ActionCategory.SEARCH,
+    hitlPolicy: options.hitlPolicy
   });
 }
 function registerAction2(options) {
@@ -893,25 +1388,51 @@ var HITLAction2 = /* @__PURE__ */ ((HITLAction3) => {
   return HITLAction3;
 })(HITLAction2 || {});
 var DEFAULT_CONFIG2 = {
-  autoInfer: true,
-  developerOverrides: true,
-  hitlEnabled: true,
-  hitlTimeout: 3e4,
-  hitlRiskLevels: ["high_risk" /* HIGH_RISK */],
-  sanitizePayloads: true,
-  uiMirroring: true,
   debug: false,
-  cssPrefix: "aipjs",
-  inferenceRoot: "body",
-  inferenceTagAllowlist: []
+  inference: {
+    enabled: true,
+    rootSelector: "body",
+    tagAllowlist: []
+  },
+  security: {
+    hitl: {
+      enabled: true,
+      timeoutMs: 3e4,
+      defaultPolicy: "always" /* ALWAYS */
+    },
+    sanitizePayloads: true
+  },
+  agents: {
+    mode: "open"
+  },
+  rateLimit: {
+    enabled: true,
+    perMinute: 60,
+    scope: "global"
+  },
+  session: {
+    enabled: false,
+    storage: "memory",
+    ttlMs: 18e5
+  },
+  ui: {
+    mirroring: true,
+    cssPrefix: "aipjs"
+  }
 };
 var AgentBridgeEvent2 = /* @__PURE__ */ ((AgentBridgeEvent3) => {
   AgentBridgeEvent3["CAPABILITIES_REQUEST"] = "aip:capabilities:request";
   AgentBridgeEvent3["CAPABILITIES_RESPONSE"] = "aip:capabilities:response";
   AgentBridgeEvent3["TOOL_INVOKE"] = "aip:tool:invoke";
   AgentBridgeEvent3["TOOL_RESULT"] = "aip:tool:result";
+  AgentBridgeEvent3["TOOL_CANCEL"] = "aip:tool:cancel";
   AgentBridgeEvent3["HITL_REQUEST"] = "aip:hitl:request";
   AgentBridgeEvent3["HITL_RESPONSE"] = "aip:hitl:response";
+  AgentBridgeEvent3["AGENT_INTRODUCE"] = "aip:agent:introduce";
+  AgentBridgeEvent3["AGENT_INTRODUCE_ACK"] = "aip:agent:introduce:ack";
+  AgentBridgeEvent3["TOOL_STREAM_START"] = "aip:tool:stream:start";
+  AgentBridgeEvent3["TOOL_STREAM_CHUNK"] = "aip:tool:stream:chunk";
+  AgentBridgeEvent3["TOOL_STREAM_END"] = "aip:tool:stream:end";
   return AgentBridgeEvent3;
 })(AgentBridgeEvent2 || {});
 

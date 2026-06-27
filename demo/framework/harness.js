@@ -195,7 +195,7 @@ export function createDemo(opts) {
 
     // Setup security panel
     if (sc.securityPanel) {
-      sc.securityPanel(securityContainer, panelWithContent);
+      sc.securityPanel(securityContainer, panelWithContent, terminal);
     } else {
       securityContainer.innerHTML = '';
     }

@@ -1,7 +1,7 @@
 // @aipjs/security — HITL Verification + Prompt Injection Protection
 
-import type { HITLRequest, HITLResponse } from '@aipjs/types';
-import { HITLAction, RiskLevel, AgentBridgeEvent } from '@aipjs/types';
+import type { HITLRequest, HITLResponse, HITLAuditEntry } from '@aipjs/types';
+import { HITLAction, RiskLevel, AgentBridgeEvent, HITLPolicy } from '@aipjs/types';
 
 // ============================================================================
 // Prompt Injection Sanitizer
@@ -55,6 +55,30 @@ function escapeHTML(str: string): string {
   return div.innerHTML;
 }
 
+function policyLabel(policy: HITLPolicy): string {
+  switch (policy) {
+    case HITLPolicy.ONCE: return 'Approve once this session';
+    case HITLPolicy.DELEGATED: return 'Agent can auto-approve';
+    case HITLPolicy.CONDITIONAL: return 'Conditional approval';
+    case HITLPolicy.ALWAYS:
+    default: return 'Every invocation requires approval';
+  }
+}
+
+function policyHint(policy: HITLPolicy): string {
+  switch (policy) {
+    case HITLPolicy.ONCE:
+      return 'After you approve, this agent can repeat this action without asking again during this session.';
+    case HITLPolicy.DELEGATED:
+      return 'You have delegated this action to the agent. It will auto-approve.';
+    case HITLPolicy.CONDITIONAL:
+      return 'This action will auto-approve only if certain conditions are met.';
+    case HITLPolicy.ALWAYS:
+    default:
+      return 'This action requires explicit human approval every time it is invoked.';
+  }
+}
+
 function injectHITLStyles(prefix: string): void {
   if (document.getElementById(`${prefix}-hitl-styles`)) return;
   const s = document.createElement('style');
@@ -71,6 +95,11 @@ function injectHITLStyles(prefix: string): void {
     .${prefix}-hitl-detail strong{min-width:80px;color:#6b7280}
     .${prefix}-hitl-risk{padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700}
     .${prefix}-hitl-risk.high_risk{background:#fee2e2;color:#dc2626}
+    .${prefix}-hitl-policy{padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+    .${prefix}-hitl-policy.once{background:#dbeafe;color:#1d4ed8}
+    .${prefix}-hitl-policy.always{background:#fef3c7;color:#92400e}
+    .${prefix}-hitl-policy.delegated{background:#dcfce7;color:#166534}
+    .${prefix}-hitl-policy-hint{font-size:12px;color:#9ca3af;margin:4px 0 0;font-style:italic}
     .${prefix}-hitl-payload summary{cursor:pointer;color:#6b7280;font-size:12px;font-weight:500}
     .${prefix}-hitl-payload pre{background:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;padding:12px;margin-top:8px;font-size:12px;max-height:200px;overflow:auto;color:#1f2937}
     .${prefix}-hitl-timer{margin:12px 0 0;font-size:13px;color:#9ca3af;text-align:center}
@@ -97,6 +126,9 @@ function createHITLModal(prefix: string, timeout: number) {
         backdrop.setAttribute('aria-modal', 'true');
 
         const secs = Math.ceil(timeout / 1000);
+        const policy = request.policy || HITLPolicy.ALWAYS;
+        const policyClass = policy; // always, once, delegated, conditional — used as CSS class
+
         backdrop.innerHTML = `
           <div class="${prefix}-hitl-modal">
             <div class="${prefix}-hitl-header">
@@ -107,7 +139,14 @@ function createHITLModal(prefix: string, timeout: number) {
               <p><strong>An AI agent wants to perform a high-risk action:</strong></p>
               <div class="${prefix}-hitl-detail"><strong>Action:</strong><span>${escapeHTML(request.description)}</span></div>
               <div class="${prefix}-hitl-detail"><strong>Tool:</strong><code>${escapeHTML(request.toolName)}</code></div>
-              <div class="${prefix}-hitl-detail"><strong>Risk:</strong><span class="${prefix}-hitl-risk high_risk">HIGH RISK</span></div>
+              <div class="${prefix}-hitl-detail">
+                <strong>Risk:</strong><span class="${prefix}-hitl-risk high_risk">HIGH RISK</span>
+              </div>
+              <div class="${prefix}-hitl-detail">
+                <strong>Policy:</strong>
+                <span class="${prefix}-hitl-policy ${policyClass}">${escapeHTML(policyLabel(policy))}</span>
+              </div>
+              <p class="${prefix}-hitl-policy-hint">${policyHint(policy)}</p>
               <details class="${prefix}-hitl-payload"><summary>View Payload</summary><pre>${escapeHTML(JSON.stringify(request.payload, null, 2))}</pre></details>
               <p class="${prefix}-hitl-timer">Auto-denying in <span id="${prefix}-countdown">${secs}</span> seconds...</p>
             </div>
@@ -157,6 +196,7 @@ function createHITLModal(prefix: string, timeout: number) {
 export interface HITLManagerOptions {
   cssPrefix: string;
   hitlTimeout: number;
+  auditCallback?: (entry: HITLAuditEntry) => void;
 }
 
 export function createHITLManager(options: HITLManagerOptions) {
@@ -170,6 +210,8 @@ export function createHITLManager(options: HITLManagerOptions) {
       const request = (event as CustomEvent).detail as HITLRequest;
       if (!request?.id) return;
       modal.show(request).then(response => {
+        // Audit log entry is handled by the core SDK's recordHITLAudit
+        // The security package just fires the response event
         window.dispatchEvent(new CustomEvent(AgentBridgeEvent.HITL_RESPONSE, { detail: response, bubbles: true }));
       }).catch((err: unknown) => {
         console.error('[@aipjs/security] HITL error:', err);

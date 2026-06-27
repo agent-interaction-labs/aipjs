@@ -3,10 +3,11 @@
    Demonstrates auto-inference, HIGH RISK mutation classification, and HITL
    ═══════════════════════════════════════════════════════════════════════════ */
 
-import { AIP, registerSearch, registerAction } from '../vendor/bundle-entry.mjs';
+import { AIP, registerSearch, registerAction, createHITLManager } from '../vendor/bundle-entry.mjs';
 
 // Shared reference so securityPanel can access the aip instance
 let __aipInstance = null;
+let __hitlCleanup = null;
 
 // ── HTML Fragment ─────────────────────────────────────────────────────────
 // Both panels share the same HTML; aip.js auto-infers tools from it.
@@ -19,9 +20,9 @@ function panelHTML() {
 // ── aip.js Config: Auto-Inference ─────────────────────────────────────────
 function aipConfig(panelContent) {
   const aip = new AIP({
-    autoInfer: true,
-    hitlEnabled: true,
-    uiMirroring: true,
+    inference: { enabled: true },
+    security: { hitl: { enabled: true } },
+    ui: { mirroring: true },
     debug: false,
     cssPrefix: 'aipjs',
   });
@@ -38,9 +39,9 @@ function manualConfig(panelContent) {
 
   // We still initialize aip.js for the demo
   const aip = new AIP({
-    autoInfer: false,
-    hitlEnabled: true,
-    uiMirroring: true,
+    inference: { enabled: false },
+    security: { hitl: { enabled: true } },
+    ui: { mirroring: true },
     debug: false,
     cssPrefix: 'aipjs',
   });
@@ -150,42 +151,43 @@ function manualConfig(panelContent) {
 // ── Terminal Messages ─────────────────────────────────────────────────────
 function populateTerminal(terminal, currentMode) {
   // ── SIMPLE MODE ──────────────────────────────────────────────────────
-
-  // LEFT SIDE (without aip.js) — agent is confused and scared
-  terminal.addMessage('without', 'simple', {
-    icon: '😕',
-    html: 'I see <code>&lt;input name="q"&gt;</code>, <code>&lt;select name="category"&gt;</code>, and various buttons… <strong>I\'ll have to guess which element does what</strong> by reading attributes and hope I\'m right.',
-  });
+  // LEFT COLUMN (without aip.js) — agent sees raw DOM, no structure
 
   terminal.addMessage('without', 'simple', {
-    icon: '😰',
-    html: 'There\'s an "Add to Cart" button inside a <code>&lt;form action="/cart/add"&gt;</code>. I <strong>don\'t know if it\'s safe</strong> to use it. What if it triggers a purchase?',
+    icon: '',
+    html: '<strong>Page analysis:</strong> Detected 1 <code>&lt;input type="search"&gt;</code>, 4 <code>&lt;select&gt;</code> elements, 1 <code>&lt;input type="range"&gt;</code>, 1 <code>&lt;input type="checkbox"&gt;</code>, 6 <code>&lt;button type="submit"&gt;</code> elements. <strong>No structured tool schema available.</strong> All semantics must be inferred from DOM attributes alone.',
   });
 
   terminal.addMessage('without', 'simple', {
-    icon: '😱',
-    html: 'If I accidentally click multiple Add to Cart buttons while exploring the page, <strong>I could add dozens of items</strong> without the user knowing!',
+    icon: '',
+    html: '<strong>Risk classification:</strong> Found <code>&lt;form action="/cart/add"&gt;</code> with submit buttons. <strong>Cannot determine whether this action is safe or destructive.</strong> No risk metadata present in the HTML.',
   });
 
-  // RIGHT SIDE (with aip.js) — agent is confident and secure
-  terminal.addMessage('with', 'simple', {
-    icon: '✅',
-    html: 'This site exposes <strong>8 tools</strong>: <span class="badge-inline badge-safe">search_products</span> <span class="badge-inline badge-safe">filter_by_category</span> <span class="badge-inline badge-safe">filter_by_price</span> <span class="badge-inline badge-safe">filter_by_stock</span> <span class="badge-inline badge-safe">sort_products</span> <span class="badge-inline badge-safe">navigate_to</span> <span class="badge-inline badge-risk">add_to_cart</span> <span class="badge-inline badge-risk">checkout</span>',
+  terminal.addMessage('without', 'simple', {
+    icon: '',
+    html: '<strong>Parameter ambiguity:</strong> The price range input provides no min/max metadata. The category select lists options but <strong>does not indicate whether multiple selections are supported.</strong> Each interaction requires trial and error.',
   });
 
-  terminal.addMessage('with', 'simple', {
-    icon: '🛡️',
-    html: '<strong>add_to_cart</strong> and <strong>checkout</strong> are classified as <span class="badge-inline badge-risk">HIGH RISK</span>. The site owner <strong>requires human-in-the-loop approval</strong> for every cart operation. I CANNOT bypass this.',
-  });
+  // RIGHT COLUMN (with aip.js) — agent receives structured tool schemas
 
   terminal.addMessage('with', 'simple', {
-    icon: '✅',
-    html: '<strong>filter_by_price</strong> gives me a numeric range (0–1000). <strong>filter_by_stock</strong> accepts a boolean. I know <strong>exactly</strong> what data to send.',
+    icon: '',
+    html: '<strong>Capability discovery complete.</strong> Site exposes 8 structured tools: <span class="badge-inline badge-safe">search_products</span> <span class="badge-inline badge-safe">filter_by_category</span> <span class="badge-inline badge-safe">filter_by_price</span> <span class="badge-inline badge-safe">filter_by_stock</span> <span class="badge-inline badge-safe">sort_products</span> <span class="badge-inline badge-safe">navigate_to</span> <span class="badge-inline badge-risk">add_to_cart</span> <span class="badge-inline badge-risk">checkout</span>. Each tool includes typed parameters and descriptions.',
   });
 
   terminal.addMessage('with', 'simple', {
-    icon: '🛡️',
-    html: 'Even if a malicious script tries to invoke <code>add_to_cart</code> without approval, the <strong>HITL modal freezes the page</strong> until a human explicitly clicks Approve or Deny.',
+    icon: '',
+    html: '<strong>Security classification:</strong> <span class="badge-inline badge-risk">add_to_cart</span> and <span class="badge-inline badge-risk">checkout</span> are classified as <strong>HIGH_RISK (riskLevel: "high_risk")</strong>. These operations <strong>require human-in-the-loop approval</strong> before execution. The site enforces this — the agent cannot bypass it.',
+  });
+
+  terminal.addMessage('with', 'simple', {
+    icon: '',
+    html: '<strong>Parameter validation:</strong> <code>filter_by_price</code> accepts <code>{ maxPrice: number }</code> with range 0–1000. <code>filter_by_stock</code> accepts <code>{ inStock: boolean }</code>. <strong>All parameter types and constraints are declared in the schema</strong> — no guessing required.',
+  });
+
+  terminal.addMessage('with', 'simple', {
+    icon: '',
+    html: '<strong>HITL enforcement:</strong> Invoking <code>add_to_cart</code> or <code>checkout</code> triggers a <strong>mandatory approval modal</strong>. The page freezes until a human explicitly approves or denies. <strong>This is enforced at the protocol level, not suggested.</strong>',
   });
 
   // ── RAW MODE ─────────────────────────────────────────────────────────
@@ -265,7 +267,7 @@ function populateTerminal(terminal, currentMode) {
 }
 
 // ── Security Panel (HITL Demo) ────────────────────────────────────────────
-function securityPanel(container, panelWithContent) {
+function securityPanel(container, panelWithContent, terminal) {
   // Build the security demo bar
   container.innerHTML = `
     <div class="security-panel">
@@ -284,36 +286,111 @@ function securityPanel(container, panelWithContent) {
     </div>
   `;
 
+  // ── Initialize HITL Manager (shows modal on aip:hitl:request) ──────────
+  const hitlManager = createHITLManager({
+    cssPrefix: 'aipjs',
+    hitlTimeout: 30000,
+  });
+  hitlManager.listen();
+
+  // ── Live terminal messages during simulation ───────────────────────────
+
+  function terminalMsg(side, text) {
+    if (terminal && terminal.addMessage) {
+      terminal.addMessage(side, 'simple', { icon: '', html: text });
+    }
+  }
+
+  // Listen for tool invocation
+  const onToolInvoke = (e) => {
+    const detail = e.detail;
+    terminalMsg('with', `<strong>Agent invoked:</strong> <code>${detail.method}</code> with params <code>${JSON.stringify(detail.params)}</code>`);
+  };
+  window.addEventListener('aip:tool:invoke', onToolInvoke);
+
+  // Listen for HITL request (modal is about to appear)
+  const onHitlRequest = (e) => {
+    const req = e.detail;
+    terminalMsg('with', `<div class="msg-text" style="background:#fef3c7;padding:8px;border-radius:4px;border-left:3px solid #f59e0b;">🛡️ <strong>HITL:</strong> Agent wants to run <code>${req.toolName}</code> — approval modal shown. <em>Awaiting human decision...</em></div>`);
+  };
+  window.addEventListener('aip:hitl:request', onHitlRequest);
+
+  // Listen for HITL response (user approved or denied)
+  const onHitlResponse = (e) => {
+    const resp = e.detail;
+    if (resp.action === 'approve') {
+      terminalMsg('with', `<div class="msg-text" style="background:#dcfce7;padding:8px;border-radius:4px;border-left:3px solid #16a34a;">✅ <strong>Human approved:</strong> Action allowed to proceed.</div>`);
+    } else if (resp.action === 'deny') {
+      terminalMsg('with', `<div class="msg-text" style="background:#fee2e2;padding:8px;border-radius:4px;border-left:3px solid #dc2626;">❌ <strong>Human denied:</strong> ${resp.reason || 'Action rejected'}.</div>`);
+    } else if (resp.action === 'timeout') {
+      terminalMsg('with', `<div class="msg-text" style="background:#fef3c7;padding:8px;border-radius:4px;border-left:3px solid #f59e0b;">⏱️ <strong>HITL timed out:</strong> No human response within 30s. Auto-denied.</div>`);
+    }
+  };
+  window.addEventListener('aip:hitl:response', onHitlResponse);
+
+  // Listen for tool result
+  const onToolResult = (e) => {
+    const resp = e.detail;
+    if (resp.error) {
+      terminalMsg('with', `<div class="msg-text" style="background:#fee2e2;padding:8px;border-radius:4px;border-left:3px solid #dc2626;">⚠️ <strong>Tool error:</strong> ${resp.error.message || JSON.stringify(resp.error)}</div>`);
+    } else {
+      terminalMsg('with', `<strong>Tool result:</strong> <code>${JSON.stringify(resp.result)}</code>`);
+    }
+  };
+  window.addEventListener('aip:tool:result', onToolResult);
+
+  // Clean up old listeners from previous securityPanel call
+  if (__hitlCleanup) __hitlCleanup();
+  __hitlCleanup = () => {
+    window.removeEventListener('aip:tool:invoke', onToolInvoke);
+    window.removeEventListener('aip:hitl:request', onHitlRequest);
+    window.removeEventListener('aip:hitl:response', onHitlResponse);
+    window.removeEventListener('aip:tool:result', onToolResult);
+    if (hitlManager?.destroy) hitlManager.destroy();
+  };
+
   // Wire up the simulate button
   const btn = container.querySelector('#simulate-hitl-btn');
   if (!btn) return;
 
   btn.addEventListener('click', () => {
-    // Find the add_to_cart tool name from the aip instance
+    // Find any add-to-cart tool from the AIP instance
     let methodName = 'add_to_cart';
+    let params = { productId: 'WH-001', quantity: 1 };
 
-    if (__aipInstance && __aipInstance.getCapabilities) {
-      const caps = __aipInstance.getCapabilities();
-      const cartTool = caps.tools.find(t =>
-        t.name && t.name.toLowerCase().includes('add_to_cart')
-      );
+    if (__aipInstance) {
+      const tools = __aipInstance.getTools ? __aipInstance.getTools() : [];
+      if (tools.length === 0 && __aipInstance.getCapabilities) {
+        const caps = __aipInstance.getCapabilities();
+        tools.push(...caps.tools);
+      }
+      const cartTool = tools.find(t => {
+        if (!t.name) return false;
+        const normalized = t.name.toLowerCase().replace(/[ _-]+/g, '');
+        return normalized.includes('addtocart');
+      });
       if (cartTool) {
         methodName = cartTool.name;
+        // Match params to the tool's declared parameters
+        if (cartTool.parameters?.length) {
+          params = {};
+          for (const p of cartTool.parameters) {
+            params[p.name] = p.type === 'number' ? 1 : 'WH-001';
+          }
+        }
       }
     }
 
-    // Dispatch the tool invocation event — this is what an agent would send
     window.dispatchEvent(new CustomEvent('aip:tool:invoke', {
       detail: {
         jsonrpc: '2.0',
         id: 'demo-' + Date.now(),
         method: methodName,
-        params: { productId: 'WH-001', quantity: 1 },
+        params,
       },
       bubbles: true,
     }));
 
-    // Visual feedback on the button
     btn.textContent = '⏳ Waiting for human…';
     btn.disabled = true;
     btn.style.opacity = '0.7';

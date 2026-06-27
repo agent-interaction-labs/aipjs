@@ -18,9 +18,9 @@ function panelHTML() {
 
 function aipConfig(panelContent) {
   const aip = new AIP({
-    autoInfer: true,
-    hitlEnabled: true,
-    uiMirroring: true,
+    inference: { enabled: true },
+    security: { hitl: { enabled: true } },
+    ui: { mirroring: true },
     debug: false,
     cssPrefix: 'aipjs',
   });
@@ -38,9 +38,9 @@ function manualConfig(panelContent) {
   codeBlock.innerHTML = `<pre class="code-block js"><code>import { AIP } from '@aipjs/core';
 
 const aip = new AIP({
-  autoInfer: true,     // Scan DOM for semantic elements
-  hitlEnabled: true,    // Require human approval for mutations
-  uiMirroring: true,    // Show agent activity in the UI
+  inference: { enabled: true },     // Scan DOM for semantic elements
+  security: { hitl: { enabled: true } },    // Require human approval for mutations
+  ui: { mirroring: true },    // Show agent activity in the UI
 });
 
 // Explicitly register search for fine-grained control
@@ -89,35 +89,39 @@ aip.start();</code></pre>`;
 // ── Terminal Messages ─────────────────────────────────────────────────────
 
 function populateTerminal(terminal, mode) {
-  // --- Simple mode ---
+  // ── SIMPLE MODE ──────────────────────────────────────────────────────
+  // LEFT COLUMN (without aip.js) — agent sees raw DOM
+
   terminal.addMessage('without', 'simple', {
-    icon: '😕',
-    html: 'I found a <code>&lt;select&gt;</code> named "category" with options. I\'ll <strong>guess</strong> it filters articles, but I\'m not sure which values are valid or what happens when I change it. I have to <strong>try and see</strong>.',
+    icon: '',
+    html: '<strong>Page analysis:</strong> Detected 1 <code>&lt;input type="search"&gt;</code>, 2 <code>&lt;select&gt;</code> elements, 2 <code>&lt;form&gt;</code> elements with submit buttons. <strong>No structured tool schema available.</strong> Element purpose must be inferred from DOM attributes and heuristics.',
   });
   terminal.addMessage('without', 'simple', {
-    icon: '😰',
-    html: 'There\'s a <code>&lt;form&gt;</code> with a submit button labeled "Subscribe". Should I fill and submit it? <strong>What if it triggers an unwanted action?</strong> I have no way to know — the HTML doesn\'t tell me what\'s safe.',
+    icon: '',
+    html: '<strong>Form detection:</strong> Found <code>&lt;form action="/newsletter/subscribe"&gt;</code> and <code>&lt;form action="/contact/submit"&gt;</code>. <strong>Cannot determine whether these are safe to invoke.</strong> The HTML provides no risk classification or confirmation requirements.',
   });
   terminal.addMessage('without', 'simple', {
-    icon: '🤔',
-    html: 'I found an <code>&lt;input type="search"&gt;</code>. It\'s <strong>probably</strong> a search field. But I don\'t know what parameters it expects, what the backend returns, or if there are filters I should use.',
+    icon: '',
+    html: '<strong>Parameter inference:</strong> The search input has <code>name="q"</code> with no type metadata. The category select lists 5 options but <strong>does not specify which values are valid programmatic inputs</strong> vs display labels. Requires trial-and-error interaction.',
   });
 
+  // RIGHT COLUMN (with aip.js) — agent receives structured tools
+
   terminal.addMessage('with', 'simple', {
-    icon: '✅',
-    html: 'This site broadcasts <strong>6 structured tools</strong> I can use: <span class="badge-inline badge-safe">search</span> <span class="badge-inline badge-safe">filter</span> <span class="badge-inline badge-safe">sort</span> <span class="badge-inline badge-safe">navigate</span> <span class="badge-inline badge-risk">newsletter</span> <span class="badge-inline badge-risk">contact</span>',
+    icon: '',
+    html: '<strong>Capability discovery complete.</strong> Site exposes 6 structured tools: <span class="badge-inline badge-safe">search</span> <span class="badge-inline badge-safe">filter</span> <span class="badge-inline badge-safe">sort</span> <span class="badge-inline badge-safe">navigate</span> <span class="badge-inline badge-risk">newsletter</span> <span class="badge-inline badge-risk">contact</span>. Each tool declares typed parameters and descriptions.',
   });
   terminal.addMessage('with', 'simple', {
-    icon: '🛡️',
-    html: '<strong>newsletter_signup</strong> and <strong>contact_form</strong> are marked <span class="badge-inline badge-risk">HIGH RISK</span>. The site owner <strong>requires human approval</strong> before I can use them. I <strong>cannot</strong> silently submit forms.',
+    icon: '',
+    html: '<strong>Security classification:</strong> <span class="badge-inline badge-risk">newsletter_signup</span> and <span class="badge-inline badge-risk">contact_form</span> are classified as <strong>HIGH_RISK (riskLevel: "high_risk")</strong>. These mutations <strong>require explicit human approval</strong> before the agent can execute them.',
   });
   terminal.addMessage('with', 'simple', {
-    icon: '✅',
-    html: '<strong>filter_by_category</strong> supports exactly: AI &amp; ML, Web Dev, DevOps &amp; Cloud, UX Design, Cybersecurity. <strong>No guessing needed</strong> — the site told me the valid options.',
+    icon: '',
+    html: '<strong>Enum validation:</strong> <code>filter_by_category</code> declares valid values: <code>ai-ml, web-dev, devops, ux-design, cybersecurity</code>. <strong>Agent receives exact enum constraints</strong> — no ambiguity between display labels and programmatic values.',
   });
   terminal.addMessage('with', 'simple', {
-    icon: '✅',
-    html: '<strong>sort_articles</strong> supports: Newest First, Oldest First, Most Popular. I can confidently sort results. <strong>Zero ambiguity</strong> about what each value does.',
+    icon: '',
+    html: '<strong>Sort parameters:</strong> <code>sort_articles</code> accepts <code>{ sort: "newest" | "oldest" | "popular" }</code>. <strong>All valid sort options are declared in the schema.</strong> The agent can apply sorting without inspecting DOM option elements.',
   });
 
   // --- Raw mode ---

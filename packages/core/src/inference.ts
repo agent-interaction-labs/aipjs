@@ -23,6 +23,12 @@ const MUTATION_SELECTORS = [
   '[data-aip-confirm]',
 ];
 
+const NAVIGATION_SELECTORS = [
+  'a[href]:not([href="#"]):not([href^="javascript:"])',
+  '[data-aip-navigate]',
+  'nav a[href]', '[role="navigation"] a[href]',
+];
+
 function getElementLabel(el: Element): string {
   const ariaLabel = el.getAttribute('aria-label');
   if (ariaLabel) return ariaLabel;
@@ -130,11 +136,87 @@ function generateToolSchema(el: Element, index: number): ToolSchema {
   const name = el.getAttribute('data-aip-name') ||
     `${category}_${label.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_${index}`;
   const description = el.getAttribute('data-aip-description') ||
-    `${category === ActionCategory.MUTATE ? '[REQUIRES HUMAN APPROVAL] ' : ''}${label}`;
+    `${classifyRisk(el) === RiskLevel.HIGH_RISK ? '[REQUIRES HUMAN APPROVAL] ' : ''}${label}`;
+
+  // Auto-generate a DOM handler for this element
+  const handler = buildAutoHandler(el, category);
+
   return {
     name, description, riskLevel: classifyRisk(el), category,
     parameters: extractParameters(el), sourceElement: getElementSelector(el),
-    metadata: { inferred: true, url: window.location.href },
+    metadata: { inferred: true, url: window.location.href, _handler: handler },
+  };
+}
+
+/** Build a handler that manipulates the DOM element as a human would. */
+function buildAutoHandler(el: Element, category: ActionCategory): (params: Record<string, unknown>) => Promise<unknown> {
+  return async (params: Record<string, unknown>) => {
+    const tag = el.tagName.toLowerCase();
+    const input = el as HTMLInputElement;
+    const select = el as HTMLSelectElement;
+    const form = el.closest('form');
+
+    // Resolve parameter values from the first param (most tools are single-param)
+    const keys = Object.keys(params);
+    const firstVal = keys.length > 0 ? params[keys[0]] : null;
+
+    if (tag === 'select' && firstVal !== null && firstVal !== undefined) {
+      // Set select value and dispatch change event
+      select.value = String(firstVal);
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    } else if (tag === 'input') {
+      const type = input.type;
+      if (type === 'checkbox') {
+        input.checked = Boolean(firstVal);
+      } else if (type === 'radio') {
+        input.checked = true;
+      } else if (type === 'range') {
+        input.value = String(firstVal ?? input.value);
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      } else {
+        // text, search, number, etc.
+        if (firstVal !== null && firstVal !== undefined) {
+          input.value = String(firstVal);
+        }
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    } else if (tag === 'button' && form) {
+      // For submit buttons: fill hidden inputs from params, then submit
+      const hiddenInputs = form.querySelectorAll('input[type="hidden"]');
+      for (const hi of Array.from(hiddenInputs) as HTMLInputElement[]) {
+        const key = hi.getAttribute('name') || hi.id;
+        if (key && params[key] !== undefined) {
+          hi.value = String(params[key]);
+        }
+      }
+      // Submit the form natively
+      form.requestSubmit ? form.requestSubmit(el as HTMLElement) : form.submit();
+    } else if (tag === 'a' && (el as HTMLAnchorElement).href) {
+      // For links: navigate
+      window.location.href = (el as HTMLAnchorElement).href;
+    } else if (form) {
+      // Generic: submit the parent form with param values as hidden inputs
+      for (const [key, val] of Object.entries(params)) {
+        let hidden = form.querySelector(`input[name="${key}"]`) as HTMLInputElement;
+        if (!hidden) {
+          hidden = document.createElement('input');
+          hidden.type = 'hidden';
+          hidden.name = key;
+          form.appendChild(hidden);
+        }
+        hidden.value = String(val);
+      }
+      form.requestSubmit ? form.requestSubmit() : form.submit();
+    }
+
+    // Return a simulated result
+    return {
+      success: true,
+      action: category,
+      element: getElementSelector(el),
+      params,
+    };
   };
 }
 
@@ -148,7 +230,7 @@ export function inferTools(config: { rootSelector?: string; tagAllowlist?: strin
   const toolSchemas: ToolSchema[] = [];
   const seen = new Set<Element>();
   let idx = 0;
-  const selectors = [...SEARCH_SELECTORS, ...FILTER_SELECTORS, ...SORT_SELECTORS, ...MUTATION_SELECTORS];
+  const selectors = [...SEARCH_SELECTORS, ...FILTER_SELECTORS, ...SORT_SELECTORS, ...MUTATION_SELECTORS, ...NAVIGATION_SELECTORS];
   for (const sel of selectors) {
     try {
       root.querySelectorAll(sel).forEach(el => {
