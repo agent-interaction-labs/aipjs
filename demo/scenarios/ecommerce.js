@@ -5,8 +5,8 @@
 
 import { AIXA, registerSearch, registerAction, createHITLManager } from '../vendor/bundle-entry.mjs';
 
-// Shared reference so securityPanel can access the aip instance
-let __aipInstance = null;
+// Shared reference so securityPanel can access the aixa instance
+let __aixaInstance = null;
 let __hitlCleanup = null;
 
 // ── HTML Fragment ─────────────────────────────────────────────────────────
@@ -18,7 +18,7 @@ function panelHTML() {
 }
 
 // ── aixa.js Config: Auto-Inference ─────────────────────────────────────────
-function aipConfig(panelContent) {
+function aixaConfig(panelContent) {
   const aixa = new AIXA({
     inference: { enabled: true },
     security: { hitl: { enabled: true } },
@@ -27,8 +27,8 @@ function aipConfig(panelContent) {
     cssPrefix: 'aixa',
   });
   aixa.start();
-  __aipInstance = aip;
-  return aip;
+  __aixaInstance = aixa;
+  return aixa;
 }
 
 // ── Manual Config Mode ────────────────────────────────────────────────────
@@ -144,8 +144,8 @@ function manualConfig(panelContent) {
   });
 
   aixa.start();
-  __aipInstance = aip;
-  return aip;
+  __aixaInstance = aixa;
+  return aixa;
 }
 
 // ── Terminal Messages ─────────────────────────────────────────────────────
@@ -358,10 +358,10 @@ function securityPanel(container, panelWithContent, terminal) {
     let methodName = 'add_to_cart';
     let params = { productId: 'WH-001', quantity: 1 };
 
-    if (__aipInstance) {
-      const tools = __aipInstance.getTools ? __aipInstance.getTools() : [];
-      if (tools.length === 0 && __aipInstance.getCapabilities) {
-        const caps = __aipInstance.getCapabilities();
+    if (__aixaInstance) {
+      const tools = __aixaInstance.getTools ? __aixaInstance.getTools() : [];
+      if (tools.length === 0 && __aixaInstance.getCapabilities) {
+        const caps = __aixaInstance.getCapabilities();
         tools.push(...caps.tools);
       }
       const cartTool = tools.find(t => {
@@ -438,7 +438,7 @@ export const ecommerceScenario = {
   },
   with: {
     html: panelHTML,
-    aipConfig,
+    aixaConfig,
     manualConfig,
   },
   terminal: populateTerminal,

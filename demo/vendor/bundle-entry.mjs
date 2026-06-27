@@ -1,7 +1,7 @@
-// aip.js — Agentic Engine Optimization SDK — self-contained ESM bundle
+// aixa.js — Agent Interaction & eXecution Agreement (AIXA) SDK — self-contained ESM bundle
 
 // packages/types/dist/index.js
-var AIP_PROTOCOL_VERSION = "1.0.0";
+var AIXA_PROTOCOL_VERSION = "1.0.0";
 var RiskLevel;
 (function(RiskLevel4) {
   RiskLevel4["SAFE"] = "safe";
@@ -30,27 +30,27 @@ var HITLAction;
   HITLAction3["DENY"] = "deny";
   HITLAction3["TIMEOUT"] = "timeout";
 })(HITLAction || (HITLAction = {}));
-var AIPErrorCode;
-(function(AIPErrorCode2) {
-  AIPErrorCode2[AIPErrorCode2["TOOL_NOT_FOUND"] = -32001] = "TOOL_NOT_FOUND";
-  AIPErrorCode2[AIPErrorCode2["TOOL_DISABLED"] = -32002] = "TOOL_DISABLED";
-  AIPErrorCode2[AIPErrorCode2["TOOL_TIMEOUT"] = -32003] = "TOOL_TIMEOUT";
-  AIPErrorCode2[AIPErrorCode2["TOOL_RATE_LIMITED"] = -32004] = "TOOL_RATE_LIMITED";
-  AIPErrorCode2[AIPErrorCode2["TOOL_DEPENDENCY_FAIL"] = -32005] = "TOOL_DEPENDENCY_FAIL";
-  AIPErrorCode2[AIPErrorCode2["HITL_EXPIRED"] = -32020] = "HITL_EXPIRED";
-  AIPErrorCode2[AIPErrorCode2["HITL_DENIED"] = -32021] = "HITL_DENIED";
-  AIPErrorCode2[AIPErrorCode2["HITL_REQUIRED"] = -32022] = "HITL_REQUIRED";
-  AIPErrorCode2[AIPErrorCode2["HITL_UNAVAILABLE"] = -32023] = "HITL_UNAVAILABLE";
-  AIPErrorCode2[AIPErrorCode2["UNAUTHORIZED_AGENT"] = -32030] = "UNAUTHORIZED_AGENT";
-  AIPErrorCode2[AIPErrorCode2["FORBIDDEN_ACTION"] = -32031] = "FORBIDDEN_ACTION";
-  AIPErrorCode2[AIPErrorCode2["AGENT_NOT_IDENTIFIED"] = -32032] = "AGENT_NOT_IDENTIFIED";
-  AIPErrorCode2[AIPErrorCode2["UNSUPPORTED_VERSION"] = -32040] = "UNSUPPORTED_VERSION";
-  AIPErrorCode2[AIPErrorCode2["FEATURE_NOT_AVAILABLE"] = -32041] = "FEATURE_NOT_AVAILABLE";
-  AIPErrorCode2[AIPErrorCode2["MALFORMED_REQUEST"] = -32042] = "MALFORMED_REQUEST";
-  AIPErrorCode2[AIPErrorCode2["VALIDATION_ERROR"] = -32043] = "VALIDATION_ERROR";
-  AIPErrorCode2[AIPErrorCode2["RATE_LIMITED_GLOBAL"] = -32050] = "RATE_LIMITED_GLOBAL";
-  AIPErrorCode2[AIPErrorCode2["QUOTA_EXCEEDED"] = -32051] = "QUOTA_EXCEEDED";
-})(AIPErrorCode || (AIPErrorCode = {}));
+var AIXAErrorCode;
+(function(AIXAErrorCode2) {
+  AIXAErrorCode2[AIXAErrorCode2["TOOL_NOT_FOUND"] = -32001] = "TOOL_NOT_FOUND";
+  AIXAErrorCode2[AIXAErrorCode2["TOOL_DISABLED"] = -32002] = "TOOL_DISABLED";
+  AIXAErrorCode2[AIXAErrorCode2["TOOL_TIMEOUT"] = -32003] = "TOOL_TIMEOUT";
+  AIXAErrorCode2[AIXAErrorCode2["TOOL_RATE_LIMITED"] = -32004] = "TOOL_RATE_LIMITED";
+  AIXAErrorCode2[AIXAErrorCode2["TOOL_DEPENDENCY_FAIL"] = -32005] = "TOOL_DEPENDENCY_FAIL";
+  AIXAErrorCode2[AIXAErrorCode2["HITL_EXPIRED"] = -32020] = "HITL_EXPIRED";
+  AIXAErrorCode2[AIXAErrorCode2["HITL_DENIED"] = -32021] = "HITL_DENIED";
+  AIXAErrorCode2[AIXAErrorCode2["HITL_REQUIRED"] = -32022] = "HITL_REQUIRED";
+  AIXAErrorCode2[AIXAErrorCode2["HITL_UNAVAILABLE"] = -32023] = "HITL_UNAVAILABLE";
+  AIXAErrorCode2[AIXAErrorCode2["UNAUTHORIZED_AGENT"] = -32030] = "UNAUTHORIZED_AGENT";
+  AIXAErrorCode2[AIXAErrorCode2["FORBIDDEN_ACTION"] = -32031] = "FORBIDDEN_ACTION";
+  AIXAErrorCode2[AIXAErrorCode2["AGENT_NOT_IDENTIFIED"] = -32032] = "AGENT_NOT_IDENTIFIED";
+  AIXAErrorCode2[AIXAErrorCode2["UNSUPPORTED_VERSION"] = -32040] = "UNSUPPORTED_VERSION";
+  AIXAErrorCode2[AIXAErrorCode2["FEATURE_NOT_AVAILABLE"] = -32041] = "FEATURE_NOT_AVAILABLE";
+  AIXAErrorCode2[AIXAErrorCode2["MALFORMED_REQUEST"] = -32042] = "MALFORMED_REQUEST";
+  AIXAErrorCode2[AIXAErrorCode2["VALIDATION_ERROR"] = -32043] = "VALIDATION_ERROR";
+  AIXAErrorCode2[AIXAErrorCode2["RATE_LIMITED_GLOBAL"] = -32050] = "RATE_LIMITED_GLOBAL";
+  AIXAErrorCode2[AIXAErrorCode2["QUOTA_EXCEEDED"] = -32051] = "QUOTA_EXCEEDED";
+})(AIXAErrorCode || (AIXAErrorCode = {}));
 var DEFAULT_CONFIG = {
   debug: false,
   inference: {
@@ -81,23 +81,23 @@ var DEFAULT_CONFIG = {
   },
   ui: {
     mirroring: true,
-    cssPrefix: "aipjs"
+    cssPrefix: "aixa"
   }
 };
 var AgentBridgeEvent;
 (function(AgentBridgeEvent3) {
-  AgentBridgeEvent3["CAPABILITIES_REQUEST"] = "aip:capabilities:request";
-  AgentBridgeEvent3["CAPABILITIES_RESPONSE"] = "aip:capabilities:response";
-  AgentBridgeEvent3["TOOL_INVOKE"] = "aip:tool:invoke";
-  AgentBridgeEvent3["TOOL_RESULT"] = "aip:tool:result";
-  AgentBridgeEvent3["TOOL_CANCEL"] = "aip:tool:cancel";
-  AgentBridgeEvent3["HITL_REQUEST"] = "aip:hitl:request";
-  AgentBridgeEvent3["HITL_RESPONSE"] = "aip:hitl:response";
-  AgentBridgeEvent3["AGENT_INTRODUCE"] = "aip:agent:introduce";
-  AgentBridgeEvent3["AGENT_INTRODUCE_ACK"] = "aip:agent:introduce:ack";
-  AgentBridgeEvent3["TOOL_STREAM_START"] = "aip:tool:stream:start";
-  AgentBridgeEvent3["TOOL_STREAM_CHUNK"] = "aip:tool:stream:chunk";
-  AgentBridgeEvent3["TOOL_STREAM_END"] = "aip:tool:stream:end";
+  AgentBridgeEvent3["CAPABILITIES_REQUEST"] = "aixa:capabilities:request";
+  AgentBridgeEvent3["CAPABILITIES_RESPONSE"] = "aixa:capabilities:response";
+  AgentBridgeEvent3["TOOL_INVOKE"] = "aixa:tool:invoke";
+  AgentBridgeEvent3["TOOL_RESULT"] = "aixa:tool:result";
+  AgentBridgeEvent3["TOOL_CANCEL"] = "aixa:tool:cancel";
+  AgentBridgeEvent3["HITL_REQUEST"] = "aixa:hitl:request";
+  AgentBridgeEvent3["HITL_RESPONSE"] = "aixa:hitl:response";
+  AgentBridgeEvent3["AGENT_INTRODUCE"] = "aixa:agent:introduce";
+  AgentBridgeEvent3["AGENT_INTRODUCE_ACK"] = "aixa:agent:introduce:ack";
+  AgentBridgeEvent3["TOOL_STREAM_START"] = "aixa:tool:stream:start";
+  AgentBridgeEvent3["TOOL_STREAM_CHUNK"] = "aixa:tool:stream:chunk";
+  AgentBridgeEvent3["TOOL_STREAM_END"] = "aixa:tool:stream:end";
 })(AgentBridgeEvent || (AgentBridgeEvent = {}));
 
 // packages/core/src/inference.ts
@@ -110,7 +110,7 @@ var SEARCH_SELECTORS = [
   'input[role="searchbox"]',
   'input[role="combobox"]',
   'form[role="search"] input',
-  "[data-aip-search]"
+  "[data-aixa-search]"
 ];
 var FILTER_SELECTORS = [
   "select",
@@ -118,23 +118,23 @@ var FILTER_SELECTORS = [
   'input[type="radio"]',
   '[role="radiogroup"]',
   'input[type="range"]',
-  "[data-aip-filter]"
+  "[data-aixa-filter]"
 ];
 var SORT_SELECTORS = [
   'select[name*="sort" i]',
   'select[aria-label*="sort" i]',
-  "[data-aip-sort]"
+  "[data-aixa-sort]"
 ];
 var MUTATION_SELECTORS = [
   'button[type="submit"]',
   'input[type="submit"]',
   'form[action*="cart" i] button[type="submit"]',
   'form[action*="checkout" i] button[type="submit"]',
-  "[data-aip-confirm]"
+  "[data-aixa-confirm]"
 ];
 var NAVIGATION_SELECTORS = [
   'a[href]:not([href="#"]):not([href^="javascript:"])',
-  "[data-aip-navigate]",
+  "[data-aixa-navigate]",
   "nav a[href]",
   '[role="navigation"] a[href]'
 ];
@@ -175,7 +175,7 @@ function getElementSelector(el) {
   return el.tagName.toLowerCase();
 }
 function classifyRisk(el) {
-  const explicit = el.getAttribute("data-aip-risk");
+  const explicit = el.getAttribute("data-aixa-risk");
   if (explicit === "high_risk") return RiskLevel.HIGH_RISK;
   if (explicit === "safe") return RiskLevel.SAFE;
   const tag = el.tagName.toLowerCase();
@@ -185,7 +185,7 @@ function classifyRisk(el) {
   }
   if (el.closest('form[action*="cart" i]') || el.closest('form[action*="checkout" i]'))
     return RiskLevel.HIGH_RISK;
-  if (el.hasAttribute("data-aip-confirm")) return RiskLevel.HIGH_RISK;
+  if (el.hasAttribute("data-aixa-confirm")) return RiskLevel.HIGH_RISK;
   const href = el.href;
   if (href && /(checkout|subscribe|upgrade|delete|remove)/i.test(href))
     return RiskLevel.HIGH_RISK;
@@ -198,7 +198,7 @@ function classifyCategory(el) {
   if (el.tagName.toLowerCase() === "a") return ActionCategory.NAVIGATE;
   const typeAttr = el.type;
   if (typeAttr === "submit") return ActionCategory.MUTATE;
-  const explicit = el.getAttribute("data-aip-category");
+  const explicit = el.getAttribute("data-aixa-category");
   if (explicit) return explicit;
   return ActionCategory.CUSTOM;
 }
@@ -224,7 +224,7 @@ function extractParameters(el) {
       required: input.required
     });
   } else if (tag === "button" || tag === "a") {
-    const dataParams = el.getAttribute("data-aip-params");
+    const dataParams = el.getAttribute("data-aixa-params");
     if (dataParams) {
       try {
         const parsed = JSON.parse(dataParams);
@@ -232,7 +232,7 @@ function extractParameters(el) {
           params.push({ name: key, type: typeof value, description: key, required: true });
         }
       } catch (err) {
-        console.warn(`[@aipjs/core] Failed to parse data-aip-params on element:`, el, err);
+        console.warn(`[@aixa/core] Failed to parse data-aixa-params on element:`, el, err);
       }
     }
   }
@@ -241,8 +241,8 @@ function extractParameters(el) {
 function generateToolSchema(el, index) {
   const category = classifyCategory(el);
   const label = getElementLabel(el);
-  const name = el.getAttribute("data-aip-name") || `${category}_${label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}_${index}`;
-  const description = el.getAttribute("data-aip-description") || `${classifyRisk(el) === RiskLevel.HIGH_RISK ? "[REQUIRES HUMAN APPROVAL] " : ""}${label}`;
+  const name = el.getAttribute("data-aixa-name") || `${category}_${label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}_${index}`;
+  const description = el.getAttribute("data-aixa-description") || `${classifyRisk(el) === RiskLevel.HIGH_RISK ? "[REQUIRES HUMAN APPROVAL] " : ""}${label}`;
   const handler = buildAutoHandler(el, category);
   return {
     name,
@@ -425,14 +425,14 @@ async function executeTool(name, params, signal) {
 var state = {
   active: /* @__PURE__ */ new Map(),
   indicator: null,
-  cssPrefix: "aipjs",
+  cssPrefix: "aixa",
   enabled: true
 };
 function ensureIndicator() {
   if (state.indicator) return state.indicator;
   const el = document.createElement("div");
   el.id = `${state.cssPrefix}-indicator`;
-  el.innerHTML = `<div style="position:fixed;bottom:16px;right:16px;width:10px;height:10px;border-radius:50%;background:#3b82f6;z-index:2147483646;" title="Agentic JS Active"></div>`;
+  el.innerHTML = `<div style="position:fixed;bottom:16px;right:16px;width:10px;height:10px;border-radius:50%;background:#3b82f6;z-index:2147483646;" title="AIXA Active"></div>`;
   document.body.appendChild(el);
   state.indicator = el;
   return el;
@@ -624,7 +624,7 @@ var TokenBucket = class {
     this.lastRefill = now;
   }
 };
-var AIP = class {
+var AIXA = class {
   config;
   tools = [];
   started = false;
@@ -652,7 +652,7 @@ var AIP = class {
     }
     this.broadcastCapabilities();
     if (this.config.debug) {
-      console.log(`[aip.js] Started \u2014 ${this.tools.length} tools, protocol v${AIP_PROTOCOL_VERSION}`);
+      console.log(`[aixa.js] Started \u2014 ${this.tools.length} tools, protocol v${AIXA_PROTOCOL_VERSION}`);
     }
   }
   stop() {
@@ -693,11 +693,11 @@ var AIP = class {
         url: window.location.href,
         description: document.querySelector('meta[name="description"]')?.getAttribute("content") || void 0
       },
-      protocolVersion: AIP_PROTOCOL_VERSION,
+      protocolVersion: AIXA_PROTOCOL_VERSION,
       allowsMutations: this.config.security.hitl.enabled,
       generatedAt: Date.now(),
       capabilities: {
-        version: AIP_PROTOCOL_VERSION,
+        version: AIXA_PROTOCOL_VERSION,
         features: {
           hitl: this.config.security.hitl.enabled,
           nestedParams: true,
@@ -779,7 +779,7 @@ var AIP = class {
     if (!detail?.method) return;
     const tool = this.tools.find((t) => t.name === detail.method);
     if (!tool) {
-      this.respondAIPError(detail.id, AIPErrorCode.TOOL_NOT_FOUND, `Tool not found: ${detail.method}`, { toolName: detail.method });
+      this.respondAIXAError(detail.id, AIXAErrorCode.TOOL_NOT_FOUND, `Tool not found: ${detail.method}`, { toolName: detail.method });
       return;
     }
     const params = detail.params || {};
@@ -792,13 +792,13 @@ var AIP = class {
         }
         const check = limiter.tryConsume();
         if (!check.allowed) {
-          this.respondAIPError(detail.id, AIPErrorCode.TOOL_RATE_LIMITED, `Rate limited: ${tool.name}`, { toolName: tool.name, retryAfterMs: check.retryAfterMs });
+          this.respondAIXAError(detail.id, AIXAErrorCode.TOOL_RATE_LIMITED, `Rate limited: ${tool.name}`, { toolName: tool.name, retryAfterMs: check.retryAfterMs });
           return;
         }
       } else {
         const check = this.globalLimiter.tryConsume();
         if (!check.allowed) {
-          this.respondAIPError(detail.id, AIPErrorCode.RATE_LIMITED_GLOBAL, "Global rate limit reached", { retryAfterMs: check.retryAfterMs });
+          this.respondAIXAError(detail.id, AIXAErrorCode.RATE_LIMITED_GLOBAL, "Global rate limit reached", { retryAfterMs: check.retryAfterMs });
           return;
         }
       }
@@ -806,7 +806,7 @@ var AIP = class {
     if (tool.requires?.length) {
       for (const dep of tool.requires) {
         if (!hasRegisteredTool(dep) && !this.tools.find((t) => t.name === dep)) {
-          this.respondAIPError(detail.id, AIPErrorCode.TOOL_DEPENDENCY_FAIL, `Tool "${tool.name}" requires "${dep}" to be called first`, { toolName: tool.name, requiredTools: tool.requires });
+          this.respondAIXAError(detail.id, AIXAErrorCode.TOOL_DEPENDENCY_FAIL, `Tool "${tool.name}" requires "${dep}" to be called first`, { toolName: tool.name, requiredTools: tool.requires });
           return;
         }
       }
@@ -837,9 +837,9 @@ var AIP = class {
       this.toolExecutions.delete(tool.name);
       onToolComplete(tool.name);
       if (err.name === "AbortError") {
-        this.respondAIPError(detail.id, AIPErrorCode.TOOL_TIMEOUT, `Tool "${tool.name}" timed out`, { toolName: tool.name });
+        this.respondAIXAError(detail.id, AIXAErrorCode.TOOL_TIMEOUT, `Tool "${tool.name}" timed out`, { toolName: tool.name });
       } else {
-        this.respondAIPError(detail.id, AIPErrorCode.TOOL_RATE_LIMITED, err instanceof Error ? err.message : "Execution failed", { toolName: tool.name });
+        this.respondAIXAError(detail.id, AIXAErrorCode.TOOL_RATE_LIMITED, err instanceof Error ? err.message : "Execution failed", { toolName: tool.name });
       }
     }
   };
@@ -883,7 +883,7 @@ var AIP = class {
           }
           resolve(true);
         } else {
-          this.respondAIPError(reqId, AIPErrorCode.HITL_DENIED, `Human denied: ${tool.name}`, { toolName: tool.name });
+          this.respondAIXAError(reqId, AIXAErrorCode.HITL_DENIED, `Human denied: ${tool.name}`, { toolName: tool.name });
           resolve(false);
         }
       };
@@ -923,7 +923,7 @@ var AIP = class {
       detail: {
         jsonrpc: "2.0",
         id: reqId,
-        error: { code: AIPErrorCode.HITL_EXPIRED, message: "HITL approval window expired" }
+        error: { code: AIXAErrorCode.HITL_EXPIRED, message: "HITL approval window expired" }
       },
       bubbles: true
     }));
@@ -935,7 +935,7 @@ var AIP = class {
       bubbles: true
     }));
   }
-  respondAIPError(id, code, message, data) {
+  respondAIXAError(id, code, message, data) {
     window.dispatchEvent(new CustomEvent(AgentBridgeEvent.TOOL_RESULT, {
       detail: {
         jsonrpc: "2.0",
@@ -1172,7 +1172,7 @@ function createHITLManager(options) {
       modal.show(request).then((response) => {
         window.dispatchEvent(new CustomEvent(AgentBridgeEvent.HITL_RESPONSE, { detail: response, bubbles: true }));
       }).catch((err) => {
-        console.error("[@aipjs/security] HITL error:", err);
+        console.error("[@aixa/security] HITL error:", err);
       });
     };
     window.addEventListener(AgentBridgeEvent.HITL_REQUEST, handler);
@@ -1417,23 +1417,23 @@ var DEFAULT_CONFIG2 = {
   },
   ui: {
     mirroring: true,
-    cssPrefix: "aipjs"
+    cssPrefix: "aixa"
   }
 };
 var AgentBridgeEvent2 = /* @__PURE__ */ ((AgentBridgeEvent3) => {
-  AgentBridgeEvent3["CAPABILITIES_REQUEST"] = "aip:capabilities:request";
-  AgentBridgeEvent3["CAPABILITIES_RESPONSE"] = "aip:capabilities:response";
-  AgentBridgeEvent3["TOOL_INVOKE"] = "aip:tool:invoke";
-  AgentBridgeEvent3["TOOL_RESULT"] = "aip:tool:result";
-  AgentBridgeEvent3["TOOL_CANCEL"] = "aip:tool:cancel";
-  AgentBridgeEvent3["HITL_REQUEST"] = "aip:hitl:request";
-  AgentBridgeEvent3["HITL_RESPONSE"] = "aip:hitl:response";
-  AgentBridgeEvent3["AGENT_INTRODUCE"] = "aip:agent:introduce";
-  AgentBridgeEvent3["AGENT_INTRODUCE_ACK"] = "aip:agent:introduce:ack";
-  AgentBridgeEvent3["TOOL_STREAM_START"] = "aip:tool:stream:start";
-  AgentBridgeEvent3["TOOL_STREAM_CHUNK"] = "aip:tool:stream:chunk";
-  AgentBridgeEvent3["TOOL_STREAM_END"] = "aip:tool:stream:end";
+  AgentBridgeEvent3["CAPABILITIES_REQUEST"] = "aixa:capabilities:request";
+  AgentBridgeEvent3["CAPABILITIES_RESPONSE"] = "aixa:capabilities:response";
+  AgentBridgeEvent3["TOOL_INVOKE"] = "aixa:tool:invoke";
+  AgentBridgeEvent3["TOOL_RESULT"] = "aixa:tool:result";
+  AgentBridgeEvent3["TOOL_CANCEL"] = "aixa:tool:cancel";
+  AgentBridgeEvent3["HITL_REQUEST"] = "aixa:hitl:request";
+  AgentBridgeEvent3["HITL_RESPONSE"] = "aixa:hitl:response";
+  AgentBridgeEvent3["AGENT_INTRODUCE"] = "aixa:agent:introduce";
+  AgentBridgeEvent3["AGENT_INTRODUCE_ACK"] = "aixa:agent:introduce:ack";
+  AgentBridgeEvent3["TOOL_STREAM_START"] = "aixa:tool:stream:start";
+  AgentBridgeEvent3["TOOL_STREAM_CHUNK"] = "aixa:tool:stream:chunk";
+  AgentBridgeEvent3["TOOL_STREAM_END"] = "aixa:tool:stream:end";
   return AgentBridgeEvent3;
 })(AgentBridgeEvent2 || {});
 
-export { AIP, ActionCategory2 as ActionCategory, AgentBridgeEvent2 as AgentBridgeEvent, DEFAULT_CONFIG2 as DEFAULT_CONFIG, HITLAction2 as HITLAction, RiskLevel3 as RiskLevel, VERTICAL_TEMPLATES, clearRegistry, createHITLManager, ecommercePlugin, executeTool, getRegisteredTools, inferTools, mirrorElementValue, registerAction, registerSearch, registerTool, sanitizePayload, unregisterTool };
+export { AIXA, ActionCategory2 as ActionCategory, AgentBridgeEvent2 as AgentBridgeEvent, DEFAULT_CONFIG2 as DEFAULT_CONFIG, HITLAction2 as HITLAction, RiskLevel3 as RiskLevel, VERTICAL_TEMPLATES, clearRegistry, createHITLManager, ecommercePlugin, executeTool, getRegisteredTools, inferTools, mirrorElementValue, registerAction, registerSearch, registerTool, sanitizePayload, unregisterTool };

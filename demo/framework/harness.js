@@ -8,7 +8,7 @@
  *
  * @param {object} opts
  * @param {string} opts.container - CSS selector for the mount point
- * @param {object} opts.scenarios - Map of scenario name → { label, without: {html}, with: {html, aipConfig, manualConfig?} }
+ * @param {object} opts.scenarios - Map of scenario name → { label, without: {html}, with: {html, aixaConfig, manualConfig?} }
  * @param {object} opts.terminal - Agent terminal instance (from createAgentTerminal)
  * @param {string} [opts.defaultScenario] - Name of the default scenario
  * @param {string} [opts.defaultMode] - 'auto-inference' or 'manual-config'
@@ -27,7 +27,7 @@ export function createDemo(opts) {
 
   let currentScenario = defaultScenario;
   let currentMode = defaultMode; // 'auto-inference' | 'manual-config'
-  let aipInstance = null;
+  let aixaInstance = null;
 
   // ── Build shell ────────────────────────────────────────────────────────
 
@@ -151,10 +151,10 @@ export function createDemo(opts) {
     if (!sc) return;
 
     // Destroy previous aixa.js instance
-    if (aipInstance?.stop) {
-      try { aipInstance.stop(); } catch {}
+    if (aixaInstance?.stop) {
+      try { aixaInstance.stop(); } catch {}
     }
-    aipInstance = null;
+    aixaInstance = null;
 
     // Clear panels
     panelWithoutContent.innerHTML = '';
@@ -173,7 +173,7 @@ export function createDemo(opts) {
     // Right panel: draw HTML, then initialize aixa.js
     const config = currentMode === 'manual-config' && sc.with.manualConfig
       ? sc.with.manualConfig
-      : sc.with.aipConfig;
+      : sc.with.aixaConfig;
 
     if (sc.with.html) {
       if (typeof sc.with.html === 'function') {
@@ -185,7 +185,7 @@ export function createDemo(opts) {
 
     // Initialize aixa.js in right panel
     if (config && typeof config === 'function') {
-      aipInstance = config(panelWithContent);
+      aixaInstance = config(panelWithContent);
     }
 
     // Populate terminal
@@ -224,7 +224,7 @@ export function createDemo(opts) {
     switchMode,
     getCurrentScenario: () => currentScenario,
     getCurrentMode: () => currentMode,
-    getAipInstance: () => aipInstance,
+    getAixaInstance: () => aixaInstance,
     root,
   };
 }

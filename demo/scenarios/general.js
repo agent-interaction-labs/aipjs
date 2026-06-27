@@ -6,7 +6,7 @@
 
 import { AIXA } from '../vendor/bundle-entry.mjs';
 
-let __aipInstance = null;
+let __aixaInstance = null;
 
 // ── HTML Fragment ─────────────────────────────────────────────────────────
 
@@ -16,7 +16,7 @@ function panelHTML() {
 
 // ── aixa.js Config: Auto-Inference ─────────────────────────────────────────
 
-function aipConfig(panelContent) {
+function aixaConfig(panelContent) {
   const aixa = new AIXA({
     inference: { enabled: true },
     security: { hitl: { enabled: true } },
@@ -25,8 +25,8 @@ function aipConfig(panelContent) {
     cssPrefix: 'aixa',
   });
   aixa.start();
-  __aipInstance = aip;
-  return aip;
+  __aixaInstance = aixa;
+  return aixa;
 }
 
 // ── aixa.js Config: Manual Config ──────────────────────────────────────────
@@ -83,7 +83,7 @@ aixa.start();</code></pre>`;
   panelContent.insertBefore(codeBlock, panelContent.firstChild);
 
   // Then init AIXA with auto-inference — the manual overrides take precedence
-  return aipConfig(panelContent);
+  return aixaConfig(panelContent);
 }
 
 // ── Terminal Messages ─────────────────────────────────────────────────────
@@ -195,7 +195,7 @@ export const generalScenario = {
 
   with: {
     html: panelHTML,
-    aipConfig,
+    aixaConfig,
     manualConfig,
   },
 
