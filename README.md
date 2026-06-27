@@ -180,8 +180,8 @@ Built for React, Vue, Next.js, and Svelte apps:
 
 ```bash
 # Clone and install
-git clone https://github.com/agent-interaction-labs/aixa.git
-cd aixa
+git clone https://github.com/agent-interaction-labs/aixa.js.git
+cd aixa.js
 npm install
 
 # Build all packages

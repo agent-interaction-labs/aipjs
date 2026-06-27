@@ -10,7 +10,7 @@
   }
 
   nav.innerHTML = `
-    <div class="sidebar-logo"><a href="../">aip<span class="accent">.</span>js</a></div>
+    <div class="sidebar-logo"><a href="../">aixa<span class="accent">.</span>js</a></div>
 
     <div class="nav-section">
       <div class="nav-section-title">Getting Started</div>
@@ -41,7 +41,7 @@
 
     <div class="nav-section" style="margin-top:auto">
       <a href="../demo/" class="nav-link demo-link">→ Live Demo</a>
-      <a href="https://github.com/agent-interaction-labs/aixa" class="nav-link demo-link">→ GitHub</a>
+      <a href="https://github.com/agent-interaction-labs/aixa.js" class="nav-link demo-link">→ GitHub</a>
     </div>
   `;
 })();
