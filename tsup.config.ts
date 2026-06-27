@@ -14,6 +14,6 @@ export default defineConfig({
   treeshake: true,
   noExternal: [/./],  // bundle everything
   banner: {
-    js: '// aixa.js — Agentic Engine Optimization SDK — self-contained ESM bundle',
+    js: '// aixa.js — Agent Interaction & eXecution Agreement (AIXA) SDK — self-contained ESM bundle',
   },
 });

@@ -47,7 +47,7 @@ describe('AIXAErrorCode', () => {
 });
 
 describe('AgentBridgeEvent', () => {
-  it('uses aip namespace', () => {
+  it('uses aixa namespace', () => {
     expect(AgentBridgeEvent.CAPABILITIES_REQUEST).toContain('aixa:');
     expect(AgentBridgeEvent.TOOL_INVOKE).toContain('aixa:');
     expect(AgentBridgeEvent.HITL_REQUEST).toContain('aixa:');

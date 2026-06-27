@@ -9,7 +9,7 @@ function ensureIndicator(): HTMLElement {
   if (state.indicator) return state.indicator;
   const el = document.createElement('div');
   el.id = `${state.cssPrefix}-indicator`;
-  el.innerHTML = `<div style="position:fixed;bottom:16px;right:16px;width:10px;height:10px;border-radius:50%;background:#3b82f6;z-index:2147483646;" title="Agentic JS Active"></div>`;
+  el.innerHTML = `<div style="position:fixed;bottom:16px;right:16px;width:10px;height:10px;border-radius:50%;background:#3b82f6;z-index:2147483646;" title="AIXA Active"></div>`;
   document.body.appendChild(el);
   state.indicator = el;
   return el;

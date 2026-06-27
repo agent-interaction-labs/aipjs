@@ -1,7 +1,7 @@
 {
   "name": "aixa.js",
   "version": "0.1.0",
-  "description": "Agentic Engine Optimization (AEO) SDK — empower websites to broadcast searchable, structured capabilities to visiting browser agents via WebMCP-compatible JSON-RPC tool schemas",
+  "description": "Agent Interaction & eXecution Agreement (AIXA) SDK — empower websites to broadcast searchable, structured capabilities to visiting browser agents via WebMCP-compatible JSON-RPC tool schemas",
   "private": true,
   "workspaces": [
     "packages/types",
