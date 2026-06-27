@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Getting Started — aip.js</title>
+  <title>Getting Started — aixa.js</title>
   <link rel="stylesheet" href="assets/docs.css">
 </head>
 <body>
@@ -14,7 +14,7 @@
       <h1>Getting Started</h1>
 
       <p>
-        aip.js is a lightweight SDK that exposes your web application's functionality to AI agents
+        aixa.js is a lightweight SDK that exposes your web application's functionality to AI agents
         via JSON-RPC tool schemas. This guide walks you through installation, quick-start examples,
         and verification — so you can go from zero to agent-friendly in under a minute.
       </p>
@@ -29,23 +29,23 @@
       <p>Choose the method that best fits your project:</p>
 
       <h3>1. npm</h3>
-      <pre><code>npm install @aipjs/core</code></pre>
+      <pre><code>npm install @aixa/core</code></pre>
       <p>Then import it in your application:</p>
-      <pre><code>import { AIP } from '@aipjs/core';</code></pre>
+      <pre><code>import { AIXA } from '@aixa/core';</code></pre>
 
       <h3>2. CDN — jsDelivr</h3>
       <pre><code>&lt;script type="module"&gt;
-  import { AIP } from 'https://cdn.jsdelivr.net/npm/@aipjs/core/dist/index.js';
+  import { AIXA } from 'https://cdn.jsdelivr.net/npm/@aixa/core/dist/index.js';
 &lt;/script&gt;</code></pre>
 
       <h3>3. CDN — unpkg</h3>
       <pre><code>&lt;script type="module"&gt;
-  import { AIP } from 'https://unpkg.com/@aipjs/core/dist/index.js';
+  import { AIXA } from 'https://unpkg.com/@aixa/core/dist/index.js';
 &lt;/script&gt;</code></pre>
 
       <h3>4. CDN — esm.sh (bundled)</h3>
       <pre><code>&lt;script type="module"&gt;
-  import { AIP } from 'https://esm.sh/@aipjs/core';
+  import { AIXA } from 'https://esm.sh/@aixa/core';
 &lt;/script&gt;</code></pre>
 
       <h3>5. Self-Hosted Bundle</h3>
@@ -54,7 +54,7 @@
         host it on your own server, and import it directly:
       </p>
       <pre><code>&lt;script type="module"&gt;
-  import { AIP } from '/path/to/your/bundle-entry.mjs';
+  import { AIXA } from '/path/to/your/bundle-entry.mjs';
 &lt;/script&gt;</code></pre>
 
       <h2>Quick Start — Auto-Inference</h2>
@@ -65,10 +65,10 @@
         and simple SPAs.
       </p>
 
-      <pre><code>import { AIP } from '@aipjs/core';
+      <pre><code>import { AIXA } from '@aixa/core';
 
-const aip = new AIP({ autoInfer: true });
-aip.start();</code></pre>
+const aixa = new AIXA({ autoInfer: true });
+aixa.start();</code></pre>
 
       <p>That's it. The SDK will:</p>
       <ul>
@@ -85,18 +85,18 @@ aip.start();</code></pre>
         can access, use the manual registration API:
       </p>
 
-      <pre><code>import { AIP } from '@aipjs/core';
+      <pre><code>import { AIXA } from '@aixa/core';
 
-const aip = new AIP();
+const aixa = new AIXA();
 
-aip.registerSearch('product_search', [
+aixa.registerSearch('product_search', [
   { name: 'q', type: 'string', description: 'Search query', required: true },
   { name: 'category', type: 'string', description: 'Product category' },
   { name: 'minPrice', type: 'number', description: 'Minimum price' },
   { name: 'maxPrice', type: 'number', description: 'Maximum price' }
 ], 'https://api.example.com/products/search');
 
-aip.start();</code></pre>
+aixa.start();</code></pre>
 
       <h2>Verifying It Works</h2>
 
@@ -104,7 +104,7 @@ aip.start();</code></pre>
         Once the SDK is running, open your browser's DevTools console and run:
       </p>
 
-      <pre><code>window.__aip.getCapabilities()</code></pre>
+      <pre><code>window.__aixa.getCapabilities()</code></pre>
 
       <p>
         This returns an array of all registered tool schemas — both auto-inferred and manually
@@ -113,9 +113,9 @@ aip.start();</code></pre>
       </p>
 
       <div class="callout callout-tip">
-        <strong>Tip:</strong> You can also listen for the <code>aip:tools-ready</code> event
+        <strong>Tip:</strong> You can also listen for the <code>aixa:tools-ready</code> event
         to know when tool discovery is complete:
-        <pre><code>window.addEventListener('aip:tools-ready', (e) =&gt; {
+        <pre><code>window.addEventListener('aixa:tools-ready', (e) =&gt; {
   console.log('Available tools:', e.detail.tools);
 });</code></pre>
       </div>
@@ -126,7 +126,7 @@ aip.start();</code></pre>
         <li>
           <a href="auto-inference.html"><strong>Auto-Inference</strong></a> —
           Learn how the DOM scanner works, which elements it detects, and how to
-          annotate your HTML with <code>data-aip-*</code> attributes.
+          annotate your HTML with <code>data-aixa-*</code> attributes.
         </li>
         <li>
           <a href="manual-config.html"><strong>Manual Configuration</strong></a> —
@@ -140,7 +140,7 @@ aip.start();</code></pre>
         </li>
         <li>
           <a href="../demo/"><strong>Demo</strong></a> —
-          Explore the live demo application to see aip.js in action with both
+          Explore the live demo application to see aixa.js in action with both
           auto-inferred and manually configured tools.
         </li>
       </ul>

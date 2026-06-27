@@ -1,5 +1,5 @@
-import type { ToolSchema, ToolParameter, HITLPolicy, HITLCondition } from '@aipjs/types';
-import { RiskLevel, ActionCategory } from '@aipjs/types';
+import type { ToolSchema, ToolParameter, HITLPolicy, HITLCondition } from '@aixa/types';
+import { RiskLevel, ActionCategory } from '@aixa/types';
 
 interface RegisteredTool {
   schema: ToolSchema;

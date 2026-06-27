@@ -1,4 +1,4 @@
-// @aipjs/core — Shadow DOM & Web Component Support
+// @aixa/core — Shadow DOM & Web Component Support
 // Extends the auto-inference engine into Shadow DOM boundaries
 // for frameworks using Web Components (Lit, Stencil, Fast, etc.)
 
@@ -57,7 +57,7 @@ export function querySelectorAllDeep(selector: string): Element[] {
 
 /**
  * Check if a shadow root's adoptedStyleSheets or <style> elements
- * could conflict with aip.js injected styles.
+ * could conflict with aixa.js injected styles.
  * Returns true if potential z-index conflicts are detected.
  */
 export function detectStyleConflicts(shadowRoot: ShadowRoot): string[] {
@@ -98,7 +98,7 @@ export function detectStyleConflicts(shadowRoot: ShadowRoot): string[] {
  * to exceed any detected maximum. Returns the new z-index value.
  */
 export function resolveZIndexConflicts(): number {
-  let maxZ = 2147483647; // aip.js default max
+  let maxZ = 2147483647; // aixa.js default max
 
   // Scan all elements for z-index values
   const allElements = document.querySelectorAll('*');

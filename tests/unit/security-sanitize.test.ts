@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { sanitizePayload } from '@aipjs/security';
+import { sanitizePayload } from '@aixa/security';
 
 describe('sanitizePayload', () => {
   it('passes through clean strings', () => {

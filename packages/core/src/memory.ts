@@ -1,4 +1,4 @@
-// @aipjs/core — Memory Leak Protection
+// @aixa/core — Memory Leak Protection
 // Guards against DOM MutationObserver leaks, dangling event listeners,
 // and orphaned injected elements in long-running SPAs.
 
@@ -85,20 +85,20 @@ export function startLeakDetection(intervalMs = 30000): () => void {
     // Warning thresholds
     if (counts.observer > 20) {
       console.warn(
-        `[aip.js] Memory leak warning: ${counts.observer} active MutationObservers. ` +
-        'Consider calling aip.stop() on route changes.',
+        `[aixa.js] Memory leak warning: ${counts.observer} active MutationObservers. ` +
+        'Consider calling aixa.stop() on route changes.',
       );
     }
     if (counts.listener > 50) {
       console.warn(
-        `[aip.js] Memory leak warning: ${counts.listener} active event listeners.`,
+        `[aixa.js] Memory leak warning: ${counts.listener} active event listeners.`,
       );
     }
 
     if (counts.observer + counts.listener + counts.element + counts.timer > 100) {
       console.error(
-        `[aip.js] CRITICAL: ${counts.observer + counts.listener + counts.element + counts.timer} total tracked resources. ` +
-        'Possible memory leak. Call aip.stop() and re-initialize.',
+        `[aixa.js] CRITICAL: ${counts.observer + counts.listener + counts.element + counts.timer} total tracked resources. ` +
+        'Possible memory leak. Call aixa.stop() and re-initialize.',
       );
     }
   }, intervalMs);

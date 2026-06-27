@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HITL Security — aip.js</title>
+  <title>HITL Security — aixa.js</title>
   <link rel="stylesheet" href="assets/docs.css">
 </head>
 <body>
@@ -12,7 +12,7 @@
     <main class="docs-content">
       <h1>Human-in-the-Loop Security</h1>
       <p>
-        aip.js classifies <strong>every</strong> tool as either <code>SAFE</code> or <code>HIGH_RISK</code>.
+        aixa.js classifies <strong>every</strong> tool as either <code>SAFE</code> or <code>HIGH_RISK</code>.
         For <code>HIGH_RISK</code> tools, agents <strong>cannot proceed</strong> without human approval.
         This is not a suggestion — it is enforced at the framework level. No tool call tagged
         <code>HIGH_RISK</code> will ever execute until a human explicitly clicks <em>Approve</em>.
@@ -37,7 +37,7 @@
             <td><strong>HIGH_RISK</strong></td>
           </tr>
           <tr>
-            <td><code>data-aip-confirm</code> attribute present</td>
+            <td><code>data-aixa-confirm</code> attribute present</td>
             <td><strong>HIGH_RISK</strong></td>
           </tr>
           <tr>
@@ -47,7 +47,7 @@
         </tbody>
       </table>
       <p>
-        You can explicitly mark any element as high-risk by adding a <code>data-aip-confirm</code>
+        You can explicitly mark any element as high-risk by adding a <code>data-aixa-confirm</code>
         attribute. The inference engine will respect it regardless of the element type.
       </p>
 
@@ -135,7 +135,7 @@
       </p>
 
       <h2>Risk Policies</h2>
-      <p>aip.js supports three risk policy modes to match your security posture:</p>
+      <p>aixa.js supports three risk policy modes to match your security posture:</p>
       <table>
         <thead>
           <tr>

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { registerTool, registerSearch, registerAction, getRegisteredTools, executeTool, clearRegistry, unregisterTool } from '@aipjs/core';
-import { RiskLevel, ActionCategory } from '@aipjs/types';
+import { registerTool, registerSearch, registerAction, getRegisteredTools, executeTool, clearRegistry, unregisterTool } from '@aixa/core';
+import { RiskLevel, ActionCategory } from '@aixa/types';
 
 describe('Tool Registry', () => {
   beforeEach(() => {

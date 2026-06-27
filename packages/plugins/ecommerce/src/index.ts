@@ -1,11 +1,11 @@
-// @aipjs/plugin-ecommerce — Safe Search Abstraction
+// @aixa/plugin-ecommerce — Safe Search Abstraction
 // Specialized for e-commerce, real estate, and travel sites.
 // Exposes search, filtering, and inventory queries with ZERO mutation risk.
 // Hooks into internal search APIs or window.dataLayer — no DOM scraping.
 
-import type { SearchQuery, SearchFilter, SortCriterion, Pagination, SearchResult, ToolParameter } from '@aipjs/types';
-import { RiskLevel, ActionCategory } from '@aipjs/types';
-import { registerSearch, registerAction } from '@aipjs/core';
+import type { SearchQuery, SearchFilter, SortCriterion, Pagination, SearchResult, ToolParameter } from '@aixa/types';
+import { RiskLevel, ActionCategory } from '@aixa/types';
+import { registerSearch, registerAction } from '@aixa/core';
 
 // ============================================================================
 // Search API Hook
@@ -30,14 +30,14 @@ export interface EcommercePluginInstance {
 }
 
 /**
- * Register e-commerce search capabilities with the aip.js SDK.
+ * Register e-commerce search capabilities with the aixa.js SDK.
  *
  * This is the primary plugin for e-commerce, real estate, and travel sites.
  * It hooks into the site's existing search infrastructure, bypassing
  * DOM scraping entirely. Zero mutation risk — only read operations.
  *
  * @example
- *   import { ecommercePlugin } from '@aipjs/plugin-ecommerce';
+ *   import { ecommercePlugin } from '@aixa/plugin-ecommerce';
  *   ecommercePlugin({
  *     searchEndpoint: '/api/v2/products/search',
  *     detailEndpoint: '/api/v2/products',

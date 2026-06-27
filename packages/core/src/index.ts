@@ -1,11 +1,11 @@
 import type {
-  AIPConfig, AgentCapability, ToolSchema, JSONRPCRequest, JSONRPCResponse,
+  AIXAConfig, AgentCapability, ToolSchema, JSONRPCRequest, JSONRPCResponse,
   AgentIdentity, HITLAuditEntry, RateLimitInfo,
-} from '@aipjs/types';
+} from '@aixa/types';
 import {
   DEFAULT_CONFIG, RiskLevel, AgentBridgeEvent, HITLPolicy, HITLAction,
-  AIPErrorCode, AIP_PROTOCOL_VERSION,
-} from '@aipjs/types';
+  AIXAErrorCode, AIXA_PROTOCOL_VERSION,
+} from '@aixa/types';
 import { inferTools, type InferenceResult } from './inference.js';
 import {
   registerTool, registerSearch, registerAction, unregisterTool, clearRegistry,
@@ -48,7 +48,7 @@ interface ResolvedConfig {
   ui: { mirroring: boolean; cssPrefix: string };
 }
 
-function resolveConfig(partial: Partial<AIPConfig>): ResolvedConfig {
+function resolveConfig(partial: Partial<AIXAConfig>): ResolvedConfig {
   const d = DEFAULT_CONFIG;
   const inf = partial.inference ?? {};
   const sec = partial.security ?? {};
@@ -151,10 +151,10 @@ interface HITLSessionState {
 }
 
 // ============================================================================
-// AIP Main Class
+// AIXA Main Class
 // ============================================================================
 
-export class AIP {
+export class AIXA {
   readonly config: ResolvedConfig;
   private tools: ToolSchema[] = [];
   private started = false;
@@ -164,7 +164,7 @@ export class AIP {
   private hitlSession: HITLSessionState = { approvedTools: new Set(), auditLog: [] };
   private toolExecutions = new Map<string, AbortController>();
 
-  constructor(config: Partial<AIPConfig> = {}) {
+  constructor(config: Partial<AIXAConfig> = {}) {
     this.config = resolveConfig(config);
     this.globalLimiter = new TokenBucket(this.config.rateLimit.perMinute);
   }
@@ -194,7 +194,7 @@ export class AIP {
     this.broadcastCapabilities();
 
     if (this.config.debug) {
-      console.log(`[aip.js] Started — ${this.tools.length} tools, protocol v${AIP_PROTOCOL_VERSION}`);
+      console.log(`[aixa.js] Started — ${this.tools.length} tools, protocol v${AIXA_PROTOCOL_VERSION}`);
     }
   }
 
@@ -241,11 +241,11 @@ export class AIP {
         url: window.location.href,
         description: document.querySelector('meta[name="description"]')?.getAttribute('content') || undefined,
       },
-      protocolVersion: AIP_PROTOCOL_VERSION,
+      protocolVersion: AIXA_PROTOCOL_VERSION,
       allowsMutations: this.config.security.hitl.enabled,
       generatedAt: Date.now(),
       capabilities: {
-        version: AIP_PROTOCOL_VERSION,
+        version: AIXA_PROTOCOL_VERSION,
         features: {
           hitl: this.config.security.hitl.enabled,
           nestedParams: true,
@@ -340,7 +340,7 @@ export class AIP {
 
     const tool = this.tools.find(t => t.name === detail.method);
     if (!tool) {
-      this.respondAIPError(detail.id, AIPErrorCode.TOOL_NOT_FOUND, `Tool not found: ${detail.method}`, { toolName: detail.method });
+      this.respondAIXAError(detail.id, AIXAErrorCode.TOOL_NOT_FOUND, `Tool not found: ${detail.method}`, { toolName: detail.method });
       return;
     }
 
@@ -356,13 +356,13 @@ export class AIP {
         }
         const check = limiter.tryConsume();
         if (!check.allowed) {
-          this.respondAIPError(detail.id, AIPErrorCode.TOOL_RATE_LIMITED, `Rate limited: ${tool.name}`, { toolName: tool.name, retryAfterMs: check.retryAfterMs });
+          this.respondAIXAError(detail.id, AIXAErrorCode.TOOL_RATE_LIMITED, `Rate limited: ${tool.name}`, { toolName: tool.name, retryAfterMs: check.retryAfterMs });
           return;
         }
       } else {
         const check = this.globalLimiter.tryConsume();
         if (!check.allowed) {
-          this.respondAIPError(detail.id, AIPErrorCode.RATE_LIMITED_GLOBAL, 'Global rate limit reached', { retryAfterMs: check.retryAfterMs });
+          this.respondAIXAError(detail.id, AIXAErrorCode.RATE_LIMITED_GLOBAL, 'Global rate limit reached', { retryAfterMs: check.retryAfterMs });
           return;
         }
       }
@@ -372,7 +372,7 @@ export class AIP {
     if (tool.requires?.length) {
       for (const dep of tool.requires) {
         if (!hasRegisteredTool(dep) && !this.tools.find(t => t.name === dep)) {
-          this.respondAIPError(detail.id, AIPErrorCode.TOOL_DEPENDENCY_FAIL, `Tool "${tool.name}" requires "${dep}" to be called first`, { toolName: tool.name, requiredTools: tool.requires });
+          this.respondAIXAError(detail.id, AIXAErrorCode.TOOL_DEPENDENCY_FAIL, `Tool "${tool.name}" requires "${dep}" to be called first`, { toolName: tool.name, requiredTools: tool.requires });
           return;
         }
       }
@@ -415,9 +415,9 @@ export class AIP {
       onToolComplete(tool.name);
 
       if ((err as Error).name === 'AbortError') {
-        this.respondAIPError(detail.id, AIPErrorCode.TOOL_TIMEOUT, `Tool "${tool.name}" timed out`, { toolName: tool.name });
+        this.respondAIXAError(detail.id, AIXAErrorCode.TOOL_TIMEOUT, `Tool "${tool.name}" timed out`, { toolName: tool.name });
       } else {
-        this.respondAIPError(detail.id, AIPErrorCode.TOOL_RATE_LIMITED, err instanceof Error ? err.message : 'Execution failed', { toolName: tool.name });
+        this.respondAIXAError(detail.id, AIXAErrorCode.TOOL_RATE_LIMITED, err instanceof Error ? err.message : 'Execution failed', { toolName: tool.name });
       }
     }
   };
@@ -472,7 +472,7 @@ export class AIP {
           }
           resolve(true);
         } else {
-          this.respondAIPError(reqId as unknown as string | number, AIPErrorCode.HITL_DENIED, `Human denied: ${tool.name}`, { toolName: tool.name });
+          this.respondAIXAError(reqId as unknown as string | number, AIXAErrorCode.HITL_DENIED, `Human denied: ${tool.name}`, { toolName: tool.name });
           resolve(false);
         }
       };
@@ -519,7 +519,7 @@ export class AIP {
       detail: {
         jsonrpc: '2.0',
         id: reqId,
-        error: { code: AIPErrorCode.HITL_EXPIRED, message: 'HITL approval window expired' },
+        error: { code: AIXAErrorCode.HITL_EXPIRED, message: 'HITL approval window expired' },
       } as JSONRPCResponse,
       bubbles: true,
     }));
@@ -534,8 +534,8 @@ export class AIP {
     }));
   }
 
-  private respondAIPError(
-    id: string | number, code: AIPErrorCode, message: string,
+  private respondAIXAError(
+    id: string | number, code: AIXAErrorCode, message: string,
     data?: Record<string, unknown>,
   ): void {
     window.dispatchEvent(new CustomEvent(AgentBridgeEvent.TOOL_RESULT, {

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UI Mirroring — aip.js</title>
+  <title>UI Mirroring — aixa.js</title>
   <link rel="stylesheet" href="assets/docs.css">
 </head>
 <body>
@@ -65,16 +65,16 @@
         <li><code>&lt;checkbox&gt;</code> — toggles checked state</li>
       </ul>
       <pre><code>// Mirror a value into a text input
-aip.mirrorElementValue('#search-box', 'wireless headphones');
+aixa.mirrorElementValue('#search-box', 'wireless headphones');
 
 // Mirror a select dropdown
-aip.mirrorElementValue('#category-select', 'electronics');
+aixa.mirrorElementValue('#category-select', 'electronics');
 
 // Mirror a checkbox
-aip.mirrorElementValue('#agree-terms', true);</code></pre>
+aixa.mirrorElementValue('#agree-terms', true);</code></pre>
 
       <h2>CSS Classes</h2>
-      <p>All mirroring classes use the configured <code>cssPrefix</code> (default: <code>"aipjs"</code>):</p>
+      <p>All mirroring classes use the configured <code>cssPrefix</code> (default: <code>"aixa"</code>):</p>
       <table>
         <thead>
           <tr>
@@ -84,15 +84,15 @@ aip.mirrorElementValue('#agree-terms', true);</code></pre>
         </thead>
         <tbody>
           <tr>
-            <td><code>.aipjs-mirror-focus</code></td>
+            <td><code>.aixa-mirror-focus</code></td>
             <td>Blue outline on the targeted element, visible for 1.5 seconds</td>
           </tr>
           <tr>
-            <td><code>.aipjs-mirror-changed</code></td>
+            <td><code>.aixa-mirror-changed</code></td>
             <td>Brief flash animation when a value is programmatically set</td>
           </tr>
           <tr>
-            <td><code>#aipjs-indicator</code></td>
+            <td><code>#aixa-indicator</code></td>
             <td>The bottom-right dot indicator (pulses green when active)</td>
           </tr>
         </tbody>
@@ -120,11 +120,11 @@ aip.mirrorElementValue('#agree-terms', true);</code></pre>
 
       <h2>Disabling</h2>
       <p>
-        To turn off all visual mirroring, set <code>uiMirroring: false</code> in your AIP
+        To turn off all visual mirroring, set <code>uiMirroring: false</code> in your AIXA
         configuration. The agent will still function normally — you just won't see the visual
         feedback.
       </p>
-      <pre><code>const aip = new AIP({
+      <pre><code>const aixa = new AIXA({
   uiMirroring: false
 });</code></pre>
 

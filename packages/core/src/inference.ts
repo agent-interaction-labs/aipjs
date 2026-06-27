@@ -1,31 +1,31 @@
-import type { ToolSchema, ToolParameter } from '@aipjs/types';
-import { RiskLevel, ActionCategory } from '@aipjs/types';
+import type { ToolSchema, ToolParameter } from '@aixa/types';
+import { RiskLevel, ActionCategory } from '@aixa/types';
 
 const SEARCH_SELECTORS = [
   'input[type="search"]', 'input[name*="search" i]', 'input[name*="query" i]',
   'input[name="q"]', 'input[placeholder*="search" i]', 'input[role="searchbox"]',
-  'input[role="combobox"]', 'form[role="search"] input', '[data-aip-search]',
+  'input[role="combobox"]', 'form[role="search"] input', '[data-aixa-search]',
 ];
 
 const FILTER_SELECTORS = [
   'select', 'input[type="checkbox"]', 'input[type="radio"]',
-  '[role="radiogroup"]', 'input[type="range"]', '[data-aip-filter]',
+  '[role="radiogroup"]', 'input[type="range"]', '[data-aixa-filter]',
 ];
 
 const SORT_SELECTORS = [
-  'select[name*="sort" i]', 'select[aria-label*="sort" i]', '[data-aip-sort]',
+  'select[name*="sort" i]', 'select[aria-label*="sort" i]', '[data-aixa-sort]',
 ];
 
 const MUTATION_SELECTORS = [
   'button[type="submit"]', 'input[type="submit"]',
   'form[action*="cart" i] button[type="submit"]',
   'form[action*="checkout" i] button[type="submit"]',
-  '[data-aip-confirm]',
+  '[data-aixa-confirm]',
 ];
 
 const NAVIGATION_SELECTORS = [
   'a[href]:not([href="#"]):not([href^="javascript:"])',
-  '[data-aip-navigate]',
+  '[data-aixa-navigate]',
   'nav a[href]', '[role="navigation"] a[href]',
 ];
 
@@ -69,7 +69,7 @@ function getElementSelector(el: Element): string {
 }
 
 function classifyRisk(el: Element): RiskLevel {
-  const explicit = el.getAttribute('data-aip-risk');
+  const explicit = el.getAttribute('data-aixa-risk');
   if (explicit === 'high_risk') return RiskLevel.HIGH_RISK;
   if (explicit === 'safe') return RiskLevel.SAFE;
   const tag = el.tagName.toLowerCase();
@@ -79,7 +79,7 @@ function classifyRisk(el: Element): RiskLevel {
   }
   if (el.closest('form[action*="cart" i]') || el.closest('form[action*="checkout" i]'))
     return RiskLevel.HIGH_RISK;
-  if (el.hasAttribute('data-aip-confirm')) return RiskLevel.HIGH_RISK;
+  if (el.hasAttribute('data-aixa-confirm')) return RiskLevel.HIGH_RISK;
   const href = (el as HTMLAnchorElement).href;
   if (href && /(checkout|subscribe|upgrade|delete|remove)/i.test(href))
     return RiskLevel.HIGH_RISK;
@@ -93,7 +93,7 @@ function classifyCategory(el: Element): ActionCategory {
   if (el.tagName.toLowerCase() === 'a') return ActionCategory.NAVIGATE;
   const typeAttr = (el as HTMLInputElement).type;
   if (typeAttr === 'submit') return ActionCategory.MUTATE;
-  const explicit = el.getAttribute('data-aip-category');
+  const explicit = el.getAttribute('data-aixa-category');
   if (explicit) return explicit as ActionCategory;
   return ActionCategory.CUSTOM;
 }
@@ -115,7 +115,7 @@ function extractParameters(el: Element): ToolParameter[] {
       description: getElementLabel(el), required: input.required,
     });
   } else if (tag === 'button' || tag === 'a') {
-    const dataParams = el.getAttribute('data-aip-params');
+    const dataParams = el.getAttribute('data-aixa-params');
     if (dataParams) {
       try {
         const parsed = JSON.parse(dataParams) as Record<string, unknown>;
@@ -123,7 +123,7 @@ function extractParameters(el: Element): ToolParameter[] {
           params.push({ name: key, type: typeof value as ToolParameter['type'], description: key, required: true });
         }
       } catch (err) {
-        console.warn(`[@aipjs/core] Failed to parse data-aip-params on element:`, el, err);
+        console.warn(`[@aixa/core] Failed to parse data-aixa-params on element:`, el, err);
       }
     }
   }
@@ -133,9 +133,9 @@ function extractParameters(el: Element): ToolParameter[] {
 function generateToolSchema(el: Element, index: number): ToolSchema {
   const category = classifyCategory(el);
   const label = getElementLabel(el);
-  const name = el.getAttribute('data-aip-name') ||
+  const name = el.getAttribute('data-aixa-name') ||
     `${category}_${label.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_${index}`;
-  const description = el.getAttribute('data-aip-description') ||
+  const description = el.getAttribute('data-aixa-description') ||
     `${classifyRisk(el) === RiskLevel.HIGH_RISK ? '[REQUIRES HUMAN APPROVAL] ' : ''}${label}`;
 
   // Auto-generate a DOM handler for this element

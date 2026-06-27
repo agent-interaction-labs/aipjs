@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WebMCP Compatibility — aip.js</title>
+  <title>WebMCP Compatibility — aixa.js</title>
   <link rel="stylesheet" href="assets/docs.css">
 </head>
 <body>
@@ -13,10 +13,10 @@
 
       <h1>WebMCP Compatibility</h1>
 
-      <p>WebMCP (Web Model Context Protocol) is a W3C Community Group specification for how websites expose capabilities to browser-based AI agents. aip.js was designed with WebMCP alignment in mind — we use the same tool schema format and event model so that migration is seamless when browsers ship native support.</p>
+      <p>WebMCP (Web Model Context Protocol) is a W3C Community Group specification for how websites expose capabilities to browser-based AI agents. aixa.js was designed with WebMCP alignment in mind — we use the same tool schema format and event model so that migration is seamless when browsers ship native support.</p>
 
       <div class="callout callout-info">
-        <strong>This is a reference page.</strong> Most users don't need to care about WebMCP. aip.js works today in all modern browsers with no flags required.
+        <strong>This is a reference page.</strong> Most users don't need to care about WebMCP. aixa.js works today in all modern browsers with no flags required.
       </div>
 
       <h2>Spec Status</h2>
@@ -27,30 +27,30 @@
         <li><strong>Timeline:</strong> No announced ship date for any browser. Expect 12–24 months before stable support.</li>
       </ul>
 
-      <p>Until browsers ship native WebMCP, aip.js provides a production-ready polyfill that works in all modern browsers today.</p>
+      <p>Until browsers ship native WebMCP, aixa.js provides a production-ready polyfill that works in all modern browsers today.</p>
 
       <h2>Compatibility Table</h2>
 
-      <p>The table below maps WebMCP concepts to their aip.js equivalents:</p>
+      <p>The table below maps WebMCP concepts to their aixa.js equivalents:</p>
 
       <table>
         <thead>
           <tr>
             <th>WebMCP Feature</th>
             <th>Native API</th>
-            <th>aip.js Equivalent</th>
+            <th>aixa.js Equivalent</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td>Tool registration</td>
             <td><code>navigator.mcp.registerTool()</code></td>
-            <td><code>aip.registerTool()</code> / <code>aip.registerSearch()</code> / <code>aip.registerAction()</code></td>
+            <td><code>aixa.registerTool()</code> / <code>aixa.registerSearch()</code> / <code>aixa.registerAction()</code></td>
           </tr>
           <tr>
             <td>Declarative HTML</td>
             <td><code>&lt;meta name="mcp-tool"&gt;</code> elements</td>
-            <td>Auto-inference engine (<code>aip.inferTools()</code>) — scans the DOM and auto-generates tool schemas</td>
+            <td>Auto-inference engine (<code>aixa.inferTools()</code>) — scans the DOM and auto-generates tool schemas</td>
           </tr>
           <tr>
             <td>JSON Schema params</td>
@@ -70,23 +70,23 @@
           <tr>
             <td>Transport</td>
             <td>Browser-native message channel</td>
-            <td>Custom DOM events (<code>aip:tool:invoke</code>, <code>aip:tool:result</code>) plus direct function calls</td>
+            <td>Custom DOM events (<code>aixa:tool:invoke</code>, <code>aixa:tool:result</code>) plus direct function calls</td>
           </tr>
         </tbody>
       </table>
 
       <h2>Migration Path</h2>
 
-      <p>When browsers ship native WebMCP support, aip.js is designed to detect it and delegate to the native API automatically. Here's what that means for you:</p>
+      <p>When browsers ship native WebMCP support, aixa.js is designed to detect it and delegate to the native API automatically. Here's what that means for you:</p>
 
       <ul>
-        <li><strong>Same developer-facing API.</strong> Your calls to <code>aip.registerTool()</code>, <code>aip.registerSearch()</code>, etc. remain unchanged. aip.js routes them to the native WebMCP API when available, or uses its own implementation as a fallback.</li>
-        <li><strong>Zero migration work.</strong> Sites already using aip.js will automatically gain native WebMCP integration when browsers ship it. No code changes, no re-deployment.</li>
-        <li><strong>Graceful degradation.</strong> If a browser doesn't support WebMCP (or supports an older version), aip.js falls back to its own implementation seamlessly.</li>
+        <li><strong>Same developer-facing API.</strong> Your calls to <code>aixa.registerTool()</code>, <code>aixa.registerSearch()</code>, etc. remain unchanged. aixa.js routes them to the native WebMCP API when available, or uses its own implementation as a fallback.</li>
+        <li><strong>Zero migration work.</strong> Sites already using aixa.js will automatically gain native WebMCP integration when browsers ship it. No code changes, no re-deployment.</li>
+        <li><strong>Graceful degradation.</strong> If a browser doesn't support WebMCP (or supports an older version), aixa.js falls back to its own implementation seamlessly.</li>
       </ul>
 
       <pre><code>// Your code stays the same — forever
-aip.registerTool({
+aixa.registerTool({
   name: 'search_catalog',
   description: 'Search the product catalog',
   parameters: [
@@ -95,13 +95,13 @@ aip.registerTool({
   handler: async ({ q }) => { /* ... */ },
 });
 
-// aip.js handles the rest:
+// aixa.js handles the rest:
 // - Today: uses custom DOM events and direct calls
 // - Future: delegates to navigator.mcp.registerTool() when available</code></pre>
 
       <h2>Beyond the Spec</h2>
 
-      <p>WebMCP defines the minimum viable protocol. aip.js adds several capabilities that the current WebMCP draft does not address:</p>
+      <p>WebMCP defines the minimum viable protocol. aixa.js adds several capabilities that the current WebMCP draft does not address:</p>
 
       <table>
         <thead>
@@ -120,7 +120,7 @@ aip.registerTool({
           <tr>
             <td><strong>HITL modal UI</strong></td>
             <td>A pre-built, accessible modal that prompts users to approve or deny high-risk agent actions.</td>
-            <td>WebMCP defines the protocol but not the UI. aip.js ships the full UX.</td>
+            <td>WebMCP defines the protocol but not the UI. aixa.js ships the full UX.</td>
           </tr>
           <tr>
             <td><strong>Prompt injection sanitization</strong></td>
@@ -129,7 +129,7 @@ aip.registerTool({
           </tr>
           <tr>
             <td><strong>Plugin architecture</strong></td>
-            <td>Reusable, publishable plugin packages (<code>@aipjs/plugin-*</code>) for common use cases like e-commerce, booking, and knowledge bases.</td>
+            <td>Reusable, publishable plugin packages (<code>@aixa/plugin-*</code>) for common use cases like e-commerce, booking, and knowledge bases.</td>
             <td>WebMCP is a protocol spec, not an ecosystem.</td>
           </tr>
           <tr>

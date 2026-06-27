@@ -3,47 +3,47 @@
    Demonstrates auto-inference, HIGH RISK mutation classification, and HITL
    ═══════════════════════════════════════════════════════════════════════════ */
 
-import { AIP, registerSearch, registerAction, createHITLManager } from '../vendor/bundle-entry.mjs';
+import { AIXA, registerSearch, registerAction, createHITLManager } from '../vendor/bundle-entry.mjs';
 
 // Shared reference so securityPanel can access the aip instance
 let __aipInstance = null;
 let __hitlCleanup = null;
 
 // ── HTML Fragment ─────────────────────────────────────────────────────────
-// Both panels share the same HTML; aip.js auto-infers tools from it.
+// Both panels share the same HTML; aixa.js auto-infers tools from it.
 function panelHTML() {
   // The HTML fragment is loaded from ecommerce.html by the demo page.
   // Return a placeholder — the harness will inject the fragment from the file.
   return document.getElementById('ecommerce-template')?.innerHTML || '';
 }
 
-// ── aip.js Config: Auto-Inference ─────────────────────────────────────────
+// ── aixa.js Config: Auto-Inference ─────────────────────────────────────────
 function aipConfig(panelContent) {
-  const aip = new AIP({
+  const aixa = new AIXA({
     inference: { enabled: true },
     security: { hitl: { enabled: true } },
     ui: { mirroring: true },
     debug: false,
-    cssPrefix: 'aipjs',
+    cssPrefix: 'aixa',
   });
-  aip.start();
+  aixa.start();
   __aipInstance = aip;
   return aip;
 }
 
 // ── Manual Config Mode ────────────────────────────────────────────────────
 function manualConfig(panelContent) {
-  // Show the manual config code block, then init aip.js with it
+  // Show the manual config code block, then init aixa.js with it
   const codeBlock = panelContent.querySelector('.manual-config-code');
   if (!codeBlock) return null;
 
-  // We still initialize aip.js for the demo
-  const aip = new AIP({
+  // We still initialize aixa.js for the demo
+  const aixa = new AIXA({
     inference: { enabled: false },
     security: { hitl: { enabled: true } },
     ui: { mirroring: true },
     debug: false,
-    cssPrefix: 'aipjs',
+    cssPrefix: 'aixa',
   });
 
   // Register search tool explicitly
@@ -143,7 +143,7 @@ function manualConfig(panelContent) {
     },
   });
 
-  aip.start();
+  aixa.start();
   __aipInstance = aip;
   return aip;
 }
@@ -151,7 +151,7 @@ function manualConfig(panelContent) {
 // ── Terminal Messages ─────────────────────────────────────────────────────
 function populateTerminal(terminal, currentMode) {
   // ── SIMPLE MODE ──────────────────────────────────────────────────────
-  // LEFT COLUMN (without aip.js) — agent sees raw DOM, no structure
+  // LEFT COLUMN (without aixa.js) — agent sees raw DOM, no structure
 
   terminal.addMessage('without', 'simple', {
     icon: '',
@@ -168,7 +168,7 @@ function populateTerminal(terminal, currentMode) {
     html: '<strong>Parameter ambiguity:</strong> The price range input provides no min/max metadata. The category select lists options but <strong>does not indicate whether multiple selections are supported.</strong> Each interaction requires trial and error.',
   });
 
-  // RIGHT COLUMN (with aip.js) — agent receives structured tool schemas
+  // RIGHT COLUMN (with aixa.js) — agent receives structured tool schemas
 
   terminal.addMessage('with', 'simple', {
     icon: '',
@@ -286,9 +286,9 @@ function securityPanel(container, panelWithContent, terminal) {
     </div>
   `;
 
-  // ── Initialize HITL Manager (shows modal on aip:hitl:request) ──────────
+  // ── Initialize HITL Manager (shows modal on aixa:hitl:request) ──────────
   const hitlManager = createHITLManager({
-    cssPrefix: 'aipjs',
+    cssPrefix: 'aixa',
     hitlTimeout: 30000,
   });
   hitlManager.listen();
@@ -306,14 +306,14 @@ function securityPanel(container, panelWithContent, terminal) {
     const detail = e.detail;
     terminalMsg('with', `<strong>Agent invoked:</strong> <code>${detail.method}</code> with params <code>${JSON.stringify(detail.params)}</code>`);
   };
-  window.addEventListener('aip:tool:invoke', onToolInvoke);
+  window.addEventListener('aixa:tool:invoke', onToolInvoke);
 
   // Listen for HITL request (modal is about to appear)
   const onHitlRequest = (e) => {
     const req = e.detail;
     terminalMsg('with', `<div class="msg-text" style="background:#fef3c7;padding:8px;border-radius:4px;border-left:3px solid #f59e0b;">🛡️ <strong>HITL:</strong> Agent wants to run <code>${req.toolName}</code> — approval modal shown. <em>Awaiting human decision...</em></div>`);
   };
-  window.addEventListener('aip:hitl:request', onHitlRequest);
+  window.addEventListener('aixa:hitl:request', onHitlRequest);
 
   // Listen for HITL response (user approved or denied)
   const onHitlResponse = (e) => {
@@ -326,7 +326,7 @@ function securityPanel(container, panelWithContent, terminal) {
       terminalMsg('with', `<div class="msg-text" style="background:#fef3c7;padding:8px;border-radius:4px;border-left:3px solid #f59e0b;">⏱️ <strong>HITL timed out:</strong> No human response within 30s. Auto-denied.</div>`);
     }
   };
-  window.addEventListener('aip:hitl:response', onHitlResponse);
+  window.addEventListener('aixa:hitl:response', onHitlResponse);
 
   // Listen for tool result
   const onToolResult = (e) => {
@@ -337,15 +337,15 @@ function securityPanel(container, panelWithContent, terminal) {
       terminalMsg('with', `<strong>Tool result:</strong> <code>${JSON.stringify(resp.result)}</code>`);
     }
   };
-  window.addEventListener('aip:tool:result', onToolResult);
+  window.addEventListener('aixa:tool:result', onToolResult);
 
   // Clean up old listeners from previous securityPanel call
   if (__hitlCleanup) __hitlCleanup();
   __hitlCleanup = () => {
-    window.removeEventListener('aip:tool:invoke', onToolInvoke);
-    window.removeEventListener('aip:hitl:request', onHitlRequest);
-    window.removeEventListener('aip:hitl:response', onHitlResponse);
-    window.removeEventListener('aip:tool:result', onToolResult);
+    window.removeEventListener('aixa:tool:invoke', onToolInvoke);
+    window.removeEventListener('aixa:hitl:request', onHitlRequest);
+    window.removeEventListener('aixa:hitl:response', onHitlResponse);
+    window.removeEventListener('aixa:tool:result', onToolResult);
     if (hitlManager?.destroy) hitlManager.destroy();
   };
 
@@ -354,7 +354,7 @@ function securityPanel(container, panelWithContent, terminal) {
   if (!btn) return;
 
   btn.addEventListener('click', () => {
-    // Find any add-to-cart tool from the AIP instance
+    // Find any add-to-cart tool from the AIXA instance
     let methodName = 'add_to_cart';
     let params = { productId: 'WH-001', quantity: 1 };
 
@@ -381,7 +381,7 @@ function securityPanel(container, panelWithContent, terminal) {
       }
     }
 
-    window.dispatchEvent(new CustomEvent('aip:tool:invoke', {
+    window.dispatchEvent(new CustomEvent('aixa:tool:invoke', {
       detail: {
         jsonrpc: '2.0',
         id: 'demo-' + Date.now(),
@@ -397,7 +397,7 @@ function securityPanel(container, panelWithContent, terminal) {
 
     // Listen for the HITL request event to know the modal appeared
     const onHitlRequest = () => {
-      window.removeEventListener('aip:hitl:request', onHitlRequest);
+      window.removeEventListener('aixa:hitl:request', onHitlRequest);
       // Reset button after a short delay (the modal is now showing)
       setTimeout(() => {
         btn.textContent = '⚡ Simulate Agent: Add to Cart';
@@ -405,24 +405,24 @@ function securityPanel(container, panelWithContent, terminal) {
         btn.style.opacity = '1';
       }, 500);
     };
-    window.addEventListener('aip:hitl:request', onHitlRequest);
+    window.addEventListener('aixa:hitl:request', onHitlRequest);
 
     // Also listen for tool result in case HITL is not triggered
     const onToolResult = (e) => {
-      window.removeEventListener('aip:tool:result', onToolResult);
-      window.removeEventListener('aip:hitl:request', onHitlRequest);
+      window.removeEventListener('aixa:tool:result', onToolResult);
+      window.removeEventListener('aixa:hitl:request', onHitlRequest);
       setTimeout(() => {
         btn.textContent = '⚡ Simulate Agent: Add to Cart';
         btn.disabled = false;
         btn.style.opacity = '1';
       }, 300);
     };
-    window.addEventListener('aip:tool:result', onToolResult);
+    window.addEventListener('aixa:tool:result', onToolResult);
 
     // Fallback reset after 30s (HITL timeout)
     setTimeout(() => {
-      window.removeEventListener('aip:hitl:request', onHitlRequest);
-      window.removeEventListener('aip:tool:result', onToolResult);
+      window.removeEventListener('aixa:hitl:request', onHitlRequest);
+      window.removeEventListener('aixa:tool:result', onToolResult);
       btn.textContent = '⚡ Simulate Agent: Add to Cart';
       btn.disabled = false;
       btn.style.opacity = '1';

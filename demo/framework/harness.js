@@ -36,7 +36,7 @@ export function createDemo(opts) {
       <nav class="demo-nav">
         <div class="nav-brand">
           <span class="logo-dot"></span>
-          <span>aip.js</span>
+          <span>aixa.js</span>
           <span style="font-weight:400;color:var(--text-muted);font-size:12px;">Demo</span>
         </div>
         <div class="nav-label">Scenario</div>
@@ -53,7 +53,7 @@ export function createDemo(opts) {
         <div class="panel" id="panel-without">
           <div class="panel-header without">
             <span class="status-dot"></span>
-            <span>Without aip.js</span>
+            <span>Without aixa.js</span>
             <span class="panel-subtitle">Raw HTML — agent must scrape</span>
           </div>
           <div class="panel-content" id="panel-without-content"></div>
@@ -61,7 +61,7 @@ export function createDemo(opts) {
         <div class="panel" id="panel-with">
           <div class="panel-header with">
             <span class="status-dot"></span>
-            <span>With aip.js</span>
+            <span>With aixa.js</span>
             <span class="panel-subtitle">Structured tools — agent reads schemas</span>
           </div>
           <div class="panel-mode-bar" id="panel-mode-bar">
@@ -150,7 +150,7 @@ export function createDemo(opts) {
     const sc = scenarios[currentScenario];
     if (!sc) return;
 
-    // Destroy previous aip.js instance
+    // Destroy previous aixa.js instance
     if (aipInstance?.stop) {
       try { aipInstance.stop(); } catch {}
     }
@@ -161,7 +161,7 @@ export function createDemo(opts) {
     panelWithContent.innerHTML = '';
     terminal.clear();
 
-    // Left panel: draw pure HTML (no aip.js)
+    // Left panel: draw pure HTML (no aixa.js)
     if (sc.without.html) {
       if (typeof sc.without.html === 'function') {
         panelWithoutContent.innerHTML = sc.without.html();
@@ -170,7 +170,7 @@ export function createDemo(opts) {
       }
     }
 
-    // Right panel: draw HTML, then initialize aip.js
+    // Right panel: draw HTML, then initialize aixa.js
     const config = currentMode === 'manual-config' && sc.with.manualConfig
       ? sc.with.manualConfig
       : sc.with.aipConfig;
@@ -183,7 +183,7 @@ export function createDemo(opts) {
       }
     }
 
-    // Initialize aip.js in right panel
+    // Initialize aixa.js in right panel
     if (config && typeof config === 'function') {
       aipInstance = config(panelWithContent);
     }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manual Configuration — aip.js</title>
+  <title>Manual Configuration — aixa.js</title>
   <link rel="stylesheet" href="assets/docs.css">
 </head>
 <body>
@@ -39,7 +39,7 @@
       </p>
 
       <h3>Signature</h3>
-      <pre><code>aip.registerSearch(
+      <pre><code>aixa.registerSearch(
   name: string,
   parameters: ParamDef[],
   endpoint?: string,
@@ -85,7 +85,7 @@
 
       <h3>Example: E-Commerce Product Search</h3>
 
-      <pre><code>aip.registerSearch('product_search', [
+      <pre><code>aixa.registerSearch('product_search', [
   {
     name: 'q',
     type: 'string',
@@ -125,7 +125,7 @@
       </p>
 
       <h3>Signature</h3>
-      <pre><code>aip.registerAction(
+      <pre><code>aixa.registerAction(
   name: string,
   description: string,
   parameters: ParamDef[],
@@ -178,7 +178,7 @@
 
       <h3>Example: Add to Cart with Confirmation</h3>
 
-      <pre><code>aip.registerAction(
+      <pre><code>aixa.registerAction(
   'add_to_cart',
   'Add a product to the shopping cart',
   [
@@ -228,7 +228,7 @@
       </p>
 
       <h3>Signature</h3>
-      <pre><code>aip.registerTool(
+      <pre><code>aixa.registerTool(
   name: string,
   description: string,
   parameters: ParamDef[],
@@ -312,10 +312,10 @@
       <p>Remove tools from the registry when they are no longer available:</p>
 
       <pre><code>// Remove a single tool by name
-aip.unregisterTool('search_product_search');
+aixa.unregisterTool('search_product_search');
 
 // Remove all registered tools (auto-inferred and manual)
-aip.clearRegistry();</code></pre>
+aixa.clearRegistry();</code></pre>
 
       <p>
         <strong>Note:</strong> <code>clearRegistry()</code> removes <em>all</em> tools.
@@ -345,12 +345,12 @@ aip.clearRegistry();</code></pre>
         actions:
       </p>
 
-      <pre><code>import { AIP } from '@aipjs/core';
+      <pre><code>import { AIXA } from '@aixa/core';
 
-const aip = new AIP();
+const aixa = new AIXA();
 
 // --- Search: browse products ---
-aip.registerSearch('product_search', [
+aixa.registerSearch('product_search', [
   { name: 'q', type: 'string', description: 'Search query', required: true },
   { name: 'category', type: 'string', description: 'Product category',
     enum: ['electronics', 'clothing', 'home', 'sports'] },
@@ -361,7 +361,7 @@ aip.registerSearch('product_search', [
 ], 'https://api.example.com/products/search');
 
 // --- Action: add to cart (HITL) ---
-aip.registerAction(
+aixa.registerAction(
   'add_to_cart',
   'Add items to the shopping cart',
   [
@@ -382,7 +382,7 @@ aip.registerAction(
 );
 
 // --- Action: checkout (HITL) ---
-aip.registerAction(
+aixa.registerAction(
   'checkout',
   'Complete the purchase and place the order',
   [
@@ -405,7 +405,7 @@ aip.registerAction(
 );
 
 // --- Start the SDK ---
-aip.start();</code></pre>
+aixa.start();</code></pre>
 
       <p>
         With this setup, an AI agent can search products, add items to the cart (after

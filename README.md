@@ -1,6 +1,6 @@
-# aip.js — The Agent Interaction Protocol (AIP) SDK
+# aixa.js — The Agent Interaction & eXecution Agreement (AIXA) SDK
 
-**Agent Interaction Protocol (AIP)** — gives your website the ability to expose structured, discoverable capabilities to visiting AI agents. Secure your platform, control the agent UX, and stop bots from breaking on fragile DOM updates.
+**Agent Interaction & eXecution Agreement (AIXA)** — gives your website the ability to expose structured, discoverable capabilities to visiting AI agents. Secure your platform, control the agent UX, and stop bots from breaking on fragile DOM updates.
 
 [![Build](https://img.shields.io/badge/build-passing-brightgreen)]()
 [![Tests](https://img.shields.io/badge/tests-26%2F26-brightgreen)]()
@@ -8,13 +8,13 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)]()
 [![Bundle Size](https://img.shields.io/badge/bundle-36KB-green)]()
 
-## What is aip.js?
+## What is aixa.js?
 
-**aip.js** is the JavaScript SDK for the Agent Interaction Protocol. Just as SEO optimized websites for search crawlers, AIP optimizes websites for AI agents.
+**aixa.js** is the JavaScript SDK for the Agent Interaction & eXecution Agreement (AIXA). Just as SEO optimized websites for search crawlers, AIXA optimizes websites for AI agents.
 
-Instead of allowing agents to scrape your DOM and simulate brittle clicks, aip.js lets you expose your website's features (search, filter, checkout) as clean, structured JSON-RPC tools. It features auto-inference of your existing forms, developer overrides for SPAs, and built-in Human-in-the-Loop (HITL) security for high-risk actions.
+Instead of allowing agents to scrape your DOM and simulate brittle clicks, aixa.js lets you expose your website's features (search, filter, checkout) as clean, structured JSON-RPC tools. It features auto-inference of your existing forms, developer overrides for SPAs, and built-in Human-in-the-Loop (HITL) security for high-risk actions.
 
-*Note: aip.js is fully compatible with the emerging [WebMCP (Web Model Context Protocol)](https://webmachinelearning.github.io/webmcp) standard, ensuring your tool schemas remain valid as native browser adoption grows.*
+*Note: aixa.js is fully compatible with the emerging [WebMCP (Web Model Context Protocol)](https://webmachinelearning.github.io/webmcp) standard, ensuring your tool schemas remain valid as native browser adoption grows.*
 
 ## How It Works
 
@@ -49,21 +49,21 @@ Instead of allowing agents to scrape your DOM and simulate brittle clicks, aip.j
 
 ### Three Core Capabilities
 
-1. **Auto-Inference Engine** — Scans your DOM for semantic HTML elements (search inputs, filter dropdowns, action buttons), ARIA attributes, and `data-aip-*` hints, then automatically generates clean JSON-RPC tool schemas. Zero configuration needed.
+1. **Auto-Inference Engine** — Scans your DOM for semantic HTML elements (search inputs, filter dropdowns, action buttons), ARIA attributes, and `data-aixa-*` hints, then automatically generates clean JSON-RPC tool schemas. Zero configuration needed.
 
 2. **Developer Override API** — For complex SPAs and custom endpoints, register tools explicitly:
    ```js
-   import { AIP } from '@aipjs/core';
+   import { AIXA } from '@aixa/core';
 
-   const aip = new AIP({ autoInfer: true, hitlEnabled: true });
-   aip.registerSearch({
+   const aixa = new AIXA({ autoInfer: true, hitlEnabled: true });
+   aixa.registerSearch({
      endpoint: '/api/v2/search',
      parameters: [
        { name: 'q', type: 'string', description: 'Search query', required: true },
        { name: 'category', type: 'string', description: 'Category filter', required: false },
      ]
    });
-   aip.start();
+   aixa.start();
    ```
 
 3. **Security & HITL** — Every tool is classified SAFE (read-only: search, filter, navigate) or HIGH_RISK (mutation: add to cart, checkout, profile changes). High-risk actions trigger a native DOM modal requiring explicit human approval before the payload touches your backend. Includes prompt injection sanitization to prevent malicious page data from hijacking agent instructions.
@@ -72,10 +72,10 @@ Instead of allowing agents to scrape your DOM and simulate brittle clicks, aip.j
 
 | Package | Description | Size |
 |---------|-------------|------|
-| `@aipjs/types` | Shared types: JSON-RPC, ToolSchema, HITL, Config | <2 KB |
-| `@aipjs/core` | Auto-inference, registry, UI mirroring, AIP class | <8 KB |
-| `@aipjs/security` | HITL modal, prompt injection sanitizer | <6 KB |
-| `@aipjs/plugin-ecommerce` | Safe search abstraction for e-commerce, real estate, travel | <5 KB |
+| `@aixa/types` | Shared types: JSON-RPC, ToolSchema, HITL, Config | <2 KB |
+| `@aixa/core` | Auto-inference, registry, UI mirroring, AIXA class | <8 KB |
+| `@aixa/security` | HITL modal, prompt injection sanitizer | <6 KB |
+| `@aixa/plugin-ecommerce` | Safe search abstraction for e-commerce, real estate, travel | <5 KB |
 
 ## Quick Start
 
@@ -83,14 +83,14 @@ Instead of allowing agents to scrape your DOM and simulate brittle clicks, aip.j
 
 ```html
 <script type="module">
-  import { AIP } from 'https://cdn.aipjs.dev/core/index.js';
+  import { AIXA } from 'https://cdn.aixa.dev/core/index.js';
 
-  const aip = new AIP({ autoInfer: true });
-  aip.start();
+  const aixa = new AIXA({ autoInfer: true });
+  aixa.start();
 
   // Your page now broadcasts tool schemas to browser agents
   // Search inputs, filters, sort controls — all auto-discovered
-  console.log(aip.getCapabilities());
+  console.log(aixa.getCapabilities());
   // { tools: [...], page: { title: "My Store", url: "..." }, ... }
 </script>
 ```
@@ -98,7 +98,7 @@ Instead of allowing agents to scrape your DOM and simulate brittle clicks, aip.j
 ### E-Commerce Plugin
 
 ```js
-import { ecommercePlugin } from '@aipjs/plugin-ecommerce';
+import { ecommercePlugin } from '@aixa/plugin-ecommerce';
 
 ecommercePlugin({
   searchEndpoint: '/api/v1/products/search',
@@ -114,15 +114,15 @@ ecommercePlugin({
 ### With Security Module
 
 ```js
-import { AIP } from '@aipjs/core';
-import { createHITLManager, sanitizePayload } from '@aipjs/security';
+import { AIXA } from '@aixa/core';
+import { createHITLManager, sanitizePayload } from '@aixa/security';
 
 // Agent actions trigger HITL approval for high-risk operations
-const hitl = createHITLManager({ cssPrefix: 'aipjs', hitlTimeout: 30000 });
+const hitl = createHITLManager({ cssPrefix: 'aixa', hitlTimeout: 30000 });
 hitl.listen();
 
-const aip = new AIP({ autoInfer: true, hitlEnabled: true });
-aip.start();
+const aixa = new AIXA({ autoInfer: true, hitlEnabled: true });
+aixa.start();
 ```
 
 ## Architecture
@@ -133,12 +133,12 @@ Agent-website communication uses CustomEvents on the window object:
 
 | Event | Direction | Purpose |
 |-------|-----------|---------|
-| `aip:capabilities:request` | Agent → Site | Agent asks "what can you do?" |
-| `aip:capabilities:response` | Site → Agent | Site replies with tool schemas |
-| `aip:tool:invoke` | Agent → Site | Agent calls a tool with params |
-| `aip:tool:result` | Site → Agent | Site returns tool result |
-| `aip:hitl:request` | Site → User | High-risk action needs approval |
-| `aip:hitl:response` | User → Site | User approves or denies |
+| `aixa:capabilities:request` | Agent → Site | Agent asks "what can you do?" |
+| `aixa:capabilities:response` | Site → Agent | Site replies with tool schemas |
+| `aixa:tool:invoke` | Agent → Site | Agent calls a tool with params |
+| `aixa:tool:result` | Site → Agent | Site returns tool result |
+| `aixa:hitl:request` | Site → User | High-risk action needs approval |
+| `aixa:hitl:response` | User → Site | User approves or denies |
 
 ### Risk Classification
 
@@ -164,10 +164,10 @@ Built for React, Vue, Next.js, and Svelte apps:
 
 ## WebMCP Compatibility
 
-| Feature | WebMCP Spec | aip.js |
+| Feature | WebMCP Spec | aixa.js |
 |---------|------------|--------|
-| Imperative API (`registerTool`) | ✅ `document.modelContext.registerTool()` | ✅ `aip.registerSearch()` / `registerAction()` |
-| Declarative API (HTML attrs) | ✅ `<form toolname="...">` | ✅ Auto-inference from semantic HTML + `data-aip-*` |
+| Imperative API (`registerTool`) | ✅ `document.modelContext.registerTool()` | ✅ `aixa.registerSearch()` / `registerAction()` |
+| Declarative API (HTML attrs) | ✅ `<form toolname="...">` | ✅ Auto-inference from semantic HTML + `data-aixa-*` |
 | JSON Schema input params | ✅ | ✅ `ToolParameter` type |
 | Read-only hints | ✅ `annotations.readOnlyHint` | ✅ `RiskLevel.SAFE` / `HIGH_RISK` |
 | Origin-based exposure | ✅ `exposedTo` | 🔜 Planned |
@@ -180,8 +180,8 @@ Built for React, Vue, Next.js, and Svelte apps:
 
 ```bash
 # Clone and install
-git clone https://github.com/agent-interaction-labs/aipjs.git
-cd aipjs
+git clone https://github.com/agent-interaction-labs/aixa.git
+cd aixa
 npm install
 
 # Build all packages

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Auto-Inference — aip.js</title>
+  <title>Auto-Inference — aixa.js</title>
   <link rel="stylesheet" href="assets/docs.css">
 </head>
 <body>
@@ -14,15 +14,15 @@
       <h1>Auto-Inference</h1>
 
       <p>
-        Auto-inference is the zero-configuration mode of aip.js. When enabled, the SDK
+        Auto-inference is the zero-configuration mode of aixa.js. When enabled, the SDK
         walks the DOM at startup and automatically generates JSON-RPC tool schemas from
         semantic HTML elements. You get agent-accessible tools with no manual registration —
         perfect for server-rendered pages, static sites, and simple SPAs.
       </p>
 
       <p>
-        Enable it by passing <code>{ autoInfer: true }</code> to the <code>AIP</code>
-        constructor and calling <code>aip.start()</code>.
+        Enable it by passing <code>{ autoInfer: true }</code> to the <code>AIXA</code>
+        constructor and calling <code>aixa.start()</code>.
       </p>
 
       <nav class="page-nav" aria-label="Page navigation">
@@ -36,7 +36,7 @@
 
       <ol>
         <li>
-          <strong><code>aip.start()</code> is called</strong> — The SDK initializes and
+          <strong><code>aixa.start()</code> is called</strong> — The SDK initializes and
           begins the discovery phase.
         </li>
         <li>
@@ -50,7 +50,7 @@
         </li>
         <li>
           <strong>Tools are broadcast via <code>CustomEvent</code></strong> — The
-          <code>aip:tools-ready</code> event fires on <code>window</code>, carrying
+          <code>aixa:tools-ready</code> event fires on <code>window</code>, carrying
           the full tool registry. AI agents listening on the page can then query and
           invoke these tools.
         </li>
@@ -110,18 +110,18 @@
             <td><span class="badge badge-high">HIGH_RISK</span></td>
           </tr>
           <tr>
-            <td>Elements with <code>data-aip-confirm</code></td>
-            <td><code>[data-aip-confirm]</code></td>
+            <td>Elements with <code>data-aixa-confirm</code></td>
+            <td><code>[data-aixa-confirm]</code></td>
             <td><code>mutation_*</code></td>
             <td><span class="badge badge-high">HIGH_RISK</span></td>
           </tr>
         </tbody>
       </table>
 
-      <h2>data-aip-* Attributes</h2>
+      <h2>data-aixa-* Attributes</h2>
 
       <p>
-        Use these <code>data-aip-*</code> attributes to annotate your HTML and give the
+        Use these <code>data-aixa-*</code> attributes to annotate your HTML and give the
         auto-inference engine richer context. They're optional — the scanner works fine
         without them — but they improve the quality of generated tool schemas.
       </p>
@@ -136,49 +136,49 @@
         </thead>
         <tbody>
           <tr>
-            <td><code>data-aip-search</code></td>
+            <td><code>data-aixa-search</code></td>
             <td>Marks a form or input as a search endpoint</td>
-            <td><code>&lt;form data-aip-search="product-search"&gt;</code></td>
+            <td><code>&lt;form data-aixa-search="product-search"&gt;</code></td>
           </tr>
           <tr>
-            <td><code>data-aip-filter</code></td>
+            <td><code>data-aixa-filter</code></td>
             <td>Marks a <code>&lt;select&gt;</code> as a filter control</td>
-            <td><code>&lt;select data-aip-filter="category"&gt;</code></td>
+            <td><code>&lt;select data-aixa-filter="category"&gt;</code></td>
           </tr>
           <tr>
-            <td><code>data-aip-sort</code></td>
+            <td><code>data-aixa-sort</code></td>
             <td>Marks a <code>&lt;select&gt;</code> as a sort control</td>
-            <td><code>&lt;select data-aip-sort="price-order"&gt;</code></td>
+            <td><code>&lt;select data-aixa-sort="price-order"&gt;</code></td>
           </tr>
           <tr>
-            <td><code>data-aip-confirm</code></td>
+            <td><code>data-aixa-confirm</code></td>
             <td>Requires human confirmation before this tool is invoked</td>
-            <td><code>&lt;button data-aip-confirm&gt;Delete&lt;/button&gt;</code></td>
+            <td><code>&lt;button data-aixa-confirm&gt;Delete&lt;/button&gt;</code></td>
           </tr>
           <tr>
-            <td><code>data-aip-name</code></td>
+            <td><code>data-aixa-name</code></td>
             <td>Overrides the auto-generated tool name</td>
-            <td><code>&lt;input data-aip-name="find-products"&gt;</code></td>
+            <td><code>&lt;input data-aixa-name="find-products"&gt;</code></td>
           </tr>
           <tr>
-            <td><code>data-aip-description</code></td>
+            <td><code>data-aixa-description</code></td>
             <td>Provides a human-readable description for the tool</td>
-            <td><code>&lt;form data-aip-description="Search the product catalog by keyword"&gt;</code></td>
+            <td><code>&lt;form data-aixa-description="Search the product catalog by keyword"&gt;</code></td>
           </tr>
           <tr>
-            <td><code>data-aip-category</code></td>
+            <td><code>data-aixa-category</code></td>
             <td>Assigns the tool to a logical category</td>
-            <td><code>&lt;div data-aip-category="shopping"&gt;</code></td>
+            <td><code>&lt;div data-aixa-category="shopping"&gt;</code></td>
           </tr>
           <tr>
-            <td><code>data-aip-risk</code></td>
+            <td><code>data-aixa-risk</code></td>
             <td>Explicitly sets the risk level (<code>safe</code> or <code>high</code>)</td>
-            <td><code>&lt;button data-aip-risk="high"&gt;</code></td>
+            <td><code>&lt;button data-aixa-risk="high"&gt;</code></td>
           </tr>
           <tr>
-            <td><code>data-aip-params</code></td>
+            <td><code>data-aixa-params</code></td>
             <td>JSON string defining additional or override parameters</td>
-            <td><code>&lt;input data-aip-params='{"limit":{"type":"number"}}'&gt;</code></td>
+            <td><code>&lt;input data-aixa-params='{"limit":{"type":"number"}}'&gt;</code></td>
           </tr>
         </tbody>
       </table>
@@ -221,9 +221,9 @@
           templates, etc.) are not detected unless they render standard DOM elements.
         </li>
         <li>
-          <strong>Dynamic content</strong> — Content loaded after <code>aip.start()</code>
+          <strong>Dynamic content</strong> — Content loaded after <code>aixa.start()</code>
           (e.g., infinite scroll, lazy-loaded sections) is not automatically discovered.
-          Call <code>aip.refreshTools()</code> to re-scan the DOM after dynamic updates.
+          Call <code>aixa.refreshTools()</code> to re-scan the DOM after dynamic updates.
         </li>
         <li>
           <strong>Shadow DOM</strong> — Elements inside shadow roots are not traversed
@@ -232,7 +232,7 @@
         </li>
         <li>
           <strong>Overlapping tools</strong> — Multiple elements matching the same
-          pattern may produce duplicate tool names. Use <code>data-aip-name</code> to
+          pattern may produce duplicate tool names. Use <code>data-aixa-name</code> to
           disambiguate.
         </li>
       </ul>

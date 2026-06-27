@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>API Reference — aip.js</title>
+  <title>API Reference — aixa.js</title>
   <link rel="stylesheet" href="assets/docs.css">
 </head>
 <body>
@@ -13,21 +13,21 @@
 
       <h1>API Reference</h1>
 
-      <p>Complete reference of every public function, class, and type exported by aip.js. This page covers the core SDK — see <a href="ecommerce-plugin.html">E-Commerce Plugin</a> for the <code>@aipjs/plugin-ecommerce</code> package.</p>
+      <p>Complete reference of every public function, class, and type exported by aixa.js. This page covers the core SDK — see <a href="ecommerce-plugin.html">E-Commerce Plugin</a> for the <code>@aixa/plugin-ecommerce</code> package.</p>
 
-      <h2>AIP Class</h2>
+      <h2>AIXA Class</h2>
 
-      <p>The main entry point. Create an instance to configure and control the AIP runtime.</p>
+      <p>The main entry point. Create an instance to configure and control the AIXA runtime.</p>
 
       <h3>Constructor</h3>
 
-      <pre><code>new AIP(config: AIPConfig)</code></pre>
+      <pre><code>new AIXA(config: AIXAConfig)</code></pre>
 
-      <p>Creates a new AIP instance with the provided configuration. See <a href="#aipconfig">AIPConfig</a> for all options.</p>
+      <p>Creates a new AIXA instance with the provided configuration. See <a href="#aipconfig">AIXAConfig</a> for all options.</p>
 
-      <pre><code>import { AIP } from '@aipjs/sdk';
+      <pre><code>import { AIXA } from '@aixa/sdk';
 
-const aip = new AIP({
+const aixa = new AIXA({
   siteId: 'my-store',
   inference: { autoDetect: true },
 });</code></pre>
@@ -46,12 +46,12 @@ const aip = new AIP({
           <tr>
             <td><code>start()</code></td>
             <td><code>start(): Promise&lt;void&gt;</code></td>
-            <td>Initializes the AIP runtime: runs auto-inference (if enabled), sets up event listeners, and broadcasts capabilities. Call once after construction.</td>
+            <td>Initializes the AIXA runtime: runs auto-inference (if enabled), sets up event listeners, and broadcasts capabilities. Call once after construction.</td>
           </tr>
           <tr>
             <td><code>stop()</code></td>
             <td><code>stop(): void</code></td>
-            <td>Shuts down the AIP runtime: removes event listeners, clears registrations, and stops broadcasting.</td>
+            <td>Shuts down the AIXA runtime: removes event listeners, clears registrations, and stops broadcasting.</td>
           </tr>
           <tr>
             <td><code>refreshTools()</code></td>
@@ -66,14 +66,14 @@ const aip = new AIP({
           <tr>
             <td><code>broadcastCapabilities()</code></td>
             <td><code>broadcastCapabilities(): void</code></td>
-            <td>Dispatches an <code>aip:capabilities:response</code> event with the current capabilities snapshot. Called automatically by <code>start()</code>, but can be invoked manually to re-announce after registration changes.</td>
+            <td>Dispatches an <code>aixa:capabilities:response</code> event with the current capabilities snapshot. Called automatically by <code>start()</code>, but can be invoked manually to re-announce after registration changes.</td>
           </tr>
         </tbody>
       </table>
 
       <h2>Tool Registration</h2>
 
-      <p>Register capabilities that agents can discover and invoke. All registration methods are chainable (they return the AIP instance).</p>
+      <p>Register capabilities that agents can discover and invoke. All registration methods are chainable (they return the AIXA instance).</p>
 
       <h3>registerSearch()</h3>
 
@@ -82,9 +82,9 @@ const aip = new AIP({
   parameters: ToolParameter[];
   handler?: (params: Record&lt;string, any&gt;) =&gt; Promise&lt;any&gt;;
   method?: 'GET' | 'POST';
-}): AIP</code></pre>
+}): AIXA</code></pre>
 
-      <p>Registers a search endpoint. This is a convenience wrapper that creates a <code>SEARCH</code>-category tool with standard parameter handling. If no <code>handler</code> is provided, aip.js will <code>fetch()</code> the <code>endpoint</code> with parameters serialized as query string (GET) or JSON body (POST).</p>
+      <p>Registers a search endpoint. This is a convenience wrapper that creates a <code>SEARCH</code>-category tool with standard parameter handling. If no <code>handler</code> is provided, aixa.js will <code>fetch()</code> the <code>endpoint</code> with parameters serialized as query string (GET) or JSON body (POST).</p>
 
       <table>
         <thead>
@@ -123,7 +123,7 @@ const aip = new AIP({
         </tbody>
       </table>
 
-      <pre><code>aip.registerSearch({
+      <pre><code>aixa.registerSearch({
   endpoint: '/api/products/search',
   parameters: [
     { name: 'q', type: 'string', description: 'Search query', required: true },
@@ -141,7 +141,7 @@ const aip = new AIP({
   parameters: ToolParameter[];
   handler: (params: Record&lt;string, any&gt;) =&gt; Promise&lt;any&gt;;
   requiresConfirmation?: boolean;
-}): AIP</code></pre>
+}): AIXA</code></pre>
 
       <p>Registers a named action with a required handler. Use this for custom logic beyond simple fetch — database queries, calculations, third-party API calls with auth, etc.</p>
 
@@ -188,7 +188,7 @@ const aip = new AIP({
         </tbody>
       </table>
 
-      <pre><code>aip.registerAction({
+      <pre><code>aixa.registerAction({
   name: 'get_article',
   description: 'Fetch full article content by ID',
   parameters: [
@@ -211,7 +211,7 @@ const aip = new AIP({
   method?: 'GET' | 'POST';
   riskLevel?: RiskLevel;
   category?: ActionCategory;
-}): AIP</code></pre>
+}): AIXA</code></pre>
 
       <p>The low-level registration method. <code>registerSearch()</code> and <code>registerAction()</code> are convenience wrappers around this. Use <code>registerTool()</code> when you need full control over all properties.</p>
 
@@ -300,7 +300,7 @@ const aip = new AIP({
 
       <p>Programmatically executes a registered tool by name with the given parameters. Returns the tool's result. Use this for testing or for chaining tool calls.</p>
 
-      <pre><code>const results = await aip.executeTool('search_catalog', {
+      <pre><code>const results = await aixa.executeTool('search_catalog', {
   q: 'blue shirt',
   maxPrice: 100,
 });</code></pre>
@@ -351,7 +351,7 @@ const aip = new AIP({
   categories: Record&lt;ActionCategory, number&gt;;  // Count by category
 }</code></pre>
 
-      <pre><code>const result = aip.inferTools({ rootSelector: '#search-section' });
+      <pre><code>const result = aixa.inferTools({ rootSelector: '#search-section' });
 console.log(`Found ${result.total} tools (${result.safe} safe, ${result.highRisk} high-risk)`);</code></pre>
 
       <h2>UI Mirroring</h2>
@@ -363,7 +363,7 @@ console.log(`Found ${result.total} tools (${result.safe} safe, ${result.highRisk
       <p>Programmatically sets the value of a DOM element and dispatches appropriate events (input, change) so that framework bindings (React, Vue, etc.) detect the change. Returns <code>true</code> if the element was found and updated, <code>false</code> if no element matched the selector.</p>
 
       <pre><code>// Agent fills in a search field
-aip.mirrorElementValue('#search-input', 'blue shirt');</code></pre>
+aixa.mirrorElementValue('#search-input', 'blue shirt');</code></pre>
 
       <h2>E-Commerce Plugin</h2>
 
@@ -451,7 +451,7 @@ hitl.destroy();</code></pre>
 
       <h2 id="types">Types</h2>
 
-      <h3 id="aipconfig">AIPConfig</h3>
+      <h3 id="aipconfig">AIXAConfig</h3>
 
       <table>
         <thead>
@@ -489,7 +489,7 @@ hitl.destroy();</code></pre>
           </tr>
           <tr>
             <td><code>plugins</code></td>
-            <td><code>AIPPlugin[]</code></td>
+            <td><code>AIXAPlugin[]</code></td>
             <td><code>[]</code></td>
             <td>Array of plugin instances to register on <code>start()</code>.</td>
           </tr>
@@ -615,7 +615,7 @@ hitl.destroy();</code></pre>
           <tr>
             <td><code>siteId</code></td>
             <td><code>string</code></td>
-            <td>The site identifier from AIPConfig.</td>
+            <td>The site identifier from AIXAConfig.</td>
           </tr>
           <tr>
             <td><code>tools</code></td>
@@ -625,7 +625,7 @@ hitl.destroy();</code></pre>
           <tr>
             <td><code>version</code></td>
             <td><code>string</code></td>
-            <td>aip.js SDK version.</td>
+            <td>aixa.js SDK version.</td>
           </tr>
           <tr>
             <td><code>timestamp</code></td>
@@ -715,12 +715,12 @@ hitl.destroy();</code></pre>
       <h3 id="agentbridgeevent">AgentBridgeEvent</h3>
 
       <pre><code>enum AgentBridgeEvent {
-  CAPABILITIES_REQUEST = 'aip:capabilities:request',
-  CAPABILITIES_RESPONSE = 'aip:capabilities:response',
-  TOOL_INVOKE = 'aip:tool:invoke',
-  TOOL_RESULT = 'aip:tool:result',
-  HITL_REQUEST = 'aip:hitl:request',
-  HITL_RESPONSE = 'aip:hitl:response',
+  CAPABILITIES_REQUEST = 'aixa:capabilities:request',
+  CAPABILITIES_RESPONSE = 'aixa:capabilities:response',
+  TOOL_INVOKE = 'aixa:tool:invoke',
+  TOOL_RESULT = 'aixa:tool:result',
+  HITL_REQUEST = 'aixa:hitl:request',
+  HITL_RESPONSE = 'aixa:hitl:response',
 }</code></pre>
 
       <h3 id="hitlrequest">HITLRequest</h3>
@@ -832,37 +832,37 @@ hitl.destroy();</code></pre>
         </thead>
         <tbody>
           <tr>
-            <td><code>aip:capabilities:request</code></td>
+            <td><code>aixa:capabilities:request</code></td>
             <td>Agent → Site</td>
             <td><code>{ siteId?: string }</code></td>
-            <td>An agent is requesting the site's capabilities. The AIP runtime responds automatically.</td>
+            <td>An agent is requesting the site's capabilities. The AIXA runtime responds automatically.</td>
           </tr>
           <tr>
-            <td><code>aip:capabilities:response</code></td>
+            <td><code>aixa:capabilities:response</code></td>
             <td>Site → Agent</td>
             <td><code>AgentCapability</code></td>
             <td>The site's capability listing. Automatically dispatched by <code>broadcastCapabilities()</code>.</td>
           </tr>
           <tr>
-            <td><code>aip:tool:invoke</code></td>
+            <td><code>aixa:tool:invoke</code></td>
             <td>Agent → Site</td>
             <td><code>{ tool: string; params: Record&lt;string, any&gt; }</code></td>
-            <td>An agent is invoking a tool. The AIP runtime executes the handler automatically.</td>
+            <td>An agent is invoking a tool. The AIXA runtime executes the handler automatically.</td>
           </tr>
           <tr>
-            <td><code>aip:tool:result</code></td>
+            <td><code>aixa:tool:result</code></td>
             <td>Site → Agent</td>
             <td><code>{ tool: string; result: any; error?: string }</code></td>
             <td>The result (or error) of a tool invocation.</td>
           </tr>
           <tr>
-            <td><code>aip:hitl:request</code></td>
+            <td><code>aixa:hitl:request</code></td>
             <td>Agent → Site</td>
             <td><code>HITLRequest</code></td>
             <td>A high-risk action needs user confirmation. The HITL manager shows the modal.</td>
           </tr>
           <tr>
-            <td><code>aip:hitl:response</code></td>
+            <td><code>aixa:hitl:response</code></td>
             <td>Site → Agent</td>
             <td><code>HITLResponse</code></td>
             <td>The user's decision on a HITL request.</td>
@@ -871,13 +871,13 @@ hitl.destroy();</code></pre>
       </table>
 
       <pre><code>// Listen for tool invocations
-window.addEventListener('aip:tool:invoke', (event) => {
+window.addEventListener('aixa:tool:invoke', (event) => {
   const { tool, params } = event.detail;
   console.log(`Tool invoked: ${tool}`, params);
 });
 
 // Listen for capabilities responses
-window.addEventListener('aip:capabilities:response', (event) => {
+window.addEventListener('aixa:capabilities:response', (event) => {
   const capabilities = event.detail;
   console.log(`Site has ${capabilities.tools.length} tools available`);
 });</code></pre>

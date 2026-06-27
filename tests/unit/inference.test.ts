@@ -45,7 +45,7 @@ afterEach(() => {
 
 describe('buildAutoHandler', () => {
   it('fills a search input and dispatches input+change events', async () => {
-    const { inferTools } = await import('@aipjs/core');
+    const { inferTools } = await import('@aixa/core');
     const result = inferTools();
     const searchTool = result.tools.find(t => t.category === 'search');
     expect(searchTool).toBeDefined();
@@ -67,7 +67,7 @@ describe('buildAutoHandler', () => {
   });
 
   it('sets a select value and dispatches change event', async () => {
-    const { inferTools } = await import('@aipjs/core');
+    const { inferTools } = await import('@aixa/core');
     const result = inferTools();
     const filterTool = result.tools.find(t => t.category === 'filter');
     expect(filterTool).toBeDefined();
@@ -83,7 +83,7 @@ describe('buildAutoHandler', () => {
   });
 
   it('sets a range input value and dispatches input event', async () => {
-    const { inferTools } = await import('@aipjs/core');
+    const { inferTools } = await import('@aixa/core');
     const result = inferTools();
     const rangeTool = result.tools.find(t => t.category === 'filter' && t.description.includes('price'));
     expect(rangeTool).toBeDefined();
@@ -99,7 +99,7 @@ describe('buildAutoHandler', () => {
   });
 
   it('toggles a checkbox', async () => {
-    const { inferTools } = await import('@aipjs/core');
+    const { inferTools } = await import('@aixa/core');
     const result = inferTools();
     const checkboxTool = result.tools.find(t => t.description.includes('stock'));
     expect(checkboxTool).toBeDefined();
@@ -117,7 +117,7 @@ describe('buildAutoHandler', () => {
   });
 
   it('fills hidden inputs and submits the form for a submit button', async () => {
-    const { inferTools } = await import('@aipjs/core');
+    const { inferTools } = await import('@aixa/core');
     const result = inferTools();
     const cartTool = result.tools.find(t => t.riskLevel === 'high_risk');
     expect(cartTool).toBeDefined();
@@ -140,7 +140,7 @@ describe('buildAutoHandler', () => {
   });
 
   it('submits a form even without hidden inputs', async () => {
-    const { inferTools } = await import('@aipjs/core');
+    const { inferTools } = await import('@aixa/core');
     const result = inferTools();
     const checkoutTool = result.tools.find(
       t => t.riskLevel === 'high_risk' && t.name.toLowerCase().includes('checkout')
@@ -160,7 +160,7 @@ describe('buildAutoHandler', () => {
   });
 
   it('navigates for anchor elements', async () => {
-    const { inferTools } = await import('@aipjs/core');
+    const { inferTools } = await import('@aixa/core');
     const result = inferTools();
     const navTool = result.tools.find(t => t.category === 'navigate' && t.name.toLowerCase().includes('products'));
     expect(navTool).toBeDefined();
@@ -175,7 +175,7 @@ describe('buildAutoHandler', () => {
   });
 
   it('classifies checkout links as HIGH_RISK with HITL', async () => {
-    const { inferTools } = await import('@aipjs/core');
+    const { inferTools } = await import('@aixa/core');
     const result = inferTools();
     const checkoutLink = result.tools.find(
       t => t.category === 'navigate' && t.riskLevel === 'high_risk'
@@ -185,7 +185,7 @@ describe('buildAutoHandler', () => {
   });
 
   it('handles standalone inputs (not in a form)', async () => {
-    const { inferTools } = await import('@aipjs/core');
+    const { inferTools } = await import('@aixa/core');
     const result = inferTools();
     const standaloneTool = result.tools.find(t => t.description.includes('Standalone'));
     expect(standaloneTool).toBeDefined();
@@ -202,7 +202,7 @@ describe('buildAutoHandler', () => {
   });
 
   it('returns success payload with element and params', async () => {
-    const { inferTools } = await import('@aipjs/core');
+    const { inferTools } = await import('@aixa/core');
     const result = inferTools();
     const searchTool = result.tools.find(t => t.category === 'search')!;
     const handler = searchTool.metadata!._handler as (p: Record<string, unknown>) => Promise<unknown>;

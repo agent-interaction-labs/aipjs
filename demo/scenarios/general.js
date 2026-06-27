@@ -4,7 +4,7 @@
    plus HITL on newsletter and contact forms.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-import { AIP } from '../vendor/bundle-entry.mjs';
+import { AIXA } from '../vendor/bundle-entry.mjs';
 
 let __aipInstance = null;
 
@@ -14,37 +14,37 @@ function panelHTML() {
   return document.getElementById('general-template')?.innerHTML || '';
 }
 
-// ── aip.js Config: Auto-Inference ─────────────────────────────────────────
+// ── aixa.js Config: Auto-Inference ─────────────────────────────────────────
 
 function aipConfig(panelContent) {
-  const aip = new AIP({
+  const aixa = new AIXA({
     inference: { enabled: true },
     security: { hitl: { enabled: true } },
     ui: { mirroring: true },
     debug: false,
-    cssPrefix: 'aipjs',
+    cssPrefix: 'aixa',
   });
-  aip.start();
+  aixa.start();
   __aipInstance = aip;
   return aip;
 }
 
-// ── aip.js Config: Manual Config ──────────────────────────────────────────
+// ── aixa.js Config: Manual Config ──────────────────────────────────────────
 
 function manualConfig(panelContent) {
   // Show the config code above the page content
   const codeBlock = document.createElement('div');
   codeBlock.style.cssText = 'background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius);padding:var(--space-md);margin-bottom:var(--space-md);overflow-x:auto;';
-  codeBlock.innerHTML = `<pre class="code-block js"><code>import { AIP } from '@aipjs/core';
+  codeBlock.innerHTML = `<pre class="code-block js"><code>import { AIXA } from '@aixa/core';
 
-const aip = new AIP({
+const aixa = new AIXA({
   inference: { enabled: true },     // Scan DOM for semantic elements
   security: { hitl: { enabled: true } },    // Require human approval for mutations
   ui: { mirroring: true },    // Show agent activity in the UI
 });
 
 // Explicitly register search for fine-grained control
-aip.registerSearch({
+aixa.registerSearch({
   endpoint: '/api/articles/search',
   parameters: [
     { name: 'q', type: 'string', description: 'Search query' },
@@ -58,7 +58,7 @@ aip.registerSearch({
 });
 
 // Force HITL on newsletter subscriptions
-aip.registerAction({
+aixa.registerAction({
   name: 'subscribe_newsletter',
   description: 'Subscribe to the newsletter',
   parameters: [{ name: 'email', type: 'string' }],
@@ -67,7 +67,7 @@ aip.registerAction({
 });
 
 // Force HITL on contact form
-aip.registerAction({
+aixa.registerAction({
   name: 'send_contact_message',
   description: 'Send a contact message',
   parameters: [
@@ -79,10 +79,10 @@ aip.registerAction({
   requiresConfirmation: true,  // ← Human must approve
 });
 
-aip.start();</code></pre>`;
+aixa.start();</code></pre>`;
   panelContent.insertBefore(codeBlock, panelContent.firstChild);
 
-  // Then init AIP with auto-inference — the manual overrides take precedence
+  // Then init AIXA with auto-inference — the manual overrides take precedence
   return aipConfig(panelContent);
 }
 
@@ -90,7 +90,7 @@ aip.start();</code></pre>`;
 
 function populateTerminal(terminal, mode) {
   // ── SIMPLE MODE ──────────────────────────────────────────────────────
-  // LEFT COLUMN (without aip.js) — agent sees raw DOM
+  // LEFT COLUMN (without aixa.js) — agent sees raw DOM
 
   terminal.addMessage('without', 'simple', {
     icon: '',
@@ -105,7 +105,7 @@ function populateTerminal(terminal, mode) {
     html: '<strong>Parameter inference:</strong> The search input has <code>name="q"</code> with no type metadata. The category select lists 5 options but <strong>does not specify which values are valid programmatic inputs</strong> vs display labels. Requires trial-and-error interaction.',
   });
 
-  // RIGHT COLUMN (with aip.js) — agent receives structured tools
+  // RIGHT COLUMN (with aixa.js) — agent receives structured tools
 
   terminal.addMessage('with', 'simple', {
     icon: '',
@@ -137,7 +137,7 @@ function populateTerminal(terminal, mode) {
   });
   terminal.addMessage('without', 'raw', {
     title: 'Raw DOM — Unsafe Form',
-    content: '<form data-aip-confirm="true"\n      action="/newsletter/subscribe"\n      aria-label="Newsletter signup">\n  <input type="email" name="email">\n  <button type="submit">Subscribe</button>\n</form>\n\n⚠ Agent must guess: is this safe to submit?',
+    content: '<form data-aixa-confirm="true"\n      action="/newsletter/subscribe"\n      aria-label="Newsletter signup">\n  <input type="email" name="email">\n  <button type="submit">Subscribe</button>\n</form>\n\n⚠ Agent must guess: is this safe to submit?',
     type: 'html',
   });
 

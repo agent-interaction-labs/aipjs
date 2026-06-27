@@ -1,7 +1,7 @@
-// @aipjs/security — HITL Verification + Prompt Injection Protection
+// @aixa/security — HITL Verification + Prompt Injection Protection
 
-import type { HITLRequest, HITLResponse, HITLAuditEntry } from '@aipjs/types';
-import { HITLAction, RiskLevel, AgentBridgeEvent, HITLPolicy } from '@aipjs/types';
+import type { HITLRequest, HITLResponse, HITLAuditEntry } from '@aixa/types';
+import { HITLAction, RiskLevel, AgentBridgeEvent, HITLPolicy } from '@aixa/types';
 
 // ============================================================================
 // Prompt Injection Sanitizer
@@ -214,7 +214,7 @@ export function createHITLManager(options: HITLManagerOptions) {
         // The security package just fires the response event
         window.dispatchEvent(new CustomEvent(AgentBridgeEvent.HITL_RESPONSE, { detail: response, bubbles: true }));
       }).catch((err: unknown) => {
-        console.error('[@aipjs/security] HITL error:', err);
+        console.error('[@aixa/security] HITL error:', err);
       });
     };
     window.addEventListener(AgentBridgeEvent.HITL_REQUEST, handler as EventListener);

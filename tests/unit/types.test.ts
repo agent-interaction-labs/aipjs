@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import {
   RiskLevel, ActionCategory, HITLAction, AgentBridgeEvent, DEFAULT_CONFIG,
-  HITLPolicy, AIPErrorCode, AIP_PROTOCOL_VERSION,
-} from '@aipjs/types';
+  HITLPolicy, AIXAErrorCode, AIXA_PROTOCOL_VERSION,
+} from '@aixa/types';
 
 describe('RiskLevel', () => {
   it('defines SAFE and HIGH_RISK levels', () => {
@@ -36,33 +36,33 @@ describe('HITLPolicy', () => {
   });
 });
 
-describe('AIPErrorCode', () => {
+describe('AIXAErrorCode', () => {
   it('has distinct error ranges for each category', () => {
-    expect(AIPErrorCode.TOOL_NOT_FOUND).toBe(-32001);
-    expect(AIPErrorCode.HITL_EXPIRED).toBe(-32020);
-    expect(AIPErrorCode.UNAUTHORIZED_AGENT).toBe(-32030);
-    expect(AIPErrorCode.UNSUPPORTED_VERSION).toBe(-32040);
-    expect(AIPErrorCode.RATE_LIMITED_GLOBAL).toBe(-32050);
+    expect(AIXAErrorCode.TOOL_NOT_FOUND).toBe(-32001);
+    expect(AIXAErrorCode.HITL_EXPIRED).toBe(-32020);
+    expect(AIXAErrorCode.UNAUTHORIZED_AGENT).toBe(-32030);
+    expect(AIXAErrorCode.UNSUPPORTED_VERSION).toBe(-32040);
+    expect(AIXAErrorCode.RATE_LIMITED_GLOBAL).toBe(-32050);
   });
 });
 
 describe('AgentBridgeEvent', () => {
   it('uses aip namespace', () => {
-    expect(AgentBridgeEvent.CAPABILITIES_REQUEST).toContain('aip:');
-    expect(AgentBridgeEvent.TOOL_INVOKE).toContain('aip:');
-    expect(AgentBridgeEvent.HITL_REQUEST).toContain('aip:');
+    expect(AgentBridgeEvent.CAPABILITIES_REQUEST).toContain('aixa:');
+    expect(AgentBridgeEvent.TOOL_INVOKE).toContain('aixa:');
+    expect(AgentBridgeEvent.HITL_REQUEST).toContain('aixa:');
   });
 
   it('includes v1.0 events', () => {
-    expect(AgentBridgeEvent.AGENT_INTRODUCE).toBe('aip:agent:introduce');
-    expect(AgentBridgeEvent.TOOL_CANCEL).toBe('aip:tool:cancel');
-    expect(AgentBridgeEvent.TOOL_STREAM_START).toBe('aip:tool:stream:start');
+    expect(AgentBridgeEvent.AGENT_INTRODUCE).toBe('aixa:agent:introduce');
+    expect(AgentBridgeEvent.TOOL_CANCEL).toBe('aixa:tool:cancel');
+    expect(AgentBridgeEvent.TOOL_STREAM_START).toBe('aixa:tool:stream:start');
   });
 });
 
-describe('AIP_PROTOCOL_VERSION', () => {
+describe('AIXA_PROTOCOL_VERSION', () => {
   it('is 1.0.0', () => {
-    expect(AIP_PROTOCOL_VERSION).toBe('1.0.0');
+    expect(AIXA_PROTOCOL_VERSION).toBe('1.0.0');
   });
 });
 
@@ -72,7 +72,7 @@ describe('DEFAULT_CONFIG', () => {
     expect(DEFAULT_CONFIG.security?.hitl?.enabled).toBe(true);
     expect(DEFAULT_CONFIG.security?.hitl?.timeoutMs).toBe(30000);
     expect(DEFAULT_CONFIG.security?.hitl?.defaultPolicy).toBe(HITLPolicy.ALWAYS);
-    expect(DEFAULT_CONFIG.ui?.cssPrefix).toBe('aipjs');
+    expect(DEFAULT_CONFIG.ui?.cssPrefix).toBe('aixa');
     expect(DEFAULT_CONFIG.agents?.mode).toBe('open');
     expect(DEFAULT_CONFIG.rateLimit?.enabled).toBe(true);
     expect(DEFAULT_CONFIG.rateLimit?.perMinute).toBe(60);

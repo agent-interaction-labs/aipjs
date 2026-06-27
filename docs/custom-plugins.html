@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Custom Plugins — aip.js</title>
+  <title>Custom Plugins — aixa.js</title>
   <link rel="stylesheet" href="assets/docs.css">
 </head>
 <body>
@@ -19,17 +19,17 @@
 
       <p>Every plugin must conform to this minimal interface:</p>
 
-      <pre><code>interface AIPPlugin {
+      <pre><code>interface AIXAPlugin {
   register(): void;
   unregister(): void;
 }</code></pre>
 
       <ul>
-        <li><strong><code>register()</code></strong> — Called when the plugin is activated. Use it to register search endpoints, actions, or other tools via the AIP SDK.</li>
+        <li><strong><code>register()</code></strong> — Called when the plugin is activated. Use it to register search endpoints, actions, or other tools via the AIXA SDK.</li>
         <li><strong><code>unregister()</code></strong> — Called when the plugin is deactivated. Use it to clean up registrations and event listeners.</li>
       </ul>
 
-      <p>Internally, <code>register()</code> typically calls <code>aip.registerSearch()</code> or <code>aip.registerAction()</code> to expose capabilities to agents. <code>unregister()</code> calls <code>aip.unregisterTool()</code> for cleanup.</p>
+      <p>Internally, <code>register()</code> typically calls <code>aixa.registerSearch()</code> or <code>aixa.registerAction()</code> to expose capabilities to agents. <code>unregister()</code> calls <code>aixa.unregisterTool()</code> for cleanup.</p>
 
       <h2>Example: SaaS Knowledge Base</h2>
 
@@ -45,7 +45,7 @@ export function kbPlugin(config) {
   return {
     register() {
       // Register knowledge base search
-      aip.registerSearch({
+      aixa.registerSearch({
         endpoint: `${apiBase}/kb/search`,
         parameters: [
           { name: 'query', type: 'string', description: 'Search query', required: true },
@@ -56,7 +56,7 @@ export function kbPlugin(config) {
       });
 
       // Register article detail fetch
-      aip.registerAction({
+      aixa.registerAction({
         name: 'get_article',
         description: 'Fetch the full content of a knowledge base article by ID',
         parameters: [
@@ -82,8 +82,8 @@ export function kbPlugin(config) {
     },
 
     unregister() {
-      aip.unregisterTool('search_kb');
-      aip.unregisterTool('get_article');
+      aixa.unregisterTool('search_kb');
+      aixa.unregisterTool('get_article');
     },
   };
 }
@@ -116,7 +116,7 @@ export function bookingPlugin(config) {
   return {
     register() {
       // Check availability for a specific date and service
-      aip.registerAction({
+      aixa.registerAction({
         name: 'check_availability',
         description: 'Check if a date is available for a given service',
         parameters: [
@@ -138,7 +138,7 @@ export function bookingPlugin(config) {
       });
 
       // Get all available time slots for a date
-      aip.registerAction({
+      aixa.registerAction({
         name: 'get_available_slots',
         description: 'Get all available time slots for a specific date',
         parameters: [
@@ -162,8 +162,8 @@ export function bookingPlugin(config) {
     },
 
     unregister() {
-      aip.unregisterTool('check_availability');
-      aip.unregisterTool('get_available_slots');
+      aixa.unregisterTool('check_availability');
+      aixa.unregisterTool('get_available_slots');
     },
   };
 }</code></pre>
@@ -177,26 +177,26 @@ export function bookingPlugin(config) {
       <p>To share your plugin with the community:</p>
 
       <ol>
-        <li><strong>Package it</strong> as an npm module following the naming convention <code>@aipjs/plugin-&lt;name&gt;</code>.</li>
+        <li><strong>Package it</strong> as an npm module following the naming convention <code>@aixa/plugin-&lt;name&gt;</code>.</li>
         <li><strong>Export a factory function</strong> that returns <code>{ register, unregister }</code>.</li>
         <li><strong>Publish to npm</strong> with clear documentation on configuration options.</li>
       </ol>
 
       <pre><code>// package.json
 {
-  "name": "@aipjs/plugin-kb",
+  "name": "@aixa/plugin-kb",
   "version": "1.0.0",
-  "description": "Knowledge base plugin for aip.js agents",
+  "description": "Knowledge base plugin for aixa.js agents",
   "main": "index.js",
-  "keywords": ["aipjs", "plugin", "knowledge-base"],
+  "keywords": ["aixa", "plugin", "knowledge-base"],
   "peerDependencies": {
-    "@aipjs/sdk": "^1.0.0"
+    "@aixa/sdk": "^1.0.0"
   }
 }</code></pre>
 
       <p>Users then install and use your plugin in two lines:</p>
 
-      <pre><code>import { kbPlugin } from '@aipjs/plugin-kb';
+      <pre><code>import { kbPlugin } from '@aixa/plugin-kb';
 
 kbPlugin({ apiBase: '...' }).register();</code></pre>
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Configuration — aip.js</title>
+  <title>Configuration — aixa.js</title>
   <link rel="stylesheet" href="assets/docs.css">
 </head>
 <body>
@@ -12,7 +12,7 @@
     <main class="docs-content">
       <h1>Configuration Reference</h1>
       <p>
-        Every option you can pass to <code>new AIP({...})</code>. All options are optional —
+        Every option you can pass to <code>new AIXA({...})</code>. All options are optional —
         the defaults are designed for immediate productivity with strong security defaults.
       </p>
 
@@ -78,8 +78,8 @@
           <tr>
             <td><code>cssPrefix</code></td>
             <td><code>string</code></td>
-            <td><code>"aipjs"</code></td>
-            <td>CSS class prefix for all injected elements (e.g., <code>.aipjs-mirror-focus</code>)</td>
+            <td><code>"aixa"</code></td>
+            <td>CSS class prefix for all injected elements (e.g., <code>.aixa-mirror-focus</code>)</td>
           </tr>
           <tr>
             <td><code>inferenceRoot</code></td>
@@ -100,7 +100,7 @@
 
       <h3>1. Everything On (Default)</h3>
       <p>The default configuration. All features enabled with secure defaults:</p>
-      <pre><code>const aip = new AIP({
+      <pre><code>const aixa = new AIXA({
   autoInfer: true,
   developerOverrides: true,
   hitlEnabled: true,
@@ -109,7 +109,7 @@
   sanitizePayloads: true,
   uiMirroring: true,
   debug: false,
-  cssPrefix: 'aipjs',
+  cssPrefix: 'aixa',
   inferenceRoot: 'body',
   inferenceTagAllowlist: []
 });</code></pre>
@@ -119,7 +119,7 @@
         A minimal configuration for rapid prototyping. The agent can freely interact with the
         page, but there is no human oversight on risky actions:
       </p>
-      <pre><code>const aip = new AIP({
+      <pre><code>const aixa = new AIXA({
   autoInfer: true,
   hitlEnabled: false,
   uiMirroring: false
@@ -130,7 +130,7 @@
         Locked-down configuration for production e-commerce sites. Fast timeout, HITL enabled,
         and all sanitization active:
       </p>
-      <pre><code>const aip = new AIP({
+      <pre><code>const aixa = new AIXA({
   autoInfer: true,
   hitlEnabled: true,
   hitlTimeout: 15000,

@@ -1,9 +1,9 @@
-// @aipjs/types — Agent Interaction Protocol v1.0 type definitions
+// @aixa/types — Agent Interaction & eXecution Agreement (AIXA) v1.0 type definitions
 // ============================================================================
 // Protocol version
 // ============================================================================
 
-export const AIP_PROTOCOL_VERSION = '1.0.0';
+export const AIXA_PROTOCOL_VERSION = '1.0.0';
 
 // ============================================================================
 // JSON-RPC 2.0 Primitives
@@ -233,10 +233,10 @@ export interface RateLimitConfig {
 }
 
 // ============================================================================
-// AIP Error Taxonomy (v1.0)
+// AIXA Error Taxonomy (v1.0)
 // ============================================================================
 
-export enum AIPErrorCode {
+export enum AIXAErrorCode {
   // Tool errors (-32001 to -32019)
   TOOL_NOT_FOUND        = -32001,
   TOOL_DISABLED         = -32002,
@@ -266,8 +266,8 @@ export enum AIPErrorCode {
   QUOTA_EXCEEDED        = -32051,
 }
 
-export interface AIPError {
-  code: AIPErrorCode;
+export interface AIXAError {
+  code: AIXAErrorCode;
   message: string;
   data?: {
     toolName?: string;
@@ -286,7 +286,7 @@ export interface AIPError {
 // Capabilities & Discovery (v1.0 — extended)
 // ============================================================================
 
-export interface AIPCapabilities {
+export interface AIXACapabilities {
   version: string;                   // protocol version: "1.0.0"
   features: {
     hitl: boolean;
@@ -318,7 +318,7 @@ export interface AgentCapability {
   allowsMutations: boolean;
   generatedAt: number;
   // v1.0 additions:
-  capabilities?: AIPCapabilities;
+  capabilities?: AIXACapabilities;
   session?: SessionContext;
   navigationHints?: {
     url: string;
@@ -370,10 +370,10 @@ export interface SecurityConfig {
 
 export interface UIConfig {
   mirroring?: boolean;              // default: true
-  cssPrefix?: string;               // default: 'aipjs'
+  cssPrefix?: string;               // default: 'aixa'
 }
 
-export interface AIPConfig {
+export interface AIXAConfig {
   debug?: boolean;
 
   // ── Feature groups ──
@@ -385,7 +385,7 @@ export interface AIPConfig {
   ui?: UIConfig;
 }
 
-export const DEFAULT_CONFIG: AIPConfig = {
+export const DEFAULT_CONFIG: AIXAConfig = {
   debug: false,
   inference: {
     enabled: true,
@@ -415,7 +415,7 @@ export const DEFAULT_CONFIG: AIPConfig = {
   },
   ui: {
     mirroring: true,
-    cssPrefix: 'aipjs',
+    cssPrefix: 'aixa',
   },
 };
 
@@ -425,24 +425,24 @@ export const DEFAULT_CONFIG: AIPConfig = {
 
 export enum AgentBridgeEvent {
   // Discovery
-  CAPABILITIES_REQUEST  = 'aip:capabilities:request',
-  CAPABILITIES_RESPONSE = 'aip:capabilities:response',
+  CAPABILITIES_REQUEST  = 'aixa:capabilities:request',
+  CAPABILITIES_RESPONSE = 'aixa:capabilities:response',
 
   // Tool execution
-  TOOL_INVOKE  = 'aip:tool:invoke',
-  TOOL_RESULT  = 'aip:tool:result',
-  TOOL_CANCEL  = 'aip:tool:cancel',         // v1.0: agent wants to abort running tool
+  TOOL_INVOKE  = 'aixa:tool:invoke',
+  TOOL_RESULT  = 'aixa:tool:result',
+  TOOL_CANCEL  = 'aixa:tool:cancel',         // v1.0: agent wants to abort running tool
 
   // HITL
-  HITL_REQUEST  = 'aip:hitl:request',
-  HITL_RESPONSE = 'aip:hitl:response',
+  HITL_REQUEST  = 'aixa:hitl:request',
+  HITL_RESPONSE = 'aixa:hitl:response',
 
   // Agent identity (v1.0)
-  AGENT_INTRODUCE     = 'aip:agent:introduce',
-  AGENT_INTRODUCE_ACK = 'aip:agent:introduce:ack',
+  AGENT_INTRODUCE     = 'aixa:agent:introduce',
+  AGENT_INTRODUCE_ACK = 'aixa:agent:introduce:ack',
 
   // Streaming (v1.0)
-  TOOL_STREAM_START = 'aip:tool:stream:start',
-  TOOL_STREAM_CHUNK = 'aip:tool:stream:chunk',
-  TOOL_STREAM_END   = 'aip:tool:stream:end',
+  TOOL_STREAM_START = 'aixa:tool:stream:start',
+  TOOL_STREAM_CHUNK = 'aixa:tool:stream:chunk',
+  TOOL_STREAM_END   = 'aixa:tool:stream:end',
 }

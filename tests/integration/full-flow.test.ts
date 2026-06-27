@@ -37,7 +37,7 @@ afterEach(() => {
 describe('Full Integration Flow', () => {
   it('infers tools from semantic HTML elements', async () => {
     // Dynamic import to ensure DOM is set up
-    const { inferTools } = await import('@aipjs/core');
+    const { inferTools } = await import('@aixa/core');
     const result = inferTools();
 
     expect(result.total).toBeGreaterThan(0);
@@ -46,14 +46,14 @@ describe('Full Integration Flow', () => {
   });
 
   it('classifies add-to-cart as high risk', async () => {
-    const { inferTools } = await import('@aipjs/core');
+    const { inferTools } = await import('@aixa/core');
     const result = inferTools();
     const cartTools = result.tools.filter((t) => t.riskLevel === 'high_risk');
     expect(cartTools.length).toBeGreaterThan(0);
   });
 
   it('executes a registered tool with handler', async () => {
-    const { registerTool, executeTool } = await import('@aipjs/core');
+    const { registerTool, executeTool } = await import('@aixa/core');
 
     registerTool({
       name: 'test_search',
@@ -67,7 +67,7 @@ describe('Full Integration Flow', () => {
   });
 
   it('sanitizes payloads with injection patterns', async () => {
-    const { sanitizePayload } = await import('@aipjs/security');
+    const { sanitizePayload } = await import('@aixa/security');
 
     const clean = sanitizePayload('hello world');
     expect(clean).toBe('hello world');
@@ -77,7 +77,7 @@ describe('Full Integration Flow', () => {
   });
 
   it('encodes angle brackets in payloads', async () => {
-    const { sanitizePayload } = await import('@aipjs/security');
+    const { sanitizePayload } = await import('@aixa/security');
 
     const result = sanitizePayload('<img src=x onerror=alert(1)>');
     expect(typeof result === 'string' && !(result as string).includes('<')).toBe(true);

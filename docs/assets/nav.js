@@ -41,7 +41,7 @@
 
     <div class="nav-section" style="margin-top:auto">
       <a href="../demo/" class="nav-link demo-link">→ Live Demo</a>
-      <a href="https://github.com/agent-interaction-labs/aipjs" class="nav-link demo-link">→ GitHub</a>
+      <a href="https://github.com/agent-interaction-labs/aixa" class="nav-link demo-link">→ GitHub</a>
     </div>
   `;
 })();

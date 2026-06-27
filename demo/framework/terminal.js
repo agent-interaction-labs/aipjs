@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    Agent Terminal Component
-   Split-panel: left = without aip.js, right = with aip.js
+   Split-panel: left = without aixa.js, right = with aixa.js
    Clear per-column headers so users never confuse which side they're reading
    ═══════════════════════════════════════════════════════════════════════════ */
 
@@ -23,7 +23,7 @@ export function createAgentTerminal(container) {
       <div class="terminal-columns" id="terminal-columns">
         <div class="terminal-col col-without">
           <div class="col-header without">
-            <span>Without aip.js</span>
+            <span>Without aixa.js</span>
             <span class="col-subtitle">Agent scrapes raw DOM</span>
           </div>
           <div class="col-body" id="col-without-body">
@@ -35,7 +35,7 @@ export function createAgentTerminal(container) {
         </div>
         <div class="terminal-col col-with">
           <div class="col-header with">
-            <span>With aip.js</span>
+            <span>With aixa.js</span>
             <span class="col-subtitle">Agent reads structured tools</span>
           </div>
           <div class="col-body" id="col-with-body">

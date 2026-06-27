@@ -1,10 +1,10 @@
 {
-  "name": "@aipjs/plugin-ecommerce",
+  "name": "@aixa/plugin-ecommerce",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": { ".": { "import": "./dist/index.js", "types": "./dist/index.d.ts" } },
   "scripts": { "build": "tsc" },
-  "dependencies": { "@aipjs/types": "*", "@aipjs/core": "*" }
+  "dependencies": { "@aixa/types": "*", "@aixa/core": "*" }
 }
